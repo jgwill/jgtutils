@@ -303,11 +303,6 @@ def print_exception(exception: Exception):
 
 
 
-
-
-
-
-
 def diff_month(year: int, month: int, date2: datetime):
     return (year - date2.year) * 12 + month - date2.month
 
@@ -315,10 +310,9 @@ def diff_month(year: int, month: int, date2: datetime):
 
 
 
-
 _JGT_CONFIG_JSON_SECRET=None
 
-def readconfig(json_config_str=None):
+def readconfig(json_config_str=None,config_file = 'config.json'):
     global _JGT_CONFIG_JSON_SECRET
     # Try reading config file from current directory
 
@@ -326,14 +320,12 @@ def readconfig(json_config_str=None):
         config = json.loads(json_config_str)
         _JGT_CONFIG_JSON_SECRET=json_config_str
         return config
-
-
+    
+    
     if _JGT_CONFIG_JSON_SECRET is not None:
         config = json.loads(_JGT_CONFIG_JSON_SECRET)
         return config
     
-    # Otherwise, try reading config file from current directory, home or env var
-    config_file = 'config.json'
     config = None
 
     if os.path.isfile(config_file):
@@ -343,7 +335,7 @@ def readconfig(json_config_str=None):
     else:
         # If config file not found, check home directory
         home_dir = os.path.expanduser("~")
-        config_file = os.path.join(home_dir, 'config.json')
+        config_file = os.path.join(home_dir, config_file)
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
                 config = json.load(f)
