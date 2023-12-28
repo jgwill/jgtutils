@@ -7,9 +7,9 @@ setup(
     description='A utility package common to other JGT projects.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    author='Your Name',
-    author_email='your.email@example.com',
-    url='https://github.com/yourusername/jgtutils',
+    author='Guillaume Isabelle',
+    author_email='jgi@jgwill.com',
+    url='https://github.com/jgwill/jgtutils',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -22,7 +22,7 @@ setup(
     ],
     keywords='utilities',
     project_urls={
-        'Bug Reports': 'https://github.com/yourusername/jgtutils/issues',
-        'Source': 'https://github.com/yourusername/jgtutils',
+        'Bug Reports': 'https://github.com/jgwill/jgtutils/issues',
+        'Source': 'https://github.com/jgwill/jgtutils',
     },
 )
