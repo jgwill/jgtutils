@@ -1,0 +1,25 @@
+{
+  "name": "jgtutils",
+  "version": "0.1.3",
+  "description": "A utility package common to other JGT projects.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgwill/jgtutils.git"
+  },
+  "keywords": [
+    "utility"
+  ],
+  "author": "Guillaume Isabelle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jgwill/jgtutils/issues"
+  },
+  "homepage": "https://github.com/jgwill/jgtutils#readme"
+}
