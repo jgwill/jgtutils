@@ -223,16 +223,27 @@ def add_output_argument(parser: argparse.ArgumentParser):
         parser (argparse.ArgumentParser): The argument parser to add the output argument to.
 
     Returns:
-        None
+        parser (argparse.ArgumentParser): The argument parser with the output argument added.
     """
     parser.add_argument('-o','--output',
                         action='store_true',
-                        help='Output file. If specified, output will be written in the filestore.')
+                        help='Output PATH. If specified, output will be written in the filestore.')
     
+    return parser
+
+def add_compressed_argument(parser: argparse.ArgumentParser):
+    """
+    Adds an compressed argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the output argument to.
+        
+    Returns:
+        None
+    """
     parser.add_argument('-z','--compress',
                         action='store_true',
                         help='Compress the output. If specified, it will also activate the output flag.')
-
     return parser
 
 
