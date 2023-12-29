@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='jgtutils',
-    version='0.1.7',
+    version='0.1.8',
     packages=find_packages(),
     description='A utility package common to other JGT projects.',
     long_description=open('README.md').read(),
