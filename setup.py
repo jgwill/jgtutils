@@ -20,9 +20,9 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],    
-    entry_points={
-        'console_scripts': ['fxcli2console=jgtutils.fxcli2console:main'],
-    },
+    #entry_points={
+    #    'console_scripts': ['fxcli2console=jgtutils.fxcli2console:main'],
+    #},
     keywords='utilities',
     project_urls={
         'Bug Reports': 'https://github.com/jgwill/jgtutils/issues',
