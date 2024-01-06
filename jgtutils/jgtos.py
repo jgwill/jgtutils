@@ -7,7 +7,13 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
 def create_filestore_path(
-    instrument, timeframe, quiet=True, compressed=False, tlid_range=None,output_path=None,nsdir="pds"
+    instrument:str, 
+    timeframe:str, 
+    quiet=True, 
+    compressed=False, 
+    tlid_range:str=None,
+    output_path:str=None,
+    nsdir:str="pds"
 ):
     # Define the file path based on the environment variable or local path
     if output_path is None:
@@ -29,7 +35,9 @@ def create_filestore_path(
     return fpath
 
 
-def mk_fn(instrument, timeframe, ext="csv"):
+def mk_fn(instrument:str, 
+          timeframe:str, 
+          ext:str="csv"):
     """Make a file name with instrument and timeframe
 
     Args:
@@ -48,7 +56,11 @@ def mk_fn(instrument, timeframe, ext="csv"):
     return _fn.replace("..", ".")
 
 
-def mk_fn_range(instrument, timeframe, start: datetime, end: datetime, ext="csv"):
+def mk_fn_range(instrument:str, 
+                timeframe:str, 
+                start: datetime, 
+                end: datetime, 
+                ext="csv"):
     _tf = timeframe
     _i = instrument.replace("/", "-")
     if timeframe == "m1":
@@ -80,47 +92,42 @@ def mk_fullpath(instrument, timeframe, ext, path, tlid_range=None):
 
 
 
+
 def get_data_path(nsdir: str, range_level:int=6):
+    # Try to read the path from the JGTPY_DATA environment variable
+    data_path = os.environ.get('JGTPY_DATA')
+
+    # If the variable is defined and the path exists, return it
+    if data_path and os.path.exists(data_path):
+        return os.path.abspath(os.path.join(data_path, nsdir))
+
+    # If the variable is not defined or the path does not exist, fall back to the current behavior
     # Start with the current working directory
     base_path = os.getcwd()
-def get_data_path(nsdir):
-    os.path.join(os.getcwd(),".."),
-    'data')
-  if not os.path.exists(data_path):
-    data_path = os.environ.get('JGTPY_DATA', defpath)
-    
-  defpath= os.path.join(
-    os.path.join(
-      os.path.join(os.getcwd(),".."),
-      ".."),
+
+    # Try up to X range levels up to find the data directory
+    for _ in range(range_level):
+        data_path = os.path.join(base_path, 'data')
+        if os.path.exists(data_path):
+            # Check if the directory has write permissions
+            if not os.access(data_path, os.W_OK):
+                raise Exception(f"No write access to the directory: {data_path}")
+            break
+        # Go one level up for the next iteration
         base_path = os.path.abspath(os.path.join(base_path, '..'))
-  if not os.path.exists(data_path):
-    data_path = os.environ.get('JGTPY_DATA', defpath)
-    
-  defpath= os.path.join(
-    os.path.join(
-      os.path.join(
-        os.path.join(os.getcwd(),".."),
-        ".."),
-      ".."),
+    else:
+        # If the loop completes without finding the data directory, raise an exception
+        raise Exception("Data directory not found. Please create a directory named 'data' in the current, parent directory (up to 3 levels), or set the JGTPY_DATA environment variable.")
+
+    # Replace slashes with backslashes on Windows
+    if os.name == "nt":
+        data_path = data_path.replace("/", "\\")
+
+    # Append the nsdir to the data path
     data_path = os.path.abspath(os.path.join(data_path, nsdir))
 
-    data_path = data_path.replace("/", "\\")
-    data_path = data_path.replace("/", "\\")
-    
-  if not os.path.exists(data_path):
-    raise Exception("Data directory not found. Please create a directory named 'data' in the current, parent directory (up to 3 levels), or set the JGTPY_DATA environment variable.")
-  
-  data_path = os.path.join(data_path, nsdir)
     return data_path
-    
-  if not os.path.exists(data_path):
-    raise Exception("Data directory not found. Please create a directory named 'data' in the current, parent directory (up to 3 levels), or set the JGTPY_DATA environment variable.")
-  
-  data_path = os.path.join(data_path, nsdir)
-  return data_path
-  
-  
+
 
 def tlid_range_to_start_end_datetime(tlid_range: str):
     #Support inputting just a Year
@@ -175,7 +182,7 @@ def tlid_range_to_jgtfxcon_start_end_str(tlid_range: str):
     else:
         return str(start_dt.strftime(date_format_fxcon)),str(end_dt.strftime(date_format_fxcon))
 
-def tlid_dt_to_string(dt):
+def tlid_dt_to_string(dt: datetime.datetime):
     return dt.strftime("%y%m%d%H%M")
 
 def tlidmin_to_dt(tlid_str: str):
