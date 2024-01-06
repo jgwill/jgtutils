@@ -256,8 +256,9 @@ def add_viewpath_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
-    parser.add_argument('--vp',
+    parser.add_argument('-vp','--viewpath',
                         action='store_true',
+                        dest='viewpath',
                         help='flag to just view the path of files from arguments -i -t.')
     return parser
 
