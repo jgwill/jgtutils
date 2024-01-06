@@ -58,8 +58,8 @@ def mk_fn(instrument:str,
 
 def mk_fn_range(instrument:str, 
                 timeframe:str, 
-                start: datetime, 
-                end: datetime, 
+                start: datetime.datetime, 
+                end: datetime.datetime, 
                 ext="csv"):
     _tf = timeframe
     _i = instrument.replace("/", "-")
@@ -74,7 +74,11 @@ def mk_fn_range(instrument:str,
     return _fn
 
 
-def mk_fullpath(instrument, timeframe, ext, path, tlid_range=None):
+def mk_fullpath(instrument:str, 
+                timeframe:str, 
+                ext:str, 
+                path:str, 
+                tlid_range:str=None):
     if tlid_range is None:
         fn = mk_fn(instrument, timeframe, ext)
     else:
@@ -93,7 +97,8 @@ def mk_fullpath(instrument, timeframe, ext, path, tlid_range=None):
 
 
 
-def get_data_path(nsdir: str, range_level:int=6):
+def get_data_path(nsdir: str, 
+                  range_level:int=6):
     # Try to read the path from the JGTPY_DATA environment variable
     data_path = os.environ.get('JGTPY_DATA')
 
