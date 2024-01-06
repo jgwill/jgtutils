@@ -202,7 +202,7 @@ def add_report_date_arguments(parser: argparse.ArgumentParser, date_from: bool =
 def add_max_bars_arguments(parser: argparse.ArgumentParser):
     parser.add_argument('-c','--quotescount',
                         metavar="MAX",
-                        default=335,
+                        default=-1,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
 
