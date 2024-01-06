@@ -78,43 +78,39 @@ def mk_fullpath(instrument, timeframe, ext, path, tlid_range=None):
     return rpath
 
 
-# .replace('..','.').replace('//','/')
 
 
-def get_data_path(nsdir):
-  defpath= os.path.join(os.getcwd(),'data')
-  data_path = os.environ.get('JGTPY_DATA', defpath)
 
   defpath= os.path.join(
     os.path.join(os.getcwd(),".."),
     'data')
   if not os.path.exists(data_path):
-    data_path = os.environ.get('JGTPY_DATA', defpath)
-    
-  defpath= os.path.join(
-    os.path.join(
-      os.path.join(os.getcwd(),".."),
-      ".."),
-    'data')
-  if not os.path.exists(data_path):
-    data_path = os.environ.get('JGTPY_DATA', defpath)
-    
-  defpath= os.path.join(
-    os.path.join(
-      os.path.join(
-        os.path.join(os.getcwd(),".."),
-        ".."),
-      ".."),
-    'data')
-  if not os.path.exists(data_path):
-    data_path = os.environ.get('JGTPY_DATA', defpath)
-    
-  if os.name == "nt":
-    data_path = data_path.replace("/", "\\")
-    
-  if not os.path.exists(data_path):
-    raise Exception("Data directory not found. Please create a directory named 'data' in the current, parent directory (up to 3 levels), or set the JGTPY_DATA environment variable.")
+    # Try up to X range levels up to find the data directory
+    for _ in range(range_level):
+        data_path = os.path.join(base_path, 'data')
+        if os.path.exists(data_path):
+            # Check if the directory has write permissions
+            if not os.access(data_path, os.W_OK):
+                raise Exception(f"No write access to the directory: {data_path}")
+            break
+        # Go one level up for the next iteration
+        base_path = os.path.join(base_path, '..')
+    else:
+        # If the loop completes without finding the data directory, raise an exception
+        raise Exception("Data directory not found. Please create a directory named 'data' in the current, parent directory (up to 3 levels), or set the JGTPY_DATA environment variable.")
+
+    # Replace slashes with backslashes on Windows
+    if os.name == "nt":
+        data_path = data_path.replace("/", "\\")
+
+    # Append the nsdir to the data path
+    data_path = os.path.join(data_path, nsdir)
+
   
+  
+  data_path = os.path.join(data_path, nsdir)
+  return data_path
+    return data_path
   data_path = os.path.join(data_path, nsdir)
   return data_path
   
