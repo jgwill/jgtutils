@@ -246,6 +246,21 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
 
+def add_viewpath_argument(parser: argparse.ArgumentParser):
+    """
+    Adds an view path argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the viewpath argument to.
+        
+    Returns:
+        None
+    """
+    parser.add_argument('--vp',
+                        action='store_true',
+                        help='flag to just view the path of files from arguments -i -t.')
+    return parser
+
 
 # def add_quiet_argument(parser):
 #     parser.add_argument('-q','--quiet',

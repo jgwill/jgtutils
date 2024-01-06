@@ -47,18 +47,6 @@ def run(bash_command):
 
 
     
-    
-def jgtfxcli_wsl1(cli_path, instrument, timeframe, quote_count, verbose_level):
-    if cli_path == "" or cli_path is None or cli_path == 0:
-        home_path = os.getenv('HOME')
-        cli_path = f"{home_path}/.local/bin/jgtfxcli"
-    bash_command_to_run = f"pwd;{cli_path} -i '{instrument}' -t '{timeframe}' -c {quote_count} -o -v {verbose_level}"
-    powershell_command = 'wsl.exe bash -c "' + bash_command_to_run + '"'
-    result = subprocess.run(
-        ["pwsh.exe", "-Command", powershell_command], stdout=subprocess.PIPE, shell=True
-    )
-    return result.stdout.decode("utf-8")
-
 
 def resolve_cli_path(cli_path):
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
