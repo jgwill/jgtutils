@@ -6,6 +6,18 @@ i="EUR/USD";t="H4"
 tlid_range = "231010_240105"
 
 
+
+# %%  FIXING Issue (Missing the /data/pds
+jos.create_filestore_path(i,t,quiet=False,compressed=False,tlid_range=tlid_range,output_path="/data",nsdir="pds")
+# %%
+
+
+
+
+
+
+
+
 #%% Get data path v1
 
 def get_data_path(nsdir):
@@ -68,4 +80,3 @@ jos.get_data_path("pds")
 
 jos.create_filestore_path(i,t,quiet=False,compressed=False,tlid_range=tlid_range,output_path="/data",nsdir="pds")
 
-# %%

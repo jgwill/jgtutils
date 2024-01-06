@@ -19,8 +19,8 @@ def create_filestore_path(
     if output_path is None:
         data_path = get_data_path(nsdir=nsdir)
     else: # get path from var in os
-        data_path = output_path
-        
+        data_path = os.path.join (output_path.replace("/"+nsdir,""),nsdir)
+    
     if not quiet:
         print(data_path)
 
@@ -104,7 +104,8 @@ def get_data_path(nsdir: str,
 
     # If the variable is defined and the path exists, return it
     if data_path and os.path.exists(data_path):
-        return os.path.abspath(os.path.join(data_path, nsdir))
+        rpath = os.path.abspath(os.path.join(data_path, nsdir))
+        return rpath
 
     # If the variable is not defined or the path does not exist, fall back to the current behavior
     # Start with the current working directory
