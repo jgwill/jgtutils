@@ -249,7 +249,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
 
 
 def add_exit_if_error(parser: argparse.ArgumentParser):
-    parser.add_argument('-xe','--exit',
+    parser.add_argument('-xe','--exitonerror',
                         action='store_true',
                         help='Exit on error rather than trying to keep looking')
     return parser
