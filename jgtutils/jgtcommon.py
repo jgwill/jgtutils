@@ -247,6 +247,13 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
 
+
+def add_exit_if_error(parser: argparse.ArgumentParser):
+    parser.add_argument('-xe','--exit',
+                        action='store_true',
+                        help='Exit on error rather than trying to keep looking')
+    return parser
+
 def add_viewpath_argument(parser: argparse.ArgumentParser):
     """
     Adds an view path argument to the given argument parser.
