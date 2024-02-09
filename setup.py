@@ -1,9 +1,13 @@
 from setuptools import setup, find_packages
 
+INSTALL_REQUIRES = [
+    'tlid>=0.1.6',
+]
 setup(
     name='jgtutils',
     version='0.1.19',
     packages=find_packages(),
+    install_requires=INSTALL_REQUIRES,
     description='A utility package common to other JGT projects.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
@@ -20,9 +24,9 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],    
-    #entry_points={
-    #    'console_scripts': ['fxcli2console=jgtutils.fxcli2console:main'],
-    #},
+    entry_points={
+        'console_scripts': ['jgtutr=jgtutils.cli_tlid_range:main'],
+    },
     keywords='utilities',
     project_urls={
         'Bug Reports': 'https://github.com/jgwill/jgtutils/issues',
