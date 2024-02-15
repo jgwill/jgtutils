@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
 INSTALL_REQUIRES = [
-    'tlid>=0.1.6',
+    'tlid>=0.1.11',
 ]
 setup(
     name='jgtutils',
-    version='0.1.20',
+    version='0.1.21',
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     description='A utility package common to other JGT projects.',
