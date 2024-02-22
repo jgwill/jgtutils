@@ -247,6 +247,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
 
+
 def add_read_full_argument(parser: argparse.ArgumentParser):
     """
     Adds a read full argument to the given argument parser.
