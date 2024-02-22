@@ -247,6 +247,24 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
 
+def add_read_full_argument(parser: argparse.ArgumentParser):
+    """
+    Adds a read full argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the read full argument to.
+        
+    Returns:
+        None
+    """
+    parser.add_argument('-rf','--full',
+                        action='store_true',
+                        metavar="full",
+                        default=False,
+                        type=bool,
+                        help='Output/Input uses the full store. ')
+    return parser
+
 
 def add_exit_if_error(parser: argparse.ArgumentParser):
     parser.add_argument('-xe','--exitonerror',
