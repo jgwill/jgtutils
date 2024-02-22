@@ -13,11 +13,12 @@ def create_filestore_path(
     compressed=False, 
     tlid_range:str=None,
     output_path:str=None,
-    nsdir:str="pds"
+    nsdir:str="pds",
+    read_full=False
 ):
     # Define the file path based on the environment variable or local path
     if output_path is None:
-        data_path = get_data_path(nsdir=nsdir)
+        data_path = get_data_path(nsdir=nsdir,read_full=read_full)
     else: # get path from var in os
         data_path = os.path.join (output_path.replace("/"+nsdir,""),nsdir)
     
