@@ -96,12 +96,21 @@ def mk_fullpath(instrument:str,
 
 
 
-
 def get_data_path(nsdir: str, 
-                  range_level:int=6):
+                  range_level:int=6,
+                  read_full=False):
     # Try to read the path from the JGTPY_DATA environment variable
-    data_path = os.environ.get('JGTPY_DATA')
+    if read_full:
+        default_data_full="/var/lib/jgt/full/data"
+        data_path = os.environ.get('JGTPY_DATA_FULL',default_data_full)
 
+        if not os.path.exists(data_path):
+            print("Once the directory is created, you can generate the PDS/CDS manually : " + data_path)
+            
+                
+    else:
+        data_path = os.environ.get('JGTPY_DATA')
+        
     # If the variable is defined and the path exists, return it
     if data_path and os.path.exists(data_path):
         rpath = os.path.abspath(os.path.join(data_path, nsdir))
