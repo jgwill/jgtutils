@@ -258,11 +258,8 @@ def add_read_full_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
-    parser.add_argument('-rf','--full',
+    parser.add_argument('--full',
                         action='store_true',
-                        metavar="readfull",
-                        default=False,
-                        type=bool,
                         help='Output/Input uses the full store. ')
     return parser
 
