@@ -5,7 +5,7 @@ INSTALL_REQUIRES = [
 ]
 setup(
     name='jgtutils',
-    version='0.1.27',
+    version='0.1.28',
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     description='A utility package common to other JGT projects.',
