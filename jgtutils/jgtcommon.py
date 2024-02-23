@@ -248,9 +248,9 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
     return parser
 
 
-def add_read_full_argument(parser: argparse.ArgumentParser):
+def add_use_full_argument(parser: argparse.ArgumentParser):
     """
-    Adds a read full argument to the given argument parser.
+    Adds a use full argument to the given argument parser.
     
     Args:
         parser (argparse.ArgumentParser): The argument parser to add the read full argument to.
@@ -258,7 +258,7 @@ def add_read_full_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
-    parser.add_argument('--full',
+    parser.add_argument('-uf','--full',
                         action='store_true',
                         help='Output/Input uses the full store. ')
     return parser
