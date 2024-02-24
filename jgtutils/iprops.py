@@ -1645,10 +1645,10 @@ def read_iprops():
   #return data
 read_iprops()
 
-def get_iprop(instrument):
+def get_iprop(instrument:str):
   global data
   i=instrument.replace("/","-")
   return data[i]
   
-def get_pips(instrument):
+def get_pips(instrument:str):
   return get_iprop(instrument)["pips"]	
