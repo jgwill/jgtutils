@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 INSTALL_REQUIRES = [
-    'tlid>=0.1.11',
+    'tlid>=0.1.13',
 ]
 setup(
     name='jgtutils',
