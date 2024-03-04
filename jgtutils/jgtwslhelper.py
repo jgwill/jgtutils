@@ -20,17 +20,23 @@ def pwsd_wsl_run_command1(bash_command_to_run):
 
 
 def run_bash_command_by_platform(bash_cmd):
-    if platform.system() == "Windows":
-        shell = os.environ.get('COMSPEC', 'cmd.exe')
-        if 'powershell' in shell.lower():
-            # The interpreter is PowerShell            
-            return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+    try:
+        if platform.system() == "Windows":
+            shell = os.environ.get('COMSPEC', 'cmd.exe')
+            if 'powershell' in shell.lower():
+                # The interpreter is PowerShell            
+                return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+            else:
+                # The interpreter is cmd.exe
+                return wsl_run_bash_on_cmd(bash_cmd)
         else:
-            # The interpreter is cmd.exe
-            return wsl_run_bash_on_cmd(bash_cmd)
-    else:
-        # The system is Linux
-        return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+            # The system is Linux
+            return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
+    except Exception as e:
+        print(f"An error occurred running jgtfxcli: {str(e)}")
+        print(f"   bash_cmd: {bash_cmd}")
+        raise e
+        #return None
     
 def wsl_run_bash_on_cmd(bash_cmd):   
     
