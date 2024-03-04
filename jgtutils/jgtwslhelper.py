@@ -51,25 +51,37 @@ def run(bash_command):
 def resolve_cli_path(cli_path):
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
         cli_path = '$HOME/.local/bin/jgtfxcli'
+    if not os.path.exists(cli_path):
+        cli_path = 'jgtfxcli'    
+    
     return cli_path #@STCIssue Should install : pip install --user jgtfxcon    (if not found)
 
-def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0):
+def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False):
     cli_path=resolve_cli_path(cli_path)
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
         cli_path = '$HOME/.local/bin/jgtfxcli'
         #cli_path = "/home/jgi/.local/bin/jgtfxcli"
-    bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c {quote_count} -v {verbose_level}"
+    if use_full:
+        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" --full  -v {verbose_level} "
+    else :
+        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c {quote_count} -v {verbose_level}"
+    if verbose_level > 0:
+        print(f"bash_command_to_run: {bash_command_to_run}")
+    
     return run_bash_command_by_platform(bash_command_to_run)
 
 
-def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0,quote_count=335):
+def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0,quote_count=420,use_full=False):
     cli_path=resolve_cli_path(cli_path)
     
     
     if tlid_range is not None:
         bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -r \"{tlid_range}\" -v {verbose_level}"
     else:
-        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c \"{quote_count}\" -v {verbose_level}"
+        if use_full:
+            bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" --full  -v {verbose_level} "
+        else:
+            bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c \"{quote_count}\" -v {verbose_level}"
         
     
     return bash_command_to_run
@@ -82,16 +94,16 @@ def _mkbash_cmd_string_jgtfxcli_range1(instrument:str, timeframe:str,tlid_range=
     bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -s \"{date_from}\" -e \"{date_to}\" -v {verbose_level}"
     return bash_command_to_run
 
-def jgtfxcli_wsl_range(instrument:str, timeframe:str, quote_count:int,tlid_range=None,cli_path="", verbose_level=0):
-    bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count)
+def jgtfxcli_wsl_range(instrument:str, timeframe:str, quote_count:int,tlid_range=None,cli_path="", verbose_level=0,use_full=False):
+    bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count,use_full=use_full)
         
     return run_bash_command_by_platform(bash_command_to_run)
 
-def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0):
-    return jgtfxcli_wsl(instrument,timeframe,quote_count,cli_path,verbose_level)
+def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False):
+    return jgtfxcli_wsl(instrument,timeframe,quote_count,cli_path,verbose_level,use_full=use_full)
 
-def getPH(instrument:str, timeframe:str, quote_count:int,tlid_range=None, verbose_level=0):
-    return jgtfxcli_wsl_range(instrument, timeframe, quote_count,tlid_range,"", verbose_level)
+def getPH(instrument:str, timeframe:str, quote_count:int,tlid_range=None, verbose_level=0,use_full=False):
+    return jgtfxcli_wsl_range(instrument, timeframe, quote_count,tlid_range,"", verbose_level,use_full=use_full)
 
 
 def wsl_cd(directory):
