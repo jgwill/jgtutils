@@ -263,6 +263,21 @@ def add_use_full_argument(parser: argparse.ArgumentParser):
                         help='Output/Input uses the full store. ')
     return parser
 
+def add_use_fresh_argument(parser: argparse.ArgumentParser):
+    """
+    Adds a use fresh argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the use fresh argument to.
+        
+    Returns:
+        None
+    """
+    parser.add_argument('-new','--fresh',
+                        action='store_true',
+                        help='Output/Input freshes storage with latest market. ')
+    return parser
+
 
 def add_exit_if_error(parser: argparse.ArgumentParser):
     parser.add_argument('-xe','--exitonerror',
