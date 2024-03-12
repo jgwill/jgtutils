@@ -105,12 +105,34 @@ def get_data_path(nsdir: str,
         default_data_full="/var/lib/jgt/full/data"
         data_path = os.environ.get('JGTPY_DATA_FULL',default_data_full)
 
+        #create the directory if it does not exist
+        try:
+            os.makedirs(data_path, exist_ok=True)
+        except:
+            print("Error creating the directory : " + data_path)
+            print("Please create the directory manually:  sudo mkdir -m 777 -p " + data_path)
+            data_path = "/data/full"
+            print("Using default directory : " + data_path)
+            os.makedirs(data_path, exist_ok=True)
+
+
         if not os.path.exists(data_path):
             print("Once the directory is created, you can generate the PDS/CDS manually : " + data_path)
             
+            
                 
     else:
-        data_path = os.environ.get('JGTPY_DATA')
+        default_data="/var/lib/jgt/data"
+        data_path = os.environ.get('JGTPY_DATA',default_data)
+        #create the directory if it does not exist 
+        try:        
+            os.makedirs(data_path, exist_ok=True)
+        except:                      
+            print("Error creating the directory : " + data_path)                                                                          
+            print("Please create the directory manually:  sudo mkdir -m 777 -p " + data_path) 
+            data_path = "/data" 
+            print("Using default directory : " + data_path) 
+            os.makedirs(data_path, exist_ok=True) 
         
     # If the variable is defined and the path exists, return it
     if data_path and os.path.exists(data_path):
