@@ -175,3 +175,10 @@ PRICE_PEAK_ABOVE = 'price_peak_above'
 AO_PEAK_ABOVE = 'ao_peak_above'
 PRICE_PEAK_BELLOW = 'price_peak_bellow'
 AO_PEAK_BELLOW = 'ao_peak_bellow'
+
+#ML target,vector_ao_fdbs,vector_ao_fdbb
+FDB_TARGET = 'target'
+VECTOR_AO_FDBS = 'vector_ao_fdbs'
+VECTOR_AO_FDBB = 'vector_ao_fdbb'
+
+
