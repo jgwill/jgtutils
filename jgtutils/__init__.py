@@ -19,4 +19,6 @@ from jgtutils import jgtwslhelper as wsl
 from jgtutils import jgtcommon as common
 from jgtutils.jgtcommon import readconfig
 
-# from jgtutils import jgtlogging as logger
+from jgtutils import jgtlogging as l
+
+  
