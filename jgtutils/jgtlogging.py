@@ -92,21 +92,23 @@ def write_log(msg: str, loglevel: str = "INFO"):
         logger.log(loglevel, msg)
 
 
-def info(msg: str):
-    write_log(msg, "INFO")
+def info(msg: str,*args):
+  logger.info(msg,*args)
+  #write_log(msg, "INFO")
 
 
-def warning(msg: str):
-    write_log(msg, "WARNING")
+def warning(msg: str,*args):
+  logger.warning(msg,*args)
+  
 
 
-def error(msg: str):
-    write_log(msg, "ERROR")
+def error(msg: str,*args):
+  logger.error(msg,*args)
 
 
-def critical(msg: str):
-    write_log(msg, "CRITICAL")
+def critical(msg: str,*args):
+  logger.critical(msg,*args)
 
 
-def debug(msg: str):
-    write_log(msg, "DEBUG")
+def debug(msg: str,*args):
+  logger.debug(msg,*args)
