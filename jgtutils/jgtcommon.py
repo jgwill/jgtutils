@@ -45,11 +45,38 @@ try :
     console = logging.StreamHandler(sys.stdout)
     console.setLevel(logging.INFO)
     logging.getLogger('').addHandler(console)
+    
+
 except:
     #print('logging failed - dont worry')
     pass
 
-def add_main_arguments(parser: argparse.ArgumentParser):
+try :    
+    #if __main__ has a .parser then set the default parser to that
+    if hasattr(__main__,'parser'):
+        default_parser=__main__.parser
+    else:
+        if hasattr(__main__,'default_parser'):
+            default_parser=__main__.default_parser
+        else: 
+            if hasattr(__main__,'__parser__'):
+                default_parser=__main__.__parser__
+            else:
+                default_parser = argparse.ArgumentParser(description='JGWill Trading Utilities')
+except:
+    default_parser = argparse.ArgumentParser(description='JGWill Trading Utilities')
+    pass
+
+def init_default_parser(description: str):
+    global default_parser
+    default_parser = argparse.ArgumentParser(description=description)
+    return default_parser
+
+def add_main_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('--login',
                         metavar="LOGIN",
                         required=True,
@@ -82,7 +109,10 @@ def add_main_arguments(parser: argparse.ArgumentParser):
                         help='Your pin code. Required only for users who have \
                                  a pin. Optional parameter.')
 
-def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser):
+def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
     parser.add_argument('--openpricemode',
                         metavar="CANDLE_OPEN_PRICE_MODE",
                         default="prev_close",
@@ -90,7 +120,12 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser):
                         Possible values are first_tick, prev_close. For more information see description \
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
 
-def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser, timeframe: bool = True):
+def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True):
+    
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-i','--instrument',
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
@@ -107,8 +142,12 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser, timefram
                         help='The indicator Pattern. For example, \
                                  "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
 
-def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser, direction: bool = True, rate: bool = True,
+def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
                                       lots: bool = True):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     if direction:
         parser.add_argument('-d', metavar="TYPE", required=True,
                             help='The order direction. Possible values are: B - buy, S - sell.')
@@ -120,7 +159,10 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser, direction
                             help='Trade amount in lots.')
 
 
-def add_account_arguments(parser: argparse.ArgumentParser):
+def add_account_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
     parser.add_argument('-account', metavar="ACCOUNT",
                         help='An account which you want to use in sample.')
 
@@ -153,12 +195,19 @@ def valid_datetime(check_future: bool):
     return _valid_datetime
 
 
-def add_tlid_range_argument(parser: argparse.ArgumentParser):
+def add_tlid_range_argument(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
     #print("Tlid range active")
     parser.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
                         help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
 
-def add_date_arguments(parser: argparse.ArgumentParser, date_from: bool = True, date_to: bool = True):
+def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     if date_from:
         parser.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
@@ -179,7 +228,11 @@ def add_date_arguments(parser: argparse.ArgumentParser, date_from: bool = True, 
                             )
 
 
-def add_report_date_arguments(parser: argparse.ArgumentParser, date_from: bool = True, date_to: bool = True):
+def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     if date_from:
         parser.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
@@ -200,7 +253,11 @@ def add_report_date_arguments(parser: argparse.ArgumentParser, date_from: bool =
                             )
 
 
-def add_max_bars_arguments(parser: argparse.ArgumentParser):
+def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-c','--quotescount',
                         metavar="MAX",
                         default=-1,
@@ -208,7 +265,10 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser):
                         help='Max number of bars. 0 - Not limited')
 
 
-# def add_bars_arguments(parser: argparse.ArgumentParser):
+# def add_bars_arguments(parser: argparse.ArgumentParser=None):
+    # global default_parser
+    # if parser is None:
+    #     parser=default_parser
 #     parser.add_argument('-bars',
 #                         metavar="COUNT",
 #                         default=3,
@@ -216,7 +276,7 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser):
 #                         help='Build COUNT bars. Optional parameter.')
 
 
-def add_output_argument(parser: argparse.ArgumentParser):
+def add_output_argument(parser: argparse.ArgumentParser=None):
     """
     Adds an output argument to the given argument parser.
 
@@ -226,13 +286,17 @@ def add_output_argument(parser: argparse.ArgumentParser):
     Returns:
         parser (argparse.ArgumentParser): The argument parser with the output argument added.
     """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-o','--output',
                         action='store_true',
                         help='Output PATH. If specified, output will be written in the filestore.')
     
     return parser
 
-def add_compressed_argument(parser: argparse.ArgumentParser):
+def add_compressed_argument(parser: argparse.ArgumentParser=None):
     """
     Adds an compressed argument to the given argument parser.
     
@@ -242,13 +306,17 @@ def add_compressed_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-z','--compress',
                         action='store_true',
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
 
 
-def add_use_full_argument(parser: argparse.ArgumentParser):
+def add_use_full_argument(parser: argparse.ArgumentParser=None):
     """
     Adds a use full argument to the given argument parser.
     
@@ -258,12 +326,16 @@ def add_use_full_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-uf','--full',
                         action='store_true',
                         help='Output/Input uses the full store. ')
     return parser
 
-def add_use_fresh_argument(parser: argparse.ArgumentParser):
+def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
     """
     Adds a use fresh argument to the given argument parser.
     
@@ -273,19 +345,26 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
+    global default_parser
+    if parser is None:
+        parser=default_parser
     parser.add_argument('-new','--fresh',
                         action='store_true',
                         help='Output/Input freshes storage with latest market. ')
     return parser
 
 
-def add_exit_if_error(parser: argparse.ArgumentParser):
+def add_exit_if_error(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-xe','--exitonerror',
                         action='store_true',
                         help='Exit on error rather than trying to keep looking')
     return parser
 
-def add_viewpath_argument(parser: argparse.ArgumentParser):
+def add_viewpath_argument(parser: argparse.ArgumentParser=None):
     """
     Adds an view path argument to the given argument parser.
     
@@ -295,6 +374,10 @@ def add_viewpath_argument(parser: argparse.ArgumentParser):
     Returns:
         None
     """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
     parser.add_argument('-vp','--viewpath',
                         action='store_true',
                         dest='viewpath',
@@ -302,47 +385,77 @@ def add_viewpath_argument(parser: argparse.ArgumentParser):
     return parser
 
 
-# def add_quiet_argument(parser):
+# def add_quiet_argument(parser: argparse.ArgumentParser=None):
 #     parser.add_argument('-q','--quiet',
 #                         action='store_true',
 #                         help='Suppress all output. If specified, no output will be printed to the console.')
 #     return parser
 
-def add_verbose_argument(parser):
+def add_verbose_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-v', '--verbose',
                         type=int,
                         default=0,
                         help='Set the verbosity level. 0 = quiet, 1 = normal, 2 = verbose, 3 = very verbose, etc.')
     return parser
 
-def add_cds_argument(parser):
+def add_cds_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-cds','--cds',
                         action='store_true',
                         default=False,
                         help='Action the creation of CDS')
     return parser
 
-def add_ads_argument(parser):
+def add_ads_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-ads','--ads',
                         action='store_true',
                         default=False,
                         help='Action the creation of ADS and show the chart')
     return parser
-def add_iprop_init_argument(parser):
+def add_iprop_init_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-iprop','--iprop',
                         action='store_true',
                         default=False,
                         help='Toggle the downloads of all instrument properties ')
     return parser
 
-def add_debug_argument(parser):
+def add_debug_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-debug','--debug',
                         action='store_true',
                         default=False,
                         help='Toggle debug ')
     return parser
 
-def add_pdsserver_argument(parser):
+def add_pdsserver_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
     parser.add_argument('-server','--server',
                         action='store_true',
                         default=False,
