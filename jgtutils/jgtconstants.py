@@ -168,6 +168,7 @@ ZLCS = signalSell_zeroLineCrossing_column_name
 ZCOL = signal_zcol_column_name
 SZ = signalSell_zoneSignal_column_name
 BZ = signalBuy_zoneSinal_column_name
+ZZ = "zz"
 SS = signalSell_saucer_column_name
 SB = signalBuy_saucer_column_name
 
