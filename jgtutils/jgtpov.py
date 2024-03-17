@@ -69,6 +69,8 @@ def calculate_start_datetime(end_datetime, timeframe, periods):
   start_datetime = end_datetime - timedelta(seconds=total_seconds)
   
   return start_datetime
+
+
 def calculate_tlid_range(end_datetime, timeframe, periods):
   
   # Calculate start datetime
@@ -123,4 +125,46 @@ def calculate_quote_counts_tf(month_amount):
     }
 
     return data
+
+
+
+def get_nb_minutes_by_tf(tf): # previously getMinByTF(tf):
+    """
+    Returns the number of minutes in the given timeframe string.
+
+    Args:
+    tf (str): timeframe string, one of 'm1', 'mi1', 'min1', 'm5', 'm15', 'm30', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H8', 'D1', 'W1', 'M1'
+
+    Returns:
+    int: number of minutes in the given timeframe string
+    """
+    if tf == "m1" or tf == "mi1" or tf == "min1":
+        return 1
+    if tf == "m5":
+        return 5
+    if tf == "m15":
+        return 15
+    if tf == "m30":
+        return 30
+    if tf == "H1":
+        return 60
+    if tf == "H2":
+        return 120
+    if tf == "H3":
+        return 180
+    if tf == "H4":
+        return 240
+    if tf == "H5":
+        return 300
+    if tf == "H6":
+        return 360
+    if tf == "H8":
+        return 480
+    if tf == "D1":
+        return 1440
+    if tf == "W1":
+        return 10080
+    if tf == "M1":
+        return 302400
+
 
