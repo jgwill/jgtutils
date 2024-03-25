@@ -111,13 +111,13 @@ def debug(msg: str,*args):
 
 try: 
 
-    _proto()
+    #_proto()
     #_add_error_handler() #BUGGED
 
     if logger is None:
         logger = logging.getLogger(_logger_name)
     # Create a logger object
     # log = logging.getLogger("jgt.log")
-    logger.setLevel(_loglevel)
+    #logger.setLevel(_loglevel)
 except:
     print("Failed to create logger object. Dont worry")
