@@ -112,7 +112,7 @@ def debug(msg: str,*args):
 try: 
 
     _proto()
-    _add_error_handler()
+    #_add_error_handler() #BUGGED
 
     if logger is None:
         logger = logging.getLogger(_logger_name)
