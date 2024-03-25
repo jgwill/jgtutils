@@ -168,3 +168,28 @@ def get_nb_minutes_by_tf(tf): # previously getMinByTF(tf):
         return 302400
 
 
+
+#Get the higher timeframe from a supplied one: M1,W1,D1,H8,H4,H1,m15
+def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H8,H4,H1,m15,m5"):
+  #return None if timeframe is M1
+  if timeframe == "M1":
+    return None    
+  # Default timeframes
+  timeframes = default_timeframes.split(',')
+  
+  # Override non default 
+  if timeframe == "H6" and "H6" not in timeframes:
+    return "H8"
+  if timeframe == "H3" and "H3" not in timeframes:
+    return "H8"
+  if timeframe == "H2" and "H2" not in timeframes:
+    return "H4"
+  if timeframe == "m30" and "m30" not in timeframes:
+    return "H1"
+  
+  # Get the index of the supplied timeframe
+  tf_index = timeframes.index(timeframe)
+  # Get the higher timeframe
+  higher_tf = timeframes[tf_index - 1]
+  
+  return higher_tf
