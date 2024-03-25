@@ -183,3 +183,5 @@ VECTOR_AO_FDBS = 'vector_ao_fdbs'
 VECTOR_AO_FDBB = 'vector_ao_fdbb'
 
 
+VECTOR_AO_FDBS_COUNT = 'vaosc'
+VECTOR_AO_FDBB_COUNT = 'vaobc'
