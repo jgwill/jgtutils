@@ -65,14 +65,6 @@ def _add_error_handler():
         pass
 
 
-_proto()
-_add_error_handler()
-
-if logger is None:
-    logger = logging.getLogger(_logger_name)
-# Create a logger object
-# log = logging.getLogger("jgt.log")
-logger.setLevel(_loglevel)
 
 
 def set_log_level(loglevel: str = "WARNING", logger_name=""):
@@ -112,3 +104,19 @@ def critical(msg: str,*args):
 
 def debug(msg: str,*args):
   logger.debug(msg,*args)
+
+
+
+
+try: 
+
+    _proto()
+    _add_error_handler()
+
+    if logger is None:
+        logger = logging.getLogger(_logger_name)
+    # Create a logger object
+    # log = logging.getLogger("jgt.log")
+    logger.setLevel(_loglevel)
+except:
+    print("Failed to create logger object. Dont worry")
