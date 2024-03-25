@@ -29,7 +29,7 @@ datefmt = "%Y.%m.%d %H:%M:%S"
 
 
 def _proto():
-    global _loglevel, logger, console_handler
+    global _loglevel, logger, console_handler,fmt,fmt2,datefmt
     try:
         log_file = __main__.__file__
     except:
@@ -55,13 +55,14 @@ def _proto():
 
 
 def _add_error_handler():
-    global logger, errHandler
+    global logger, errHandler,fmt
     try:
         errHandler = logging.FileHandler("error.log")
         errHandler.setLevel(logging.ERROR)
         errHandler.setFormatter(fmt)
         logger.addHandler(errHandler)
     except:
+        print("Failed to add error handler")
         pass
 
 
