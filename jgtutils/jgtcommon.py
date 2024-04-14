@@ -122,7 +122,7 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None):
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
     return parser
 
-def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True):
+def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False):
     
     global default_parser
     if parser is None:
@@ -138,7 +138,8 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
                                       For example, m1 - for 1 minute, H1 - for 1 hour.')
-    parser.add_argument('-ip',
+    if add_IndicatorPattern:
+        parser.add_argument('-ip',
                         metavar="IndicatorPattern",
                         required=False,
                         help='The indicator Pattern. For example, \
