@@ -99,7 +99,8 @@ def mk_fullpath(instrument:str,
 
 def get_data_path(nsdir: str, 
                   range_level:int=6,
-                  use_full=False):
+                  use_full=False,
+                  make_dir_if_not_exist=True):
     # Try to read the path from the JGTPY_DATA environment variable
     if use_full:
         default_data_full="/var/lib/jgt/full/data"
@@ -163,7 +164,16 @@ def get_data_path(nsdir: str,
 
     # Append the nsdir to the data path
     data_path = os.path.abspath(os.path.join(data_path, nsdir))
-
+    #make_dir_if_not_exist
+    if make_dir_if_not_exist:
+        try:
+            os.makedirs(data_path, exist_ok=True)
+        except:
+            print("Error creating the directory : " + data_path)
+            print("Please create the directory manually:  sudo mkdir -m 777 -p " + data_path)
+            data_path = "/data"
+            print("Using default directory : " + data_path)
+            os.makedirs(data_path, exist_ok=True)
     return data_path
 
 
