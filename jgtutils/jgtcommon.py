@@ -520,7 +520,10 @@ def diff_month(year: int, month: int, date2: datetime):
 
 
 
-
+def export_env_if_any(config):
+    # if has a key : "keep_bid_ask" and if yes and set to "true", export an env variable "JGT_KEEP_BID_ASK" to "1"
+    if 'keep_bid_ask' in config and config['keep_bid_ask'] == True:
+        os.environ['JGT_KEEP_BID_ASK'] = '1'
 
 _JGT_CONFIG_JSON_SECRET=None
 
@@ -531,11 +534,13 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
     if json_config_str is not None:
         config = json.loads(json_config_str)
         _JGT_CONFIG_JSON_SECRET=json_config_str
+        export_env_if_any(config)
         return config
     
     
     if _JGT_CONFIG_JSON_SECRET is not None:
         config = json.loads(_JGT_CONFIG_JSON_SECRET)
+        export_env_if_any(config)
         return config
     
     config = None
@@ -543,6 +548,7 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
     if os.path.isfile(config_file):
         with open(config_file, 'r') as f:
             config = json.load(f)
+            export_env_if_any(config)
             return config
     else:
         # If config file not found, check home directory
@@ -556,6 +562,7 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
             config_json_str = os.getenv('JGT_CONFIG_JSON_SECRET')
             if config_json_str:
                 config = json.loads(config_json_str)
+                export_env_if_any(config)
                 return config
 
 
@@ -568,4 +575,5 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
     if config is None:
         raise Exception("Configuration not found")
     
+    export_env_if_any(config)
     return config
