@@ -356,7 +356,7 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
         parser (argparse.ArgumentParser): The argument parser to add the use fresh argument to.
         
     Returns:
-        None
+        parser (argparse.ArgumentParser): The argument parser with the keep bid/ask argument added.
     """
     global default_parser
     if parser is None:
@@ -366,6 +366,24 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
                         help='Output/Input freshes storage with latest market. ')
     return parser
 
+
+def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
+    """
+    Adds a keep Bid/Ask argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the keep bid/ask argument to.
+        
+    Returns:
+        parser (argparse.ArgumentParser): The argument parser with the argument added.
+    """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-kba','--keepbidask',
+                        action='store_true',
+                        help='Keep Bid/Ask in storage. ')
+    return parser
 
 def add_exit_if_error(parser: argparse.ArgumentParser=None):
     global default_parser
@@ -385,7 +403,7 @@ def add_viewpath_argument(parser: argparse.ArgumentParser=None):
         parser (argparse.ArgumentParser): The argument parser to add the viewpath argument to.
         
     Returns:
-        None
+        parser (argparse.ArgumentParser): The argument parser with the argument added.
     """
     global default_parser
     if parser is None:
