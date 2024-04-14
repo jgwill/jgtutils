@@ -108,6 +108,7 @@ def add_main_arguments(parser: argparse.ArgumentParser=None):
     parser.add_argument('-pin',
                         help='Your pin code. Required only for users who have \
                                  a pin. Optional parameter.')
+    return parser
 
 def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None):
     global default_parser
@@ -119,6 +120,7 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None):
                         help='Ability to set the open price candles mode. \
                         Possible values are first_tick, prev_close. For more information see description \
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
+    return parser
 
 def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True):
     
@@ -141,6 +143,8 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
                         required=False,
                         help='The indicator Pattern. For example, \
                                  "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
+    return parser
+    
 
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
                                       lots: bool = True):
@@ -157,6 +161,8 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
     if lots:
         parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
                             help='Trade amount in lots.')
+    
+    return parser
 
 
 def add_account_arguments(parser: argparse.ArgumentParser=None):
@@ -165,6 +171,7 @@ def add_account_arguments(parser: argparse.ArgumentParser=None):
         parser=default_parser
     parser.add_argument('-account', metavar="ACCOUNT",
                         help='An account which you want to use in sample.')
+    return parser
 
 
 def str_to_datetime(date_str):
@@ -202,6 +209,7 @@ def add_tlid_range_argument(parser: argparse.ArgumentParser=None):
     #print("Tlid range active")
     parser.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
                         help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
+    return parser
 
 def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
     global default_parser
@@ -225,7 +233,8 @@ def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = T
                                       it will mean to now. Format is "m.d.Y H:M:S". \
                                       Optional parameter.',
                             type=valid_datetime(False)
-                            )
+        )
+    return parser
 
 
 def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
@@ -250,7 +259,8 @@ def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: b
                                       it will mean to now. Format is "m.d.Y H:M:S". \
                                       Optional parameter.',
                             type=valid_datetime(True)
-                            )
+        )
+    return parser
 
 
 def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
@@ -263,6 +273,8 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
                         default=-1,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
+    
+    return parser
 
 
 # def add_bars_arguments(parser: argparse.ArgumentParser=None):
@@ -415,6 +427,18 @@ def add_cds_argument(parser: argparse.ArgumentParser=None):
                         help='Action the creation of CDS')
     return parser
 
+def add_ids_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
+    parser.add_argument('-ids','--ids',
+                        action='store_true',
+                        default=False,
+                        help='Action the creation of IDS')
+    return parser
+
 def add_ads_argument(parser: argparse.ArgumentParser=None):
 
     global default_parser
@@ -426,6 +450,7 @@ def add_ads_argument(parser: argparse.ArgumentParser=None):
                         default=False,
                         help='Action the creation of ADS and show the chart')
     return parser
+
 def add_iprop_init_argument(parser: argparse.ArgumentParser=None):
 
     global default_parser
