@@ -74,12 +74,38 @@ def mk_fn_range(instrument:str,
     _fn = _fn.replace("/", "-")
     return _fn
 
+import subprocess
+
+def create_directory_with_sudo(path):
+    # Construct the command
+    command = f"sudo mkdir -p -m 777 {path}"
+
+    # Execute the command
+    subprocess.run(command, shell=True)
+
+
 
 def mk_fullpath(instrument:str, 
                 timeframe:str, 
                 ext:str, 
                 path:str, 
                 tlid_range:str=None):
+    #path dont exist, try to make that directory
+    if not os.path.exists(path):
+        try:
+            os.makedirs(path, exist_ok=True)
+        except:
+            print("Error creating the directory : " + path)
+            print("Executing:  sudo mkdir -m 777 -p " + path)
+            #execute system command sudo mkdir -p -m 777 $path
+            try:
+                create_directory_with_sudo(path)
+                print("Directory created : " + path)
+            except:
+                print("Error creating the directory : " + path)
+                print("Please create the directory manually:  sudo mkdir -m 777 -p " + path)
+            
+            
     if tlid_range is None:
         fn = mk_fn(instrument, timeframe, ext)
     else:
@@ -99,8 +125,7 @@ def mk_fullpath(instrument:str,
 
 def get_data_path(nsdir: str, 
                   range_level:int=6,
-                  use_full=False,
-                  make_dir_if_not_exist=True):
+                  use_full=False):
     # Try to read the path from the JGTPY_DATA environment variable
     if use_full:
         default_data_full="/var/lib/jgt/full/data"
@@ -164,16 +189,7 @@ def get_data_path(nsdir: str,
 
     # Append the nsdir to the data path
     data_path = os.path.abspath(os.path.join(data_path, nsdir))
-    #make_dir_if_not_exist
-    if make_dir_if_not_exist:
-        try:
-            os.makedirs(data_path, exist_ok=True)
-        except:
-            print("Error creating the directory : " + data_path)
-            print("Please create the directory manually:  sudo mkdir -m 777 -p " + data_path)
-            data_path = "/data"
-            print("Using default directory : " + data_path)
-            os.makedirs(data_path, exist_ok=True)
+
     return data_path
 
 
