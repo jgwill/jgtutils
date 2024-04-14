@@ -2,7 +2,7 @@
 jgtutils package
 """
 
-__version__ = "0.1.54"
+__version__ = "0.1.55"
 
 
 from jgtutils import jgtpov as pov
