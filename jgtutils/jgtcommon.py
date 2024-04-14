@@ -317,7 +317,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None):
         parser (argparse.ArgumentParser): The argument parser to add the output argument to.
         
     Returns:
-        None
+        parser (argparse.ArgumentParser): The argument parser with argument added.
     """
     global default_parser
     if parser is None:
@@ -337,7 +337,7 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None):
         parser (argparse.ArgumentParser): The argument parser to add the read full argument to.
         
     Returns:
-        None
+        parser (argparse.ArgumentParser): The argument parser with argument added.
     """
     global default_parser
     if parser is None:
@@ -356,7 +356,7 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
         parser (argparse.ArgumentParser): The argument parser to add the use fresh argument to.
         
     Returns:
-        parser (argparse.ArgumentParser): The argument parser with the keep bid/ask argument added.
+        parser (argparse.ArgumentParser): The argument parser with argument added.
     """
     global default_parser
     if parser is None:
