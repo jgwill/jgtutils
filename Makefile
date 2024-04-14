@@ -42,6 +42,7 @@ rst_check:
 clean:
 	find . -name "*.pyc" -print0 | xargs -0 rm -f
 	rm -Rf dist
+	rm -Rf build
 	rm -Rf *.egg-info
 
 .PHONY: docs
