@@ -527,20 +527,22 @@ def export_env_if_any(config):
 
 _JGT_CONFIG_JSON_SECRET=None
 
-def readconfig(json_config_str=None,config_file = 'config.json'):
+def readconfig(json_config_str=None,config_file = 'config.json',export_env=False):
     global _JGT_CONFIG_JSON_SECRET
     # Try reading config file from current directory
 
     if json_config_str is not None:
         config = json.loads(json_config_str)
         _JGT_CONFIG_JSON_SECRET=json_config_str
-        export_env_if_any(config)
+        if export_env:
+            export_env_if_any(config)
         return config
     
     
     if _JGT_CONFIG_JSON_SECRET is not None:
         config = json.loads(_JGT_CONFIG_JSON_SECRET)
-        export_env_if_any(config)
+        if export_env:
+            export_env_if_any(config)
         return config
     
     config = None
@@ -548,7 +550,8 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
     if os.path.isfile(config_file):
         with open(config_file, 'r') as f:
             config = json.load(f)
-            export_env_if_any(config)
+            if export_env:
+                export_env_if_any(config)
             return config
     else:
         # If config file not found, check home directory
@@ -562,7 +565,8 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
             config_json_str = os.getenv('JGT_CONFIG_JSON_SECRET')
             if config_json_str:
                 config = json.loads(config_json_str)
-                export_env_if_any(config)
+                if export_env:
+                    export_env_if_any(config)
                 return config
 
 
@@ -575,5 +579,6 @@ def readconfig(json_config_str=None,config_file = 'config.json'):
     if config is None:
         raise Exception("Configuration not found")
     
-    export_env_if_any(config)
+    if export_env:
+        export_env_if_any(config)
     return config
