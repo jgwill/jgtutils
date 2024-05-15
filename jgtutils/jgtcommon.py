@@ -458,6 +458,55 @@ def add_ids_argument(parser: argparse.ArgumentParser=None):
                         help='Action the creation of IDS')
     return parser
 
+
+def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument(
+        "-mfi",
+        "--mfi_flag",
+        action="store_true",
+        help="Enable the Market Facilitation Index indicator.",
+    )
+    return parser
+
+def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
+    parser.add_argument(
+        "-go",
+        "--gator_oscillator_flag",
+        action="store_true",
+        help="Enable the Gator Oscillator indicator.",
+    )
+    return parser
+
+def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    parser.add_argument(
+        "-ba",
+        "--balligator_flag",
+        action="store_true",
+        help="Enable the Alligator indicator.",
+    )
+    parser.add_argument(
+        "-bjaw",
+        "--balligator_period_jaws",
+        type=int,
+        default=89,
+        help="The period of the Alligator jaws.",
+    )
+    return parser
+  
 def add_ads_argument(parser: argparse.ArgumentParser=None):
 
     global default_parser
