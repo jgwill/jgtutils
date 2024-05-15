@@ -486,6 +486,21 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
     )
     return parser
 
+def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
+    parser.add_argument(
+        "-lfp",
+        "--largest_fractal_period",
+        type=int,
+        default=89,
+        help="The largest fractal period.",
+    )
+    return parser
+
 def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
 
     global default_parser
