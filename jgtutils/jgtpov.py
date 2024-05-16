@@ -3,6 +3,7 @@ from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 import tlid
 import re
+import os
 
 
 def get_dt_format_pattern(end_datetime):
@@ -169,7 +170,12 @@ def get_nb_minutes_by_tf(tf): # previously getMinByTF(tf):
 
 
 
-def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H4,H1,m15,m5"):
+def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H4,H1,m15,m5",quiet=True):
+  if default_timeframes=="T":# try read the os var "T"
+     default_timeframes=os.getenv("T","M1,W1,D1,H4,H1,m15,m5")
+     if not quiet:
+        print("default timeframes read from env: ",default_timeframes)
+
   #return None if timeframe is M1
   if timeframe == "M1":
     return None    
@@ -202,19 +208,20 @@ def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H4,H1,m15,m5"):
   return higher_tf
 
 
-def get_higher_tf_by_level(timeframe, level=0,default_timeframes = "M1,W1,D1,H4,H1,m15,m5"):
+def get_higher_tf_by_level(timeframe, level=0,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",quiet=True):
   """
   Recursively calculates the higher time frame based on the given timeframe and level.
 
   Parameters:
   timeframe (str): The current timeframe.
   level (int): The number of levels to go higher in timeframes. Default is 0.
-  timeframes (str): The list of timeframes to consider. Default is "M1,W1,D1,H4,H1,m15,m5".
+  timeframes (str): The list of timeframes to consider. Default is "M1,W1,D1,H4,H1,m15,m5".  Use "T" to read from the environment variable "T".
+  quiet (bool): If True, suppresses the print statements. Default is True.
 
   Returns:
   str: The higher timeframe based on the given time frame and level. Expect None if there is no level.
   """
-  htf = get_higher_tf(timeframe,default_timeframes)
+  htf = get_higher_tf(timeframe,default_timeframes,quiet)
   if level > 0:
-    htf = get_higher_tf_by_level(htf, level - 1,default_timeframes)
+    htf = get_higher_tf_by_level(htf, level - 1,default_timeframes,quiet)
   return htf
