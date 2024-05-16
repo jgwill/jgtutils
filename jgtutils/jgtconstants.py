@@ -166,6 +166,7 @@ FB = signalBuy_fractal_column_name
 ZLCB = signalBuy_zeroLineCrossing_column_name
 ZLCS = signalSell_zeroLineCrossing_column_name
 ZCOL = signal_zcol_column_name
+ZONE_INT= "zint"
 SZ = signalSell_zoneSignal_column_name
 BZ = signalBuy_zoneSinal_column_name
 ZZ = "zz"
