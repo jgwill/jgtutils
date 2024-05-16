@@ -169,8 +169,7 @@ def get_nb_minutes_by_tf(tf): # previously getMinByTF(tf):
 
 
 
-#Get the higher timeframe from a supplied one: M1,W1,D1,H8,H4,H1,m15
-def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H8,H4,H1,m15,m5"):
+def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H4,H1,m15,m5"):
   #return None if timeframe is M1
   if timeframe == "M1":
     return None    
@@ -179,17 +178,43 @@ def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H8,H4,H1,m15,m5"):
   
   # Override non default 
   if timeframe == "H6" and "H6" not in timeframes:
-    return "H8"
+    return "D1"
   if timeframe == "H3" and "H3" not in timeframes:
+    if "H8" not in timeframes:
+       return "D1"
     return "H8"
   if timeframe == "H2" and "H2" not in timeframes:
     return "H4"
   if timeframe == "m30" and "m30" not in timeframes:
+    if "H1" not in timeframes:
+       return "H4"
     return "H1"
   
   # Get the index of the supplied timeframe
-  tf_index = timeframes.index(timeframe)
+  try:
+    tf_index = timeframes.index(timeframe)
+  except ValueError:
+    return None
+  
   # Get the higher timeframe
-  higher_tf = timeframes[tf_index - 1]
+  higher_tf = timeframes[tf_index - 1] if tf_index > 0 else None
   
   return higher_tf
+
+
+def get_higher_tf_by_level(timeframe, level=0,default_timeframes = "M1,W1,D1,H4,H1,m15,m5"):
+  """
+  Recursively calculates the higher time frame based on the given timeframe and level.
+
+  Parameters:
+  timeframe (str): The current timeframe.
+  level (int): The number of levels to go higher in timeframes. Default is 0.
+  timeframes (str): The list of timeframes to consider. Default is "M1,W1,D1,H4,H1,m15,m5".
+
+  Returns:
+  str: The higher timeframe based on the given time frame and level. Expect None if there is no level.
+  """
+  htf = get_higher_tf(timeframe,default_timeframes)
+  if level > 0:
+    htf = get_higher_tf_by_level(htf, level - 1,default_timeframes)
+  return htf
