@@ -208,13 +208,13 @@ def get_higher_tf(timeframe,default_timeframes="M1,W1,D1,H4,H1,m15,m5",quiet=Tru
   return higher_tf
 
 
-def get_higher_tf_by_level(timeframe, level=0,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",quiet=True):
+def get_higher_tf_by_level(timeframe, level=1,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",quiet=True):
   """
   Recursively calculates the higher time frame based on the given timeframe and level.
 
   Parameters:
   timeframe (str): The current timeframe.
-  level (int): The number of levels to go higher in timeframes. Default is 0.
+  level (int): The number of levels to go higher in timeframes. Default is 1 (the level upper).
   timeframes (str): The list of timeframes to consider. Default is "M1,W1,D1,H4,H1,m15,m5".  Use "T" to read from the environment variable "T".
   quiet (bool): If True, suppresses the print statements. Default is True.
 
@@ -222,6 +222,6 @@ def get_higher_tf_by_level(timeframe, level=0,default_timeframes = "M1,W1,D1,H4,
   str: The higher timeframe based on the given time frame and level. Expect None if there is no level.
   """
   htf = get_higher_tf(timeframe,default_timeframes,quiet)
-  if level > 0:
+  if level > 1:
     htf = get_higher_tf_by_level(htf, level - 1,default_timeframes,quiet)
   return htf
