@@ -364,6 +364,10 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
     parser.add_argument('-new','--fresh',
                         action='store_true',
                         help='Output/Input freshes storage with latest market. ')
+    parser.add_argument('-old','--notfresh',
+                        action='store_true',
+                        help='Output/Input wont be freshed from storage (weekend or tests). ')
+ 
     return parser
 
 
@@ -383,6 +387,9 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
     parser.add_argument('-kba','--keepbidask',
                         action='store_true',
                         help='Keep Bid/Ask in storage. ')
+    parser.add_argument('-rmba','--rmbidask',
+                        action='store_true',
+                        help='Remove Bid/Ask in storage. ')
     return parser
 
 def add_exit_if_error(parser: argparse.ArgumentParser=None):
@@ -470,6 +477,12 @@ def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
         action="store_true",
         help="Enable the Market Facilitation Index indicator.",
     )
+    parser.add_argument(
+        "-nomfi",
+        "--no_mfi_flag",  
+        action="store_true",
+        help="Disable the Market Facilitation Index indicator.",
+    )  
     return parser
 
 def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
