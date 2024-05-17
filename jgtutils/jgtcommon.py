@@ -346,6 +346,10 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None):
     parser.add_argument('-uf','--full',
                         action='store_true',
                         help='Output/Input uses the full store. ')
+    parser.add_argument('-un','--notfull',
+                        action='store_true',
+                        help='Output/Input uses NOT the full store. ')
+ 
     return parser
 
 def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
