@@ -528,17 +528,38 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
         "-ba",
         "--balligator_flag",
         action="store_true",
-        help="Enable the Alligator indicator.",
+        help="Enable the Big Alligator indicator.",
     )
     parser.add_argument(
         "-bjaw",
         "--balligator_period_jaws",
         type=int,
         default=89,
-        help="The period of the Alligator jaws.",
+        help="The period of the Big Alligator jaws.",
     )
     return parser
   
+def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    parser.add_argument(
+        "-ta",
+        "--talligator_flag",
+        action="store_true",
+        help="Enable the Tide Alligator indicator.",
+    )
+    parser.add_argument(
+        "-tjaw",
+        "--talligator_period_jaws",
+        type=int,
+        default=377,
+        help="The period of the Tide Alligator jaws.",
+    )
+    return parser
+
 def add_ads_argument(parser: argparse.ArgumentParser=None):
 
     global default_parser
