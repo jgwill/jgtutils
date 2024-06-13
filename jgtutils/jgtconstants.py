@@ -61,6 +61,10 @@ BJAW=indicator_sixDegreeLarger_alligator_jaw_column_name
 BTEETH=indicator_sixDegreeLarger_alligator_teeth_column_name
 BLIPS=indicator_sixDegreeLarger_alligator_lips_column_name
 
+TJAW='tjaw'
+TTEETH='tteeth'
+TLIPS='tlips'
+
 indicator_AO_awesomeOscillator_column_name = 'ao' # AO measure energy of momentum
 indicator_AC_accelerationDeceleration_column_name = 'ac' # AC measure speed of momentum
 AO=indicator_AO_awesomeOscillator_column_name
