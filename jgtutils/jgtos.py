@@ -194,7 +194,7 @@ def get_data_path(nsdir: str,
 
 
 def get_pov_local_data_filename(instrument:str,timeframe:str,use_full=False,nsdir="pds",ext="csv"):
-  root_dir=jgtos.get_data_path(nsdir,use_full=use_full)
+  root_dir=get_data_path(nsdir,use_full=use_full)
   
   local_fn_suffix = ext
   full_path=mk_fullpath(instrument, timeframe, local_fn_suffix, root_dir)
