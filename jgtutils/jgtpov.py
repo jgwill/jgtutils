@@ -227,10 +227,11 @@ def get_higher_tf_by_level(timeframe, level=1,default_timeframes = "M1,W1,D1,H4,
   return htf
 
 
-def get_higher_tf_array(t,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",sort_reverse=True,quiet=True):
+
+def get_higher_tf_array(t,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",sort_reverse=True,quiet=True,max_level = 5):
   # for level from 0 to 3, run jpov.get_higher_tf_by_level(t,level)
-  arr=[t]
-  for level in range(0,4):
+  arr=[t]  
+  for level in range(0,max_level):
     tf = get_higher_tf_by_level(t,level,default_timeframes)
     if tf is not None:
       arr.append(tf)
@@ -242,7 +243,6 @@ def get_higher_tf_array(t,default_timeframes = "M1,W1,D1,H4,H1,m15,m5",sort_reve
   #order them by default_timeframes
   arr.sort(key=lambda x: default_timeframes.index(x), reverse=sort_reverse)
   return arr
-
 
 def get_higher_tf_array1(t):
   # for level from 0 to 3, run jpov.get_higher_tf_by_level(t,level)
