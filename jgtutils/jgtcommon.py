@@ -28,7 +28,7 @@ import tlid
 # common.py
 
 
-import logging
+#import logging
 import datetime
 import traceback
 import argparse
@@ -40,11 +40,11 @@ from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_
 
 try :
     import __main__
-    logging.basicConfig(filename='{0}.log'.format(__main__.__file__), level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s', datefmt='%m.%d.%Y %H:%M:%S')
-    console = logging.StreamHandler(sys.stdout)
-    console.setLevel(logging.INFO)
-    logging.getLogger('').addHandler(console)
+    # logging.basicConfig(filename='{0}.log'.format(__main__.__file__), level=logging.INFO,
+    #                 format='%(asctime)s %(levelname)s %(message)s', datefmt='%m.%d.%Y %H:%M:%S')
+    # console = logging.StreamHandler(sys.stdout)
+    # console.setLevel(logging.INFO)
+    # logging.getLogger('').addHandler(console)
     
 
 except:
@@ -610,7 +610,8 @@ def add_pdsserver_argument(parser: argparse.ArgumentParser=None):
 
 
 def print_exception(exception: Exception):
-    logging.error("Exception: {0}\n{1}".format(exception, traceback.format_exc()))
+    #logging.error("Exception: {0}\n{1}".format(exception, traceback.format_exc()))
+    print("Exception: {0}\n{1}".format(exception, traceback.format_exc()))
 
 
 
