@@ -630,8 +630,17 @@ def export_env_if_any(config):
 
 _JGT_CONFIG_JSON_SECRET=None
 
-def readconfig(json_config_str=None,config_file = 'config.json',export_env=False):
+def readconfig(json_config_str=None,config_file = 'config.json',export_env=False,config_file_path_env_name='JGT_CONFIG_PATH',config_values_env_name='JGT_CONFIG'):
     global _JGT_CONFIG_JSON_SECRET
+    #print argument values to debug
+    _DEBUG_240619=False
+    if _DEBUG_240619:
+        print("json_config_str:",json_config_str)
+        print("config_file:",config_file)
+        print("export_env:",export_env)
+        print("config_file_path_env_name:",config_file_path_env_name)
+        print("config_values_env_name:",config_values_env_name)
+    
     # Try reading config file from current directory
 
     if json_config_str is not None:
@@ -650,7 +659,11 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
     
     config = None
 
-    if os.path.isfile(config_file):
+    # if file does not exist try set the path to the file in the HOME
+    if not os.path.exists(config_file):
+        config_file = os.path.join(os.path.expanduser("~"), config_file)
+        
+    if os.path.exists(config_file):
         with open(config_file, 'r') as f:
             config = json.load(f)
             if export_env:
@@ -675,12 +688,35 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
 
     # Now you can use the config dictionary in your application
 
+    # if file dont exist, try loading from env var JGT_CONFIG
+    if not os.path.exists(config_file):
+        config_json_str = os.getenv(config_values_env_name)
+        
+        if config_json_str:
+            config = json.loads(config_json_str)
+            if export_env:
+                export_env_if_any(config)
+            #return config
+        else:
+            # if not found, try loading from env var JGT_CONFIG_PATH
+            config_file = os.getenv(config_file_path_env_name)
+            if config_file:
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+                    if export_env:
+                        export_env_if_any(config)
+                    #return config
+           # else:
+               
     # Read config file
-    with open(config_file, 'r') as file:
-        config = json.load(file)
+    if config is None:
+        print("config_file:",config_file)
+        if config_file is not None and os.path.exists(config_file) :
+            with open(config_file, 'r') as file:
+                config = json.load(file)
         
     if config is None:
-        raise Exception("Configuration not found")
+        raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")
     
     if export_env:
         export_env_if_any(config)
