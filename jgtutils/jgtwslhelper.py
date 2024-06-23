@@ -56,7 +56,7 @@ def run(bash_command):
 
 def resolve_cli_path(cli_path=""):
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
-        cli_path = '$HOME/.local/bin/jgtfxcli'
+        cli_path = os.path.join(os.getenv('HOME'), '.local', 'bin', 'jgtfxcli')
     if not os.path.exists(cli_path):
         cli_path = 'jgtfxcli'    
     
