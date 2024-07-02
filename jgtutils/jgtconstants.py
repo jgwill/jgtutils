@@ -90,9 +90,17 @@ indicator_mfi_marketFacilitationIndex_column_name = 'mfi' # MFI measure market f
 MFI=indicator_mfi_marketFacilitationIndex_column_name
 
 MFI_SQUAT = "mfi_sq"
+MFI_SQUAT_ID=1
+MFI_SQUAT_STR='+-'
 MFI_GREEN = "mfi_green"
+MFI_GREEN_ID=4
+MFI_GREEN_STR='++'
 MFI_FADE = "mfi_fade"
+MFI_FADE_ID=3
+MFI_FADE_STR='--'
 MFI_FAKE = "mfi_fake"
+MFI_FAKE_ID=2
+MFI_FAKE_STR='-+'
 MFI_SIGNAL = "mfi_sig"
 MFI_VAL = "mfi_str"
 
