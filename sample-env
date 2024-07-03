@@ -1,0 +1,19 @@
+# ASSISTANT CLI HELPER
+JGX_ASSISTANT_LIST_INCLUDE_TAG="fts"
+JGX_ASSISTANT_LIST_EXCLUDE_TAG=""
+JGX_OPENAI_API_KEY__VARIABLE_NAME="OPENAI_API_KEY"
+
+
+#WS
+
+WS_ROOT_PATH="."
+WS_CURRENT_FILENAME="WSL__jgtutils.code-workspace"
+WS_CONDA_ENV_NAME=jgtutils
+WS_CONDA_ENV_DEPENDING="jgtpy jgtsd jgtml"
+WS_CONDA_ENV_DEPENDING_USER="baseprod"
+
+# Other relative path where similar work is done
+#@STCGoal Mastery OpenAI Assistants
+WS_MASTERY_RELATED_PATH=/b/Dropbox/jgt
+
+
