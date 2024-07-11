@@ -193,8 +193,8 @@ ZONE_BUY_STR="green"
 ZONE_BUY_ID=1
 ZONE_SELL_STR="red"
 ZONE_SELL_ID=-1
-ZONE_NONE_STR="gray"
-ZONE_NONE_ID=0
+ZONE_NEUTRAL_STR="gray"
+ZONE_NEUTRAL_ID=0
 
 SZ = signalSell_zoneSignal_column_name
 BZ = signalBuy_zoneSinal_column_name
