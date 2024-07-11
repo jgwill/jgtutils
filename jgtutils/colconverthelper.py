@@ -84,8 +84,9 @@ def zone_id_to_str(zone_id:int):
 
 #from jgtconstants import ZCOL,ZONE_INT,ZONE_BUY_ID,ZONE_SELL_ID,ZONE_NEUTRAL_ID,ZONE_BUY_STR,ZONE_SELL_STR,ZONE_NEUTRAL_STR
 
-
-def get_zone_columns_list(t:str,zone_colname=""):
+#get_zone_columns_list
+#get_mfi_features_column_list_by_timeframe
+def get_zone_features_column_list_by_timeframe(t:str,zone_colname=""):
     """
     Get the list of columns that are ZONE features for the given timeframe and its related timeframes.
     
