@@ -189,6 +189,13 @@ ZLCB = signalBuy_zeroLineCrossing_column_name
 ZLCS = signalSell_zeroLineCrossing_column_name
 ZCOL = signal_zcol_column_name
 ZONE_INT= "zint"
+ZONE_BUY_STR="green"
+ZONE_BUY_ID=1
+ZONE_SELL_STR="red"
+ZONE_SELL_ID=-1
+ZONE_NONE_STR="gray"
+ZONE_NONE_ID=0
+
 SZ = signalSell_zoneSignal_column_name
 BZ = signalBuy_zoneSinal_column_name
 ZZ = "zz"
