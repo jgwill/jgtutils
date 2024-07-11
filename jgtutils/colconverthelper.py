@@ -1,5 +1,6 @@
-from jgtconstants import MFI_SQUAT, MFI_FAKE, MFI_FADE, MFI_GREEN, MFI_SQUAT_STR, MFI_FAKE_STR, MFI_FADE_STR, MFI_GREEN_STR, MFI_SQUAT_ID, MFI_FAKE_ID, MFI_FADE_ID, MFI_GREEN_ID, MFI_VAL
+from jgtconstants import MFI_SQUAT, MFI_FAKE, MFI_FADE, MFI_GREEN, MFI_SQUAT_STR, MFI_FAKE_STR, MFI_FADE_STR, MFI_GREEN_STR, MFI_SQUAT_ID, MFI_FAKE_ID, MFI_FADE_ID, MFI_GREEN_ID
 
+from jgtutils.jgtconstants import MFI_VAL as MFI_DEFAULT_COLNAME
 from jgtutils.jgtconstants import ZCOL as ZONE_DEFAULT_COLNAME
 
 def mfi_str_to_id(mfi_str:str):
@@ -38,7 +39,7 @@ def get_mfi_features_column_list_by_timeframe(t:str,mfi_colname=""):
     list: The list of columns that are MFI features for the given timeframe and its related timeframes
     """
     if mfi_colname=="":
-        mfi_colname=MFI_VAL
+        mfi_colname=MFI_DEFAULT_COLNAME
     mfi_str_selected_columns = [mfi_colname+'_M1',mfi_colname+'_W1']
     
     if t=='H4' or t=='H8' or t=='H6' or t=='H1' or t=='m15' or t=='m5':
