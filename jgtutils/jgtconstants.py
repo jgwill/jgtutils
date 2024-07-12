@@ -89,7 +89,7 @@ GH=indicator_gatorOscillator_high_column_name
 indicator_mfi_marketFacilitationIndex_column_name = 'mfi' # MFI measure market facilitation index
 MFI=indicator_mfi_marketFacilitationIndex_column_name
 
-MFI_SQUAT = "mfi_sq"
+MFI_SQUAT = "mfi_sq" 
 MFI_SQUAT_ID=1
 MFI_SQUAT_STR='+-'
 MFI_GREEN = "mfi_green"
@@ -102,6 +102,7 @@ MFI_FAKE = "mfi_fake"
 MFI_FAKE_ID=2
 MFI_FAKE_STR='-+'
 MFI_SIGNAL = "mfi_sig"
+MFI_SIGNAL_TYPE = int
 MFI_VAL = "mfi_str"
 
 
@@ -190,6 +191,7 @@ ZLCS = signalSell_zeroLineCrossing_column_name
 ZCOL = signal_zcol_column_name
 ZONE_INT= "zint"
 ZONE_SIGNAL= "zone_sig"
+ZONE_SIGNAL_TYPE= int
 ZONE_BUY_STR="green"
 ZONE_BUY_ID=1
 ZONE_SELL_STR="red"
