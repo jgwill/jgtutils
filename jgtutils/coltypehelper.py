@@ -83,6 +83,10 @@ VECTOR_AO_FDBB_COUNT_TYPE= int
         return VECTOR_AO_FDBS_COUNT_TYPE
     elif colname == VECTOR_AO_FDBB_COUNT:
         return VECTOR_AO_FDBB_COUNT_TYPE
+    elif colname == ACB:
+        return ACB_TYPE
+    elif colname == ACS:
+        return ACS_TYPE
     else:
         return None
       
