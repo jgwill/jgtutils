@@ -122,3 +122,5 @@ def get_dtype_definitions():
         VECTOR_AO_FDBB_COUNT: VECTOR_AO_FDBB_COUNT_TYPE
     }
     return dtype_definitions
+  
+DTYPE_DEFINITIONS=get_dtype_definitions()
