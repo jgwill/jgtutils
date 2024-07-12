@@ -5,7 +5,8 @@
 cversion=$(cat pyproject.toml |tr '"' " " |awk '/version/ {print $3}')
 git commit . -m "v$cversion" && git tag "$cversion" && git push --tags && git push 
 
-make dist && twine upload dist/* && sleep 32 &&  (conda activate jgtpy310 && pip install -U jgtutils ;(conda activate jgtfxcon && pip install -U jgtutils) )
+make dist && twine upload dist/* 
+#&& sleep 32 &&  (conda activate jgtpy && pip install -U jgtutils ;(conda activate jgtfxcon && pip install -U jgtutils) )
 
 # install upgrade in the user environment
 #if [ "$CONDA_ENV_PROD_BASE" == "" ]; then
