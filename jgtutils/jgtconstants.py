@@ -77,8 +77,11 @@ indicator_AO_aboveZero_column_name = 'aoaz'
 indicator_AO_bellowZero_column_name = 'aobz'
 indicator_zeroLineCross_column_name = 'zlc'
 AOAZ=indicator_AO_aboveZero_column_name
+AOAZ_TYPE=int
 AOBZ=indicator_AO_bellowZero_column_name
+AOBZ_TYPE=int
 ZLC=indicator_zeroLineCross_column_name
+ZLC_TYPE=int
 
 indicator_gatorOscillator_low_column_name = 'gl' # Gator Oscillator low
 indicator_gatorOscillator_high_column_name = 'gh' # Gator Oscillator high
@@ -104,6 +107,10 @@ MFI_FAKE_STR='-+'
 MFI_SIGNAL = "mfi_sig"
 MFI_SIGNAL_TYPE = int
 MFI_VAL = "mfi_str"
+MFI_SQUAT_TYPE = int
+MFI_GREEN_TYPE = int
+MFI_FADE_TYPE = int
+MFI_FAKE_TYPE = int
 
 
 #Various fractal degrees
@@ -187,7 +194,9 @@ ACB = signalBuy_AC_acceleration_column_name
 FS = signalSell_fractal_column_name
 FB = signalBuy_fractal_column_name
 ZLCB = signalBuy_zeroLineCrossing_column_name
+ZLCB_TYPE=int
 ZLCS = signalSell_zeroLineCrossing_column_name
+ZLCS_TYPE=int
 ZCOL = signal_zcol_column_name
 ZONE_INT= "zint"
 ZONE_SIGNAL= "zone_sig"
@@ -200,25 +209,37 @@ ZONE_NEUTRAL_STR="gray"
 ZONE_NEUTRAL_ID=0
 
 SZ = signalSell_zoneSignal_column_name
+SZ_TYPE=int
 BZ = signalBuy_zoneSinal_column_name
+BZ_TYPE=int
 ZZ = "zz"
 SS = signalSell_saucer_column_name
+SS_TYPE=int
 SB = signalBuy_saucer_column_name
+SB_TYPE=int
 
 PRICE_PEAK_ABOVE = 'price_peak_above'
 AO_PEAK_ABOVE = 'ao_peak_above'
 PRICE_PEAK_BELLOW = 'price_peak_bellow'
 AO_PEAK_BELLOW = 'ao_peak_bellow'
+PRICE_PEAK_ABOVE_TYPE = int
+AO_PEAK_ABOVE_TYPE = int
+PRICE_PEAK_BELLOW_TYPE = int
+AO_PEAK_BELLOW_TYPE = int
 
 #ML target,vector_ao_fdbs,vector_ao_fdbb
 FDB_TARGET = 'target'
+FDB_TARGET_TYPE = float
 VECTOR_AO_FDBS = 'vaos'
 VECTOR_AO_FDBB = 'vaob'
 
 
 VECTOR_AO_FDB_COUNT = 'vaoc'
+VECTOR_AO_FDB_COUNT_TYPE = int
 VECTOR_AO_FDBS_COUNT = 'vaosc'
+VECTOR_AO_FDBS_COUNT_TYPE = int
 VECTOR_AO_FDBB_COUNT = 'vaobc'
+VECTOR_AO_FDBB_COUNT_TYPE= int
 
 #Default insturments and timeframes
 ML_DEFAULT_INSTRUMENTS = "SPX500,EUR/USD,GBP/USD"
