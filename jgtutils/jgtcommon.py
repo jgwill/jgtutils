@@ -668,7 +668,7 @@ def __balligator_flag__post_parse()->argparse.Namespace:
             setattr(args, BALLIGATOR_FLAG_ARGNAME,False)
             
         if hasattr(args, BALLIGATOR_FLAG_ARGNAME) and args.timeframe=="M1":
-            print("We dont do balligator for M1")
+            #print("We dont do balligator for M1")
             setattr(args, BALLIGATOR_FLAG_ARGNAME,False)
     except:
         pass
@@ -682,11 +682,11 @@ def __talligator_flag__post_parse()->argparse.Namespace:
             setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
             
         if hasattr(args, TALLIGATOR_FLAG_ARGNAME) and args.timeframe=="M1":
-            print("We dont do talligator for M1")
+            #print("We dont do talligator for M1")
             setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
         
         if hasattr(args, TALLIGATOR_FLAG_ARGNAME) and args.timeframe=="W1":
-            print("We dont do talligator for W1")
+            #print("We dont do talligator for W1")
             setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
     except:
         pass
@@ -703,7 +703,7 @@ def __mfi_flag__post_parse()->argparse.Namespace:
         
         if _NO_MFI_FOR_M1_flag:
             if hasattr(args, 'mfi_flag') and args.timeframe=="M1":
-                print("We dont do MFI for M1")
+                #print("We dont do MFI for M1")
                 setattr(args, 'mfi_flag',False)
     except:
         pass
