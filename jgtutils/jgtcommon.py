@@ -406,6 +406,20 @@ def add_exit_if_error(parser: argparse.ArgumentParser=None):
                         help='Exit on error rather than trying to keep looking')
     return parser
 
+def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+        
+    parser.add_argument('-dv','--dropna_volume',
+                        action='store_true',
+                        help='Drop rows with NaN in volume column')
+    
+    parser.add_argument("-ddnav","--dont_dropna_volume", help="Do not dropna volume", action="store_true")
+    
+    return parser
+
+
 def add_viewpath_argument(parser: argparse.ArgumentParser=None):
     """
     Adds an view path argument to the given argument parser.
