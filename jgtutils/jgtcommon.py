@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
 
-args=None # Default args when we are done parsing
+args:argparse.Namespace=None # Default args when we are done parsing
 try :
     import __main__
     # logging.basicConfig(filename='{0}.log'.format(__main__.__file__), level=logging.INFO,
@@ -420,12 +420,38 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
     
     return parser
 
+def _dependent_arguments_rules()->argparse.Namespace:
+    global args
+    if args is None or args==[]:
+        raise Exception("args is not set.  Run parse_args() first before calling this function.  Most likely, the CLI must be updated to do parser.parse_args() first instead of doing it in the main (REFACTORING Responsabilities)")
+    
+    try:
+        if not hasattr(args, 'quiet') and (hasattr(args, 'verbose') and args.verbose==0):
+            #add quiet to list
+           #print("Quiet mode activated in parser")
+           setattr(args, 'quiet', True)
+        else:
+            setattr(args, 'quiet', False)
+    except:
+        pass
+    
+    
+    # OTHER DEPENDENT RULES
+    
+    
+    
+    
+    return args
+    
 
-def parse_args(parser: argparse.ArgumentParser=None):
+def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
     global default_parser,args
     if parser is None:
         parser=default_parser
     args= parser.parse_args()
+    
+    
+    args=_dependent_arguments_rules()
     return args
 
 def do_we_dropna_volume(_args=None):
