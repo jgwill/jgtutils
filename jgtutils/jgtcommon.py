@@ -204,6 +204,44 @@ def valid_datetime(check_future: bool):
     return _valid_datetime
 
 
+def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    group1 = parser.add_argument_group('Group 1 (TLID Range)')
+    g1x=group1.add_mutually_exclusive_group()
+    g1x.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
+                        help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
+    g2x=g1x.add_mutually_exclusive_group()
+    
+    raise Exception("Not implemented - Complicated")
+    
+    #group1.
+    #dt_range_group=parser.add_mutually_exclusive_group()
+    #dt_range_group.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
+    #                    help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
+    # Second group of arguments
+    group2 = parser.add_argument_group('Group 2 (Dates)')
+    group2.add_argument('-s', '--datefrom', metavar='"m.d.Y H:M:S"',
+                        help='Date/time from which you want to receive historical prices.',
+                        type=valid_datetime(True),required=False)
+    group2.add_argument('-e', '--dateto', metavar='"m.d.Y H:M:S"',
+                        help='Datetime until which you want to receive historical prices.',
+                        type=valid_datetime(False),required=False)
+    
+    # Exclusivity between the two groups
+    group1_xor_group2 = parser.add_mutually_exclusive_group()
+    group1_xor_group2.add_argument('-r', '--range', dest='tlidrange', action='store_true')
+    
+    group2x=group1_xor_group2.add_mutually_exclusive_group()
+    group2x.add_argument('-s', '--datefrom', dest='tlidrange', action='store_false')
+    group2x.add_argument('-e', '--dateto', dest='tlidrange', action='store_false')
+    
+    
+    return parser
+
+
 def add_tlid_range_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
