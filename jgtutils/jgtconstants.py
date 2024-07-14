@@ -256,3 +256,8 @@ ML_DEFAULT_COLUMNS_TO_DROP = ['Median', 'fh3', 'fl3', 'fh5', 'fl5', 'fh8', 'fl8'
 
 
 IDS_COLUMNS_TO_NORMALIZE = ["ao", "ac"] #@a Migrate to jgtutils.jgtconstants
+
+
+
+
+TIMEFRAMES_ALL=["M1","W1","D1","H8","H6","H4","H3","H2","H1","m30","m15","m5","m1"]

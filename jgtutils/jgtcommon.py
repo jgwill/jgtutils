@@ -420,10 +420,77 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
     
     return parser
 
-def _dependent_arguments_rules()->argparse.Namespace:
+
+
+def __timeframes_post_parse(timeframes=None)->argparse.Namespace:
     global args
+    __check_if_parsed()
+    if hasattr(args, 'timeframes'):
+        _timeframes=args.timeframes 
+    else :
+        setattr(args, 'timeframes',None)
+        return args
+    
+    _timeframes=None
+    
+    if isinstance(timeframes, list):
+        _timeframes = timeframes
+    else:
+        _timeframes = parse_timeframes_helper(timeframes)
+    setattr(args, 'timeframes',_timeframes)
+    return args
+
+from jgtconstants import TIMEFRAMES_ALL
+
+def parse_timeframes_helper(timeframes):
+    if timeframes in TIMEFRAMES_ALL:
+        return [timeframes]
+    if timeframes == "default" or timeframes == "all" :
+        try:
+            _timeframes = os.getenv("T").split(",")
+        except:
+            _timeframes = None
+    else:
+        try:
+            _timeframes = timeframes.split(",")
+        except:
+            _timeframes = None
+    return _timeframes
+
+def __crop_last_dt__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    if hasattr(args, 'crop_last_dt'):
+        if args.crop_last_dt is not None:
+            setattr(args, 'crop_last_dt', args.crop_last_dt)
+    else:
+        setattr(args, 'crop_last_dt', None)
+    return args
+
+def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_argname = 'rmbidask')->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        keep_bid_ask_value=False        
+        
+        if hasattr(args, keep_bid_ask_argname) and not hasattr(args, rm_bid_ask_argname):
+            keep_bid_ask_value=True
+        
+        setattr(args, keep_bid_ask_argname,keep_bid_ask_value)
+        setattr(args, 'keep_bid_ask',keep_bid_ask_value) # Future refactoring will be called just that.
+        setattr(args, rm_bid_ask_argname,not keep_bid_ask_value)
+    except:
+        pass
+    return args
+    
+
+def __check_if_parsed():
     if args is None or args==[]:
         raise Exception("args is not set.  Run parse_args() first before calling this function.  Most likely, the CLI must be updated to do parser.parse_args() first instead of doing it in the main (REFACTORING Responsabilities)")
+
+def _post_parse_dependent_arguments_rules()->argparse.Namespace:
+    global args
+    __check_if_parsed()
     
     try:
         if not hasattr(args, 'quiet') and (hasattr(args, 'verbose') and args.verbose==0):
@@ -437,12 +504,25 @@ def _dependent_arguments_rules()->argparse.Namespace:
     
     
     # OTHER DEPENDENT RULES
+    ## dropna_volume
+    try:
+        
+        dropna_volume_flag = _do_we_dropna_volume(args)
+        setattr(args, 'dropna_volume',dropna_volume_flag)
+        #dont_dropna_volume
+        setattr(args, 'dont_dropna_volume',not dropna_volume_flag)
+        
+    except:
+        pass
     
+    ## keepbidask
+    args=__keep_bid_ask__post_parse()
     
-    
+    args=__timeframes_post_parse()
+    args=__crop_last_dt__post_parse()
     
     return args
-    
+
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
     global default_parser,args
@@ -451,10 +531,10 @@ def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
     args= parser.parse_args()
     
     
-    args=_dependent_arguments_rules()
+    args=_post_parse_dependent_arguments_rules()
     return args
 
-def do_we_dropna_volume(_args=None):
+def _do_we_dropna_volume(_args=None):
     global args
     if _args is None:
         _args=args
