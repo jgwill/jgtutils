@@ -148,6 +148,27 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
     return parser
     
 
+def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-d','--bs', metavar="TYPE", required=True,
+                        help='The order direction. Possible values are: B - buy, S - sell.')
+    return parser
+
+def add_rate_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-r','--rate', metavar="RATE", required=True, type=float,
+                            help='Desired price of an entry order.')
+    return parser
+
+
+def add_lots_arguments(parser):
+    parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
+                            help='Trade amount in lots.')
+
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
                                       lots: bool = True):
     global default_parser
@@ -155,16 +176,14 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
         parser=default_parser
 
     if direction:
-        parser.add_argument('-d', metavar="TYPE", required=True,
-                            help='The order direction. Possible values are: B - buy, S - sell.')
+        add_direction_buysell_arguments(parser)
     if rate:
-        parser.add_argument('-r', metavar="RATE", required=True, type=float,
-                            help='Desired price of an entry order.')
+        add_rate_arguments(parser)
     if lots:
-        parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
-                            help='Trade amount in lots.')
+        add_lots_arguments(parser)
     
     return parser
+
 
 
 def add_account_arguments(parser: argparse.ArgumentParser=None):
