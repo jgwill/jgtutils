@@ -483,6 +483,26 @@ def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_ar
         pass
     return args
     
+def __verbose__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, 'verbose'):
+            setattr(args, 'verbose',0)
+    except:
+        pass
+    return args
+
+def __quotescount__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, 'quotescount'):
+            setattr(args, 'quotescount',-1)
+    except:
+        pass
+    return args
+
 
 def __check_if_parsed():
     if args is None or args==[]:
@@ -520,6 +540,8 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     
     args=__timeframes_post_parse()
     args=__crop_last_dt__post_parse()
+    args=__verbose__post_parse()
+    args=__quotescount__post_parse()
     
     return args
 
