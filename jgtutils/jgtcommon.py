@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
 
+args=None # Default args when we are done parsing
 try :
     import __main__
     # logging.basicConfig(filename='{0}.log'.format(__main__.__file__), level=logging.INFO,
@@ -413,12 +414,29 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
         
     parser.add_argument('-dv','--dropna_volume',
                         action='store_true',
-                        help='Drop rows with NaN in volume column')
+                        help='Drop rows with NaN (or 0) in volume column.  (note.Montly chart does not dropna volume)')
     
-    parser.add_argument("-ddnav","--dont_dropna_volume", help="Do not dropna volume", action="store_true")
+    parser.add_argument("-ddv","--dont_dropna_volume", help="Do not dropna volume", action="store_true")
     
     return parser
 
+
+def parse_args(parser: argparse.ArgumentParser=None):
+    global default_parser,args
+    if parser is None:
+        parser=default_parser
+    args= parser.parse_args()
+    return args
+
+def do_we_dropna_volume(_args=None):
+    global args
+    if _args is None:
+        _args=args
+    dropna_volume_value = _args.dropna_volume or not _args.dont_dropna_volume
+    if args.timeframe == "M1" and dropna_volume_value:
+        print("We dont drop for M1")
+        return False # We dont drop for Monthly
+    return dropna_volume_value
 
 def add_viewpath_argument(parser: argparse.ArgumentParser=None):
     """
