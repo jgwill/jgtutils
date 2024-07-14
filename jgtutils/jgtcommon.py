@@ -38,6 +38,35 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
 
+from jgtutils.jgtcliconstants import (FRESH_FLAG_ARGNAME,
+                      FRESH_FLAG_ARGNAME_ALIAS,
+                      NOT_FRESH_FLAG_ARGNAME_ALIAS,
+                      NOT_FRESH_FLAG_ARGNAME,
+                      BALLIGATOR_FLAG_ARGNAME,
+                      BALLIGATOR_FLAG_ARGNAME_ALIAS,
+                      TALLIGATOR_FLAG_ARGNAME,
+                      TALLIGATOR_FLAG_ARGNAME_ALIAS,
+                      MFI_FLAG_ARGNAME,
+                      MFI_FLAG_ARGNAME_ALIAS,
+                      NO_MFI_FLAG_ARGNAME,
+                      NO_MFI_FLAG_ARGNAME_ALIAS,
+                      GATOR_OSCILLATOR_FLAG_ARGNAME,
+                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
+                      KEEP_BID_ASK_FLAG_ARGNAME,
+                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,
+                      REMOVE_BID_ASK_FLAG_ARGNAME,
+                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,
+                      FULL_FLAG_ARGNAME,
+                      FULL_FLAG_ARGNAME_ALIAS,
+                      NOT_FULL_FLAG_ARGNAME,
+                      NOT_FULL_FLAG_ARGNAME_ALIAS,
+                      DROPNA_VOLUME_FLAG_ARGNAME,
+                      DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
+                      DONT_DROPNA_VOLUME_FLAG_ARGNAME,
+                      DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS
+                      )
+
+
 args:argparse.Namespace=None # Default args when we are done parsing
 try :
     import __main__
@@ -72,6 +101,31 @@ def init_default_parser(description: str):
     global default_parser
     default_parser = argparse.ArgumentParser(description=description)
     return default_parser
+
+
+
+
+def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true"):
+
+
+    __alias_cmd_prefix = "-"
+    __full_arg_prefix = "--"
+    
+    _argname_alias = __alias_cmd_prefix+_argname_alias
+    _argname_full = __full_arg_prefix+_argname_full
+    parser.add_argument(
+        _argname_alias,
+        _argname_full,
+        action=_action_value,
+        help=_description,
+    )
+    
+    return parser
+
+
+
+
+
 
 def add_main_arguments(parser: argparse.ArgumentParser=None):
     global default_parser
@@ -326,7 +380,8 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-        
+    
+    print("DEPRECATION: Use: add_bars_amount_V2_arguments")
     parser.add_argument('-c','--quotescount',
                         metavar="MAX",
                         default=-1,
@@ -335,16 +390,26 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
     
     return parser
 
-
-# def add_bars_arguments(parser: argparse.ArgumentParser=None):
-    # global default_parser
-    # if parser is None:
-    #     parser=default_parser
-#     parser.add_argument('-bars',
-#                         metavar="COUNT",
-#                         default=3,
-#                         type=int,
-#                         help='Build COUNT bars. Optional parameter.')
+def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    #help='Specify the number of bars to download or use the full number of bars available from the store.'
+    bars_group=parser.add_mutually_exclusive_group()
+    
+    
+    bars_group.add_argument('-c','--quotescount',
+                        metavar="MAX",
+                        default=-1,
+                        type=int,
+                        help='Max number of bars. 0 - Not limited')
+    g_full_notfull=bars_group.add_mutually_exclusive_group()
+    g_full_notfull.add_argument('-uf','--full',
+                        action='store_true',
+                        help='Output/Input uses the full store. ')
+    g_full_notfull.add_argument('-un','--notfull',
+                        action='store_true',
+                        help='Output/Input uses NOT the full store. ')
 
 
 def add_output_argument(parser: argparse.ArgumentParser=None):
@@ -400,11 +465,13 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-        
-    parser.add_argument('-uf','--full',
+    
+    #print("DEPRECATION: Use: add_bars_amount_V2_arguments")
+    full_notfull_group = parser.add_mutually_exclusive_group()
+    full_notfull_group.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input uses the full store. ')
-    parser.add_argument('-un','--notfull',
+    full_notfull_group.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input uses NOT the full store. ')
  
@@ -423,10 +490,12 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-new','--fresh',
+    
+    fresh_old_group=parser.add_mutually_exclusive_group()
+    fresh_old_group.add_argument('-'+FRESH_FLAG_ARGNAME_ALIAS,'--'+FRESH_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input freshes storage with latest market. ')
-    parser.add_argument('-old','--notfresh',
+                        help='Freshening the storage with latest market. ')
+    fresh_old_group.add_argument('-'+NOT_FRESH_FLAG_ARGNAME_ALIAS,'--'+NOT_FRESH_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input wont be freshed from storage (weekend or tests). ')
  
@@ -446,10 +515,13 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-kba','--keepbidask',
+    
+    group_kba=parser.add_mutually_exclusive_group()
+    
+    group_kba.add_argument('-'+KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+KEEP_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
                         help='Keep Bid/Ask in storage. ')
-    parser.add_argument('-rmba','--rmbidask',
+    group_kba.add_argument('-'+REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+REMOVE_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
                         help='Remove Bid/Ask in storage. ')
     return parser
@@ -468,14 +540,41 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-        
-    parser.add_argument('-dv','--dropna_volume',
+    
+    dv_group=parser.add_mutually_exclusive_group()
+    
+    dv_group.add_argument('-'+DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,'--'+DROPNA_VOLUME_FLAG_ARGNAME,
                         action='store_true',
                         help='Drop rows with NaN (or 0) in volume column.  (note.Montly chart does not dropna volume)')
     
-    parser.add_argument("-ddv","--dont_dropna_volume", help="Do not dropna volume", action="store_true")
+    dv_group.add_argument("-"+DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,"--"+DONT_DROPNA_VOLUME_FLAG_ARGNAME, help="Do not dropna volume", action="store_true")
     
     return parser
+
+
+
+def __dropna_volume__post_parse():
+    try:
+        dropna_volume_flag = _do_we_dropna_volume(args)
+        setattr(args, 'dropna_volume',dropna_volume_flag)
+        #dont_dropna_volume
+        setattr(args, 'dont_dropna_volume',not dropna_volume_flag)
+        
+    except:
+        pass
+    return args
+
+def __quiet__post_parse():
+    try:
+        if not hasattr(args, 'quiet') and (hasattr(args, 'verbose') and args.verbose==0):
+            #add quiet to list
+           #print("Quiet mode activated in parser")
+           setattr(args, 'quiet', True)
+        else:
+            setattr(args, 'quiet', False)
+    except:
+        pass
+    return args
 
 
 
@@ -524,14 +623,15 @@ def __crop_last_dt__post_parse()->argparse.Namespace:
         setattr(args, 'crop_last_dt', None)
     return args
 
+#@STCIssue We want this to Default to True and would be flagged to false by rm_bid_ask
 def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_argname = 'rmbidask')->argparse.Namespace:
     global args
     __check_if_parsed()
     try:
-        keep_bid_ask_value=False        
+        keep_bid_ask_value=True        
         
-        if hasattr(args, keep_bid_ask_argname) and not hasattr(args, rm_bid_ask_argname):
-            keep_bid_ask_value=True
+        if hasattr(args, rm_bid_ask_argname) or hasattr(args,'rm_bid_ask'):
+            keep_bid_ask_value=False
         
         setattr(args, keep_bid_ask_argname,keep_bid_ask_value)
         setattr(args, 'keep_bid_ask',keep_bid_ask_value) # Future refactoring will be called just that.
@@ -560,6 +660,70 @@ def __quotescount__post_parse()->argparse.Namespace:
         pass
     return args
 
+def __balligator_flag__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, BALLIGATOR_FLAG_ARGNAME):
+            setattr(args, BALLIGATOR_FLAG_ARGNAME,False)
+            
+        if hasattr(args, BALLIGATOR_FLAG_ARGNAME) and args.timeframe=="M1":
+            print("We dont do balligator for M1")
+            setattr(args, BALLIGATOR_FLAG_ARGNAME,False)
+    except:
+        pass
+    return args
+
+def __talligator_flag__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, TALLIGATOR_FLAG_ARGNAME):
+            setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
+            
+        if hasattr(args, TALLIGATOR_FLAG_ARGNAME) and args.timeframe=="M1":
+            print("We dont do talligator for M1")
+            setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
+        
+        if hasattr(args, TALLIGATOR_FLAG_ARGNAME) and args.timeframe=="W1":
+            print("We dont do talligator for W1")
+            setattr(args, TALLIGATOR_FLAG_ARGNAME,False)
+    except:
+        pass
+    return args
+
+
+_NO_MFI_FOR_M1_flag=False
+def __mfi_flag__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, 'mfi_flag'):
+            setattr(args, 'mfi_flag',False)
+        
+        if _NO_MFI_FOR_M1_flag:
+            if hasattr(args, 'mfi_flag') and args.timeframe=="M1":
+                print("We dont do MFI for M1")
+                setattr(args, 'mfi_flag',False)
+    except:
+        pass
+    return args
+
+
+def __use_fresh__post_parse()->argparse.Namespace: 
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, FRESH_FLAG_ARGNAME):
+            setattr(args, FRESH_FLAG_ARGNAME,False)
+        if hasattr(args, FRESH_FLAG_ARGNAME) and args.fresh:
+            setattr(args, FRESH_FLAG_ARGNAME,True)
+        else:
+            if hasattr(args, NOT_FRESH_FLAG_ARGNAME) and args.notfresh:
+                setattr(args, FRESH_FLAG_ARGNAME,False)
+    except:
+        pass
+    return args
 
 def __check_if_parsed():
     if args is None or args==[]:
@@ -569,38 +733,26 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     global args
     __check_if_parsed()
     
-    try:
-        if not hasattr(args, 'quiet') and (hasattr(args, 'verbose') and args.verbose==0):
-            #add quiet to list
-           #print("Quiet mode activated in parser")
-           setattr(args, 'quiet', True)
-        else:
-            setattr(args, 'quiet', False)
-    except:
-        pass
+    args=__quiet__post_parse()
     
     
     # OTHER DEPENDENT RULES
-    ## dropna_volume
-    try:
-        
-        dropna_volume_flag = _do_we_dropna_volume(args)
-        setattr(args, 'dropna_volume',dropna_volume_flag)
-        #dont_dropna_volume
-        setattr(args, 'dont_dropna_volume',not dropna_volume_flag)
-        
-    except:
-        pass
+
+    args=__dropna_volume__post_parse()
     
-    ## keepbidask
     args=__keep_bid_ask__post_parse()
     
     args=__timeframes_post_parse()
     args=__crop_last_dt__post_parse()
     args=__verbose__post_parse()
     args=__quotescount__post_parse()
+    args=__balligator_flag__post_parse()
+    args=__talligator_flag__post_parse()
+    args=__mfi_flag__post_parse()
+    args=__use_fresh__post_parse()
     
     return args
+
 
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
@@ -619,7 +771,7 @@ def _do_we_dropna_volume(_args=None):
         _args=args
     dropna_volume_value = _args.dropna_volume or not _args.dont_dropna_volume
     if args.timeframe == "M1" and dropna_volume_value:
-        print("We dont drop for M1")
+        print("We dont dropna volume for M1")
         return False # We dont drop for Monthly
     return dropna_volume_value
 
@@ -693,14 +845,14 @@ def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     parser.add_argument(
-        "-mfi",
-        "--mfi_flag",
+        "-"+MFI_FLAG_ARGNAME_ALIAS,
+        "--"+MFI_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Market Facilitation Index indicator.",
     )
     parser.add_argument(
-        "-nomfi",
-        "--no_mfi_flag",  
+        "-"+NO_MFI_FLAG_ARGNAME_ALIAS,
+        "--"+NO_MFI_FLAG_ARGNAME,  
         action="store_true",
         help="Disable the Market Facilitation Index indicator.",
     )  
@@ -713,8 +865,8 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
         parser=default_parser
 
     parser.add_argument(
-        "-go",
-        "--gator_oscillator_flag",
+        "-"+GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
+        "--"+GATOR_OSCILLATOR_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Gator Oscillator indicator.",
     )
@@ -741,12 +893,13 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     
-    parser.add_argument(
-        "-ba",
-        "--balligator_flag",
-        action="store_true",
-        help="Enable the Big Alligator indicator.",
-    )
+    _description = "Enable the Big Alligator indicator."
+    _argname_alias=BALLIGATOR_FLAG_ARGNAME_ALIAS
+    _argname_full=BALLIGATOR_FLAG_ARGNAME
+    
+    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser)
+    
+    
     parser.add_argument(
         "-bjaw",
         "--balligator_period_jaws",
@@ -755,6 +908,7 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
         help="The period of the Big Alligator jaws.",
     )
     return parser
+
   
 def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
 
@@ -763,8 +917,8 @@ def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
         parser=default_parser
     
     parser.add_argument(
-        "-ta",
-        "--talligator_flag",
+        "-"+TALLIGATOR_FLAG_ARGNAME_ALIAS,
+        "--"+TALLIGATOR_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Tide Alligator indicator.",
     )
