@@ -105,9 +105,9 @@ except:
 #     pass
 
 
-def new_parser(description: str):
+def new_parser(description: str,epilog: str=None,prog: str=None)->argparse.ArgumentParser:
     global default_parser
-    default_parser = argparse.ArgumentParser(description=description)
+    default_parser = argparse.ArgumentParser(description=description,epilog=epilog,prog=prog)
     return default_parser
 
 # Get a group by its title
