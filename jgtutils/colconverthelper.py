@@ -1,7 +1,7 @@
 from jgtconstants import MFI_SQUAT, MFI_FAKE, MFI_FADE, MFI_GREEN, MFI_SQUAT_STR, MFI_FAKE_STR, MFI_FADE_STR, MFI_GREEN_STR, MFI_SQUAT_ID, MFI_FAKE_ID, MFI_FADE_ID, MFI_GREEN_ID
 
-from jgtutils.jgtconstants import MFI_VAL as MFI_DEFAULT_COLNAME
-from jgtutils.jgtconstants import ZCOL as ZONE_DEFAULT_COLNAME
+from jgtutils.jgtconstants import MFI_SIGNAL as MFI_DEFAULT_COLNAME
+from jgtutils.jgtconstants import ZONE_SIGNAL as ZONE_DEFAULT_COLNAME
 
 def mfi_str_to_id(mfi_str:str)->int:
     if mfi_str == MFI_SQUAT_STR:
