@@ -10,7 +10,10 @@ example:
 PDS_RQ_BASE="""
 {
   "dropna_volume": true,
-  "keep_bid_ask": true
+  "keep_bid_ask": true,
+  "mfi_flag": true,
+  "balligator_flag": true,
+  "talligator_flag": true,
 }
 """
 
