@@ -566,45 +566,45 @@ def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None)->argparse.A
         parser=default_parser
     group_pattern=parser.add_argument_group('RQ Pattern', 'RQ Pattern to use.  Future practice to create request patterns to load into the args later.')
     
-    group_pattern.add_argument('-pdsrq','--pds_rq_json_base',
+    group_pattern.add_argument('-pdsrq','--pds_rq_base',
                         action='store_true',
-                        help='Use PDS_RQ_JSON_BASE')
-    #PDS_RQ_JSON_NORMAL
-    group_pattern.add_argument('-pdsrqnormal','--pds_rq_json_normal',
+                        help='Use PDS_RQ JSON_BASE')
+    #PDS_RQ JSON_NORMAL
+    group_pattern.add_argument('-pdsrqn','--pds_rq_normal',
                         action='store_true',
-                        help='Use PDS_RQ_JSON_NORMAL')
-    #PDS_RQ_JSON_NORMAL_FRESH
-    group_pattern.add_argument('-pdsrqfresh','--pds_rq_json_normal_fresh',
+                        help='Use PDS_RQ JSON_NORMAL')
+    #PDS_RQ JSON_NORMAL_FRESH
+    group_pattern.add_argument('-pdsrqnf','--pds_rq_normal_fresh',
                         action='store_true',
-                        help='Use PDS_RQ_JSON_NORMAL_FRESH')
-    #PDS_RQ_JSON_FULL
-    group_pattern.add_argument('-pdsrqfull','--pds_rq_json_full',
+                        help='Use PDS_RQ JSON_NORMAL_FRESH')
+    #PDS_RQ JSON_FULL
+    group_pattern.add_argument('-pdsrqf','--pds_rq_full',
                         action='store_true',
-                        help='Use PDS_RQ_JSON_FULL')
-    #PDS_RQ_JSON_FULL_FRESH
-    group_pattern.add_argument('-pdsrqfullfresh','--pds_rq_json_full_fresh',
+                        help='Use PDS_RQ JSON_FULL')
+    #PDS_RQ JSON_FULL_FRESH
+    group_pattern.add_argument('-pdsrqff','--pds_rq_full_fresh',
                         action='store_true',
-                        help='Use PDS_RQ_JSON_FULL_FRESH')
-    #IDS_RQ_JSON_BASE
-    group_pattern.add_argument('-idsrq','--ids_rq_json_base',
+                        help='Use PDS_RQ JSON_FULL_FRESH')
+    #IDS_RQ JSON_BASE
+    group_pattern.add_argument('-idsrq','--ids_rq_base',
                         action='store_true',
-                        help='Use IDS_RQ_JSON_BASE')
+                        help='Use IDS_RQ JSON_BASE')
     
-    group_pattern.add_argument('-cdsrq','--cds_rq_json_normal',
+    group_pattern.add_argument('-cdsrq','--cds_rq_normal',
                         action='store_true',
-                        help='Use CDS_RQ_JSON_NORMAL')
+                        help='Use CDS_RQ JSON_NORMAL')
     
-    group_pattern.add_argument('-cdsrqfull','--cds_rq_json_full',
+    group_pattern.add_argument('-cdsrqf','--cds_rq_full',
                         action='store_true',
-                        help='Use CDS_RQ_JSON_FULL')
-    #CDS_RQ_JSON_FULL_FRESH
-    group_pattern.add_argument('-cdsrqfullfresh','--cds_rq_json_full_fresh',
+                        help='Use CDS_RQ JSON_FULL')
+    #CDS_RQ JSON_FULL_FRESH
+    group_pattern.add_argument('-cdsrqff','--cds_rq_full_fresh',
                         action='store_true',
-                        help='Use CDS_RQ_JSON_FULL_FRESH')
-    #CDS_RQ_JSON_NORM_FRESH
-    group_pattern.add_argument('-cdsrqfresh','--cds_rq_json_norm_fresh',
+                        help='Use CDS_RQ JSON_FULL_FRESH')
+    #CDS_RQ JSON_NORM_FRESH
+    group_pattern.add_argument('-cdsrqnf','--cds_rq_norm_fresh',
                         action='store_true',
-                        help='Use CDS_RQ_JSON_NORM_FRESH')
+                        help='Use CDS_RQ JSON_NORM_FRESH')
     
     return parser
 
@@ -612,20 +612,29 @@ def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None)->argparse.A
 def __jgtclirqdata_post_parse():
     global args
     __check_if_parsed()
-    _jgtclirqdata_to_load=[jgtclirqdata.PDS_RQ_JSON_BASE]
+    _jgtclirqdata_to_load=[jgtclirqdata.PDS_RQ_BASE]
     try:
-        if hasattr(args, 'pds_rq_json_base') and args.pds_rq_json_base:
-            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_JSON_BASE)
-        if hasattr(args, 'ids_rq_json_base') and args.ids_rq_json_base:
-            _jgtclirqdata_to_load.append(jgtclirqdata.IDS_RQ_JSON_BASE)
-        if hasattr(args, 'cds_rq_json_normal') and args.cds_rq_json_normal:
-            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_NORMAL)
-        if hasattr(args, 'cds_rq_json_full') and args.cds_rq_json_full:
-            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_FULL)
-        if hasattr(args, 'cds_rq_json_full_fresh') and args.cds_rq_json_full_fresh:
-            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_FULL_FRESH)
-        if hasattr(args, 'cds_rq_json_norm_fresh') and args.cds_rq_json_norm_fresh:
-            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_NORM_FRESH)
+        if hasattr(args, 'pds_rq_base') and args.pds_rq_base:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_BASE)
+        if hasattr(args, 'ids_rq_base') and args.ids_rq_base:
+            _jgtclirqdata_to_load.append(jgtclirqdata.IDS_RQ_BASE)
+        if hasattr(args, 'cds_rq_normal') and args.cds_rq_normal:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_NORMAL)
+        if hasattr(args, 'cds_rq_full') and args.cds_rq_full:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_FULL)
+        if hasattr(args, 'cds_rq_full_fresh') and args.cds_rq_full_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_FULL_FRESH)
+        if hasattr(args, 'cds_rq_norm_fresh') and args.cds_rq_norm_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_NORM_FRESH)
+        if hasattr(args, 'pds_rq_normal') and args.pds_rq_normal:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_NORMAL)
+        if hasattr(args, 'pds_rq_normal_fresh') and args.pds_rq_normal_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_NORMAL_FRESH)
+        if hasattr(args, 'pds_rq_full') and args.pds_rq_full:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_FULL)
+        if hasattr(args, 'pds_rq_full_fresh') and args.pds_rq_full_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_FULL_FRESH)
+            
     except:
         pass
     #for each pattern we have, load their key/value into the args

@@ -7,14 +7,14 @@ example:
 
 """
 
-PDS_RQ_JSON_BASE="""
+PDS_RQ_BASE="""
 {
   "dropna_volume": true,
   "keep_bid_ask": true
 }
 """
 
-PDS_RQ_JSON_NORMAL="""
+PDS_RQ_NORMAL="""
 {
   "use_full": false,
   "use_fresh": false,
@@ -22,7 +22,7 @@ PDS_RQ_JSON_NORMAL="""
   "keep_bid_ask": true
 }
 """
-PDS_RQ_JSON_NORMAL_FRESH="""
+PDS_RQ_NORMAL_FRESH="""
 {
   "use_full": false,
   "use_fresh": true,
@@ -30,7 +30,7 @@ PDS_RQ_JSON_NORMAL_FRESH="""
   "keep_bid_ask": true
 }
 """
-PDS_RQ_JSON_FULL="""
+PDS_RQ_FULL="""
 {
   "use_full": true,
   "use_fresh": false,
@@ -39,7 +39,7 @@ PDS_RQ_JSON_FULL="""
 }
 """
 
-PDS_RQ_JSON_FULL_FRESH="""
+PDS_RQ_FULL_FRESH="""
 {
   "use_full": true,
   "use_fresh": false,
@@ -48,7 +48,7 @@ PDS_RQ_JSON_FULL_FRESH="""
 }
 """
 
-IDS_RQ_JSON_BASE="""
+IDS_RQ_BASE="""
 {
   "mfi_flag": true,
   "balligator_flag": true,
@@ -58,7 +58,7 @@ IDS_RQ_JSON_BASE="""
 }
 """
 
-CDS_RQ_JSON_NORMAL="""
+CDS_RQ_NORMAL="""
 {
   "use_full": false,
   "use_fresh": false,
@@ -69,7 +69,7 @@ CDS_RQ_JSON_NORMAL="""
   "keep_bid_ask": true
 }
 """
-CDS_RQ_JSON_FULL="""
+CDS_RQ_FULL="""
 {
   "use_full": true,
   "use_fresh": false,
@@ -83,7 +83,7 @@ CDS_RQ_JSON_FULL="""
 """
 
 
-CDS_RQ_JSON_FULL_FRESH="""
+CDS_RQ_FULL_FRESH="""
 {
   "use_full": true,
   "use_fresh": true,
@@ -96,7 +96,7 @@ CDS_RQ_JSON_FULL_FRESH="""
 }
 """
 
-CDS_RQ_JSON_NORM_FRESH="""
+CDS_RQ_NORM_FRESH="""
 {
   "use_full": false,
   "use_fresh": true,
@@ -109,7 +109,7 @@ CDS_RQ_JSON_NORM_FRESH="""
 }
 """
 
-CDS_RQ_JSON_NORM_FRESH__NO_MFI="""
+CDS_RQ_NORM_FRESH__NO_MFI="""
 {
   "use_full": false,
   "use_fresh": true,
