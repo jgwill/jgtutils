@@ -640,6 +640,7 @@ def __jgtclirqdata_post_parse():
     #for each pattern we have, load their key/value into the args
     for pattern in _jgtclirqdata_to_load:
         try:
+            #print(pattern)
             json_obj = json.loads(pattern)
             for key in json_obj:
                 setattr(args, key, json_obj[key])
