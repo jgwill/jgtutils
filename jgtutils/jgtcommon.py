@@ -153,7 +153,7 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
 
 
 
-def add_main_arguments(parser: argparse.ArgumentParser=None):
+def add_main_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -191,7 +191,7 @@ def add_main_arguments(parser: argparse.ArgumentParser=None):
                                  a pin. Optional parameter.')
     return parser
 
-def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None):
+def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -228,7 +228,7 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
     return parser
     
 
-def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None):
+def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -236,7 +236,7 @@ def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None):
                         help='The order direction. Possible values are: B - buy, S - sell.')
     return parser
 
-def add_rate_arguments(parser: argparse.ArgumentParser=None):
+def add_rate_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -266,7 +266,7 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
 
 
 
-def add_account_arguments(parser: argparse.ArgumentParser=None):
+def add_account_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -303,7 +303,7 @@ def valid_datetime(check_future: bool):
     return _valid_datetime
 
 
-def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None):
+def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -341,7 +341,7 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None):
     return parser
 
 
-def add_tlid_range_argument(parser: argparse.ArgumentParser=None):
+def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -404,7 +404,7 @@ def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: b
     return parser
 
 
-def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
+def add_max_bars_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -419,7 +419,7 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
     
     return parser
 
-def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None):
+def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -443,7 +443,7 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None):
                         help='Output/Input uses NOT the full store. ')
 
 
-def add_output_argument(parser: argparse.ArgumentParser=None):
+def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds an output argument to the given argument parser.
 
@@ -463,7 +463,7 @@ def add_output_argument(parser: argparse.ArgumentParser=None):
     
     return parser
 
-def add_compressed_argument(parser: argparse.ArgumentParser=None):
+def add_compressed_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds an compressed argument to the given argument parser.
     
@@ -483,7 +483,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None):
     return parser
 
 
-def add_use_full_argument(parser: argparse.ArgumentParser=None):
+def add_use_full_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds a use full argument to the given argument parser.
     
@@ -508,7 +508,7 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None):
  
     return parser
 
-def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
+def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds a use fresh argument to the given argument parser.
     
@@ -534,7 +534,7 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
     return parser
 
 
-def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
+def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds a keep Bid/Ask argument to the given argument parser.
     
@@ -560,7 +560,7 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
     return parser
 
 import jgtclirqdata
-def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None):
+def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -640,7 +640,7 @@ def __jgtclirqdata_post_parse():
 
 
 #Load a json content from the argument --json
-def add_load_json_file_argument(parser: argparse.ArgumentParser=None):
+def add_load_json_file_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -675,7 +675,7 @@ def __json_post_parse():
     return args
 
 
-def add_exit_if_error(parser: argparse.ArgumentParser=None):
+def add_exit_if_error(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -685,7 +685,7 @@ def add_exit_if_error(parser: argparse.ArgumentParser=None):
                         help='Exit on error rather than trying to keep looking')
     return parser
 
-def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
+def add_dropna_volume_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -927,7 +927,7 @@ def _do_we_dropna_volume(_args=None):
         return False # We dont drop for Monthly
     return dropna_volume_value
 
-def add_viewpath_argument(parser: argparse.ArgumentParser=None):
+def add_viewpath_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds an view path argument to the given argument parser.
     
@@ -948,13 +948,13 @@ def add_viewpath_argument(parser: argparse.ArgumentParser=None):
     return parser
 
 
-# def add_quiet_argument(parser: argparse.ArgumentParser=None):
+# def add_quiet_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 #     parser.add_argument('-q','--quiet',
 #                         action='store_true',
 #                         help='Suppress all output. If specified, no output will be printed to the console.')
 #     return parser
 
-def add_verbose_argument(parser: argparse.ArgumentParser=None):
+def add_verbose_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -968,7 +968,7 @@ def add_verbose_argument(parser: argparse.ArgumentParser=None):
                         help='Set the verbosity level. 0 = quiet, 1 = normal, 2 = verbose, 3 = very verbose, etc.')
     return parser
 
-def add_cds_argument(parser: argparse.ArgumentParser=None):
+def add_cds_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -980,7 +980,7 @@ def add_cds_argument(parser: argparse.ArgumentParser=None):
                         help='Action the creation of CDS')
     return parser
 
-def add_ids_argument(parser: argparse.ArgumentParser=None):
+def add_ids_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -993,7 +993,7 @@ def add_ids_argument(parser: argparse.ArgumentParser=None):
     return parser
 
 
-def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
+def add_ids_mfi_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1014,7 +1014,7 @@ def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
     )  
     return parser
 
-def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
+def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1029,7 +1029,7 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
     )
     return parser
 
-def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None):
+def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1044,7 +1044,7 @@ def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None
     )
     return parser
 
-def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
+def add_ids_balligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1068,7 +1068,7 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
     return parser
 
   
-def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
+def add_ids_talligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1091,7 +1091,7 @@ def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
     )
     return parser
 
-def add_ads_argument(parser: argparse.ArgumentParser=None):
+def add_ads_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1103,7 +1103,7 @@ def add_ads_argument(parser: argparse.ArgumentParser=None):
                         help='Action the creation of ADS and show the chart')
     return parser
 
-def add_iprop_init_argument(parser: argparse.ArgumentParser=None):
+def add_iprop_init_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1115,7 +1115,7 @@ def add_iprop_init_argument(parser: argparse.ArgumentParser=None):
                         help='Toggle the downloads of all instrument properties ')
     return parser
 
-def add_debug_argument(parser: argparse.ArgumentParser=None):
+def add_debug_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
@@ -1128,7 +1128,7 @@ def add_debug_argument(parser: argparse.ArgumentParser=None):
                         help='Toggle debug ')
     return parser
 
-def add_pdsserver_argument(parser: argparse.ArgumentParser=None):
+def add_pdsserver_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
