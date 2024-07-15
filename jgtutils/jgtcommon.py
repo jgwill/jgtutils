@@ -858,13 +858,13 @@ def __mfi_flag__post_parse()->argparse.Namespace:
     global args
     __check_if_parsed()
     try:
-        if not hasattr(args, 'mfi_flag'):
-            setattr(args, 'mfi_flag',False)
+        if not hasattr(args, MFI_FLAG_ARGNAME):
+            setattr(args, MFI_FLAG_ARGNAME,False)
         
         if _NO_MFI_FOR_M1_flag:
-            if hasattr(args, 'mfi_flag') and args.timeframe=="M1":
+            if hasattr(args, MFI_FLAG_ARGNAME) and args.timeframe=="M1":
                 #print("We dont do MFI for M1")
-                setattr(args, 'mfi_flag',False)
+                setattr(args, MFI_FLAG_ARGNAME,False)
     except:
         pass
     return args
