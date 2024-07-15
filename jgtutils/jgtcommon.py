@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
 
-from jgtutils.jgtcliconstants import (FRESH_FLAG_ARGNAME,
+from jgtutils.jgtcliconstants import (_ARG_GROUP_BARS_DESCRIPTION, _ARG_GROUP_BARS_TITLE, _ARG_GROUP_CLEANUP_DESCRIPTION, _ARG_GROUP_CLEANUP_TITLE, _ARG_GROUP_INDICATOR_DESCRIPTION, _ARG_GROUP_INDICATOR_TITLE, _ARG_GROUP_INTERACTION_DESCRIPTION, _ARG_GROUP_INTERACTION_TITLE, _ARG_GROUP_OUTPUT_DESCRIPTION, _ARG_GROUP_OUTPUT_TITLE, _ARG_GROUP_POV_DESCRIPTION, _ARG_GROUP_POV_TITLE, _ARG_GROUP_RANGE_DESCRIPTION, _ARG_GROUP_RANGE_TITLE, _ARG_GROUP_VERBOSITY_DESCRIPTION, _ARG_GROUP_VERBOSITY_TITLE, FRESH_FLAG_ARGNAME,
                       FRESH_FLAG_ARGNAME_ALIAS,
                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                       NOT_FRESH_FLAG_ARGNAME,
@@ -97,6 +97,22 @@ except:
     default_parser = argparse.ArgumentParser(description='JGWill Trading Utilities')
     pass
 
+# try:
+#     #indicator's group
+#     indicator_group = default_parser.add_argument_group(INDICATOR_GROUP_TITLE, 'Indicators to use in the processing.')
+#     #indicator_group = _get_group_by_title(default_parser, INDICATOR_GROUP_TITLE)
+# except:
+#     pass
+
+# Get a group by its title
+def _get_group_by_title(parser, title,description=""):
+    for group in parser._action_groups:
+        if group.title == title:
+            return group
+    #create it
+    return parser.add_argument_group(title, description)
+
+
 def init_default_parser(description: str):
     global default_parser
     default_parser = argparse.ArgumentParser(description=description)
@@ -105,7 +121,7 @@ def init_default_parser(description: str):
 
 
 
-def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true"):
+def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true",group_title="",group_description=""):
 
 
     __alias_cmd_prefix = "-"
@@ -113,12 +129,22 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
     
     _argname_alias = __alias_cmd_prefix+_argname_alias
     _argname_full = __full_arg_prefix+_argname_full
-    parser.add_argument(
+    if group_title=="":
+        parser.add_argument(
         _argname_alias,
         _argname_full,
         action=_action_value,
         help=_description,
-    )
+        )
+    else:
+        #try get group name or create it.
+        group = _get_group_by_title(parser, group_title,group_description)
+        group.add_argument(
+            _argname_alias,
+            _argname_full,
+            action=_action_value,
+            help=_description,
+        )
     
     return parser
 
@@ -182,14 +208,14 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
     global default_parser
     if parser is None:
         parser=default_parser
-
-    parser.add_argument('-i','--instrument',
+    pov_group=_get_group_by_title(parser,_ARG_GROUP_POV_TITLE,_ARG_GROUP_POV_DESCRIPTION)
+    pov_group.add_argument('-i','--instrument',
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
                                   For example, "EUR/USD".')
 
     if timeframe:
-        parser.add_argument('-t','--timeframe',
+        pov_group.add_argument('-t','--timeframe',
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
                                       For example, m1 - for 1 minute, H1 - for 1 hour.')
@@ -320,7 +346,8 @@ def add_tlid_range_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     #print("Tlid range active")
-    parser.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
+    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
+    group_range.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
                         help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
     return parser
 
@@ -328,9 +355,10 @@ def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = T
     global default_parser
     if parser is None:
         parser=default_parser
-        
+    
+    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
     if date_from:
-        parser.add_argument('-s','--datefrom',
+        group_range.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
                             help='Date/time from which you want to receive\
                                       historical prices. If you leave this argument as it \
@@ -339,7 +367,7 @@ def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = T
                             type=valid_datetime(True)
                             )
     if date_to:
-        parser.add_argument('-e','--dateto',
+        group_range.add_argument('-e','--dateto',
                             metavar="\"m.d.Y H:M:S\"",
                             help='Datetime until which you want to receive \
                                       historical prices. If you leave this argument as it is, \
@@ -354,9 +382,9 @@ def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: b
     global default_parser
     if parser is None:
         parser=default_parser
-        
+    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
     if date_from:
-        parser.add_argument('-s','--datefrom',
+        group_range.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
                             help='Datetime from which you want to receive\
                                       combo account statement report. If you leave this argument as it \
@@ -365,7 +393,7 @@ def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: b
                             type=valid_datetime(True)
                             )
     if date_to:
-        parser.add_argument('-e','--dateto',
+        group_range.add_argument('-e','--dateto',
                             metavar="\"m.d.Y H:M:S\"",
                             help='Datetime until which you want to receive \
                                       combo account statement report. If you leave this argument as it is, \
@@ -381,8 +409,9 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     
+    group_bars=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
     print("DEPRECATION: Use: add_bars_amount_V2_arguments")
-    parser.add_argument('-c','--quotescount',
+    group_bars.add_argument('-c','--quotescount',
                         metavar="MAX",
                         default=-1,
                         type=int,
@@ -395,15 +424,17 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     #help='Specify the number of bars to download or use the full number of bars available from the store.'
-    bars_group=parser.add_mutually_exclusive_group()
+    bars_group=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
+    #g=parser.add_argument_group('Bars Amount', 'Specify the number of bars to download or use the full number of bars available from the store.')
+    bars_exclusive_subgroup=bars_group.add_mutually_exclusive_group()
     
     
-    bars_group.add_argument('-c','--quotescount',
+    bars_exclusive_subgroup.add_argument('-c','--quotescount',
                         metavar="MAX",
                         default=-1,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
-    g_full_notfull=bars_group.add_mutually_exclusive_group()
+    g_full_notfull=bars_exclusive_subgroup.add_mutually_exclusive_group()
     g_full_notfull.add_argument('-uf','--full',
                         action='store_true',
                         help='Output/Input uses the full store. ')
@@ -445,8 +476,8 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-        
-    parser.add_argument('-z','--compress',
+    group_output=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    group_output.add_argument('-z','--compress',
                         action='store_true',
                         help='Compress the output. If specified, it will also activate the output flag.')
     return parser
@@ -490,8 +521,9 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
+    bars_group=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
     
-    fresh_old_group=parser.add_mutually_exclusive_group()
+    fresh_old_group=bars_group.add_mutually_exclusive_group()
     fresh_old_group.add_argument('-'+FRESH_FLAG_ARGNAME_ALIAS,'--'+FRESH_FLAG_ARGNAME,
                         action='store_true',
                         help='Freshening the storage with latest market. ')
@@ -516,7 +548,8 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     
-    group_kba=parser.add_mutually_exclusive_group()
+    cleanupGroup=_get_group_by_title(parser,_ARG_GROUP_CLEANUP_TITLE,_ARG_GROUP_CLEANUP_DESCRIPTION)
+    group_kba=cleanupGroup.add_mutually_exclusive_group()
     
     group_kba.add_argument('-'+KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+KEEP_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
@@ -526,12 +559,93 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
                         help='Remove Bid/Ask in storage. ')
     return parser
 
+import jgtclirqdata
+def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    group_pattern=parser.add_argument_group('RQ Pattern', 'RQ Pattern to use.  Future practice to create request patterns to load into the args later.')
+    
+    group_pattern.add_argument('-pdsrq','--pds_rq_json_base',
+                        action='store_true',
+                        help='Use PDS_RQ_JSON_BASE')
+    #PDS_RQ_JSON_NORMAL
+    group_pattern.add_argument('-pdsrqnormal','--pds_rq_json_normal',
+                        action='store_true',
+                        help='Use PDS_RQ_JSON_NORMAL')
+    #PDS_RQ_JSON_NORMAL_FRESH
+    group_pattern.add_argument('-pdsrqfresh','--pds_rq_json_normal_fresh',
+                        action='store_true',
+                        help='Use PDS_RQ_JSON_NORMAL_FRESH')
+    #PDS_RQ_JSON_FULL
+    group_pattern.add_argument('-pdsrqfull','--pds_rq_json_full',
+                        action='store_true',
+                        help='Use PDS_RQ_JSON_FULL')
+    #PDS_RQ_JSON_FULL_FRESH
+    group_pattern.add_argument('-pdsrqfullfresh','--pds_rq_json_full_fresh',
+                        action='store_true',
+                        help='Use PDS_RQ_JSON_FULL_FRESH')
+    #IDS_RQ_JSON_BASE
+    group_pattern.add_argument('-idsrq','--ids_rq_json_base',
+                        action='store_true',
+                        help='Use IDS_RQ_JSON_BASE')
+    
+    group_pattern.add_argument('-cdsrq','--cds_rq_json_normal',
+                        action='store_true',
+                        help='Use CDS_RQ_JSON_NORMAL')
+    
+    group_pattern.add_argument('-cdsrqfull','--cds_rq_json_full',
+                        action='store_true',
+                        help='Use CDS_RQ_JSON_FULL')
+    #CDS_RQ_JSON_FULL_FRESH
+    group_pattern.add_argument('-cdsrqfullfresh','--cds_rq_json_full_fresh',
+                        action='store_true',
+                        help='Use CDS_RQ_JSON_FULL_FRESH')
+    #CDS_RQ_JSON_NORM_FRESH
+    group_pattern.add_argument('-cdsrqfresh','--cds_rq_json_norm_fresh',
+                        action='store_true',
+                        help='Use CDS_RQ_JSON_NORM_FRESH')
+    
+    return parser
+
+#post add_jgtclirqdata_arguments
+def __jgtclirqdata_post_parse():
+    global args
+    __check_if_parsed()
+    _jgtclirqdata_to_load=[jgtclirqdata.PDS_RQ_JSON_BASE]
+    try:
+        if hasattr(args, 'pds_rq_json_base') and args.pds_rq_json_base:
+            _jgtclirqdata_to_load.append(jgtclirqdata.PDS_RQ_JSON_BASE)
+        if hasattr(args, 'ids_rq_json_base') and args.ids_rq_json_base:
+            _jgtclirqdata_to_load.append(jgtclirqdata.IDS_RQ_JSON_BASE)
+        if hasattr(args, 'cds_rq_json_normal') and args.cds_rq_json_normal:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_NORMAL)
+        if hasattr(args, 'cds_rq_json_full') and args.cds_rq_json_full:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_FULL)
+        if hasattr(args, 'cds_rq_json_full_fresh') and args.cds_rq_json_full_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_FULL_FRESH)
+        if hasattr(args, 'cds_rq_json_norm_fresh') and args.cds_rq_json_norm_fresh:
+            _jgtclirqdata_to_load.append(jgtclirqdata.CDS_RQ_JSON_NORM_FRESH)
+    except:
+        pass
+    #for each pattern we have, load their key/value into the args
+    for pattern in _jgtclirqdata_to_load:
+        try:
+            json_obj = json.loads(pattern)
+            for key in json_obj:
+                setattr(args, key, json_obj[key])
+        except:
+            pass
+    return args
+
+
 #Load a json content from the argument --json
 def add_load_json_file_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-jsonf','--json_file',
+    output_group=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    output_group.add_argument('-jsonf','--json_file',
                         help='JSON filepath content to be loaded.')
     
     return parser
@@ -576,7 +690,9 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     
-    dv_group=parser.add_mutually_exclusive_group()
+    cleanupGroup=_get_group_by_title(parser,_ARG_GROUP_CLEANUP_TITLE,_ARG_GROUP_CLEANUP_DESCRIPTION)
+    
+    dv_group=cleanupGroup.add_mutually_exclusive_group()
     
     dv_group.add_argument('-'+DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,'--'+DROPNA_VOLUME_FLAG_ARGNAME,
                         action='store_true',
@@ -785,7 +901,8 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__talligator_flag__post_parse()
     args=__mfi_flag__post_parse()
     args=__use_fresh__post_parse()
-    args=__json_post_parse()    
+    args=__json_post_parse()   
+    args=__jgtclirqdata_post_parse()
     return args
 
 
@@ -823,8 +940,8 @@ def add_viewpath_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-        
-    parser.add_argument('-vp','--viewpath',
+    output_group=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    output_group.add_argument('-vp','--viewpath',
                         action='store_true',
                         dest='viewpath',
                         help='flag to just view the path of files from arguments -i -t.')
@@ -842,8 +959,10 @@ def add_verbose_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-
-    parser.add_argument('-v', '--verbose',
+    
+    group_verbosity=_get_group_by_title(parser,_ARG_GROUP_VERBOSITY_TITLE,_ARG_GROUP_VERBOSITY_DESCRIPTION)
+    
+    group_verbosity.add_argument('-v', '--verbose',
                         type=int,
                         default=0,
                         help='Set the verbosity level. 0 = quiet, 1 = normal, 2 = verbose, 3 = very verbose, etc.')
@@ -879,13 +998,15 @@ def add_ids_mfi_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument(
+    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    mfi_exclusive_subgroup=group_indicators.add_mutually_exclusive_group()
+    mfi_exclusive_subgroup.add_argument(
         "-"+MFI_FLAG_ARGNAME_ALIAS,
         "--"+MFI_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Market Facilitation Index indicator.",
     )
-    parser.add_argument(
+    mfi_exclusive_subgroup.add_argument(
         "-"+NO_MFI_FLAG_ARGNAME_ALIAS,
         "--"+NO_MFI_FLAG_ARGNAME,  
         action="store_true",
@@ -899,7 +1020,8 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
 
-    parser.add_argument(
+    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators.add_argument(
         "-"+GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
         "--"+GATOR_OSCILLATOR_FLAG_ARGNAME,
         action="store_true",
@@ -912,8 +1034,8 @@ def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None
     global default_parser
     if parser is None:
         parser=default_parser
-
-    parser.add_argument(
+    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators.add_argument(
         "-lfp",
         "--largest_fractal_period",
         type=int,
@@ -932,10 +1054,11 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None):
     _argname_alias=BALLIGATOR_FLAG_ARGNAME_ALIAS
     _argname_full=BALLIGATOR_FLAG_ARGNAME
     
-    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser)
     
+    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser,group_title=_ARG_GROUP_INDICATOR_TITLE,group_description=_ARG_GROUP_INDICATOR_DESCRIPTION)
     
-    parser.add_argument(
+    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators.add_argument(
         "-bjaw",
         "--balligator_period_jaws",
         type=int,
@@ -951,13 +1074,15 @@ def add_ids_talligator_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
     
-    parser.add_argument(
+    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators.add_argument(
         "-"+TALLIGATOR_FLAG_ARGNAME_ALIAS,
         "--"+TALLIGATOR_FLAG_ARGNAME,
         action="store_true",
-        help="Enable the Tide Alligator indicator.",
+        help="Enable the Tide Alligator indicator."
     )
-    parser.add_argument(
+    
+    group_indicators.add_argument(
         "-tjaw",
         "--talligator_period_jaws",
         type=int,
@@ -971,8 +1096,8 @@ def add_ads_argument(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
         parser=default_parser
-
-    parser.add_argument('-ads','--ads',
+    interaction_group=_get_group_by_title(parser,_ARG_GROUP_INTERACTION_TITLE,_ARG_GROUP_INTERACTION_DESCRIPTION)
+    interaction_group.add_argument('-ads','--ads',
                         action='store_true',
                         default=False,
                         help='Action the creation of ADS and show the chart')
@@ -996,7 +1121,8 @@ def add_debug_argument(parser: argparse.ArgumentParser=None):
     if parser is None:
         parser=default_parser
 
-    parser.add_argument('-debug','--debug',
+    group_verbosity=_get_group_by_title(parser,_ARG_GROUP_VERBOSITY_TITLE,_ARG_GROUP_VERBOSITY_DESCRIPTION)
+    group_verbosity.add_argument('-debug','--debug',
                         action='store_true',
                         default=False,
                         help='Toggle debug ')
