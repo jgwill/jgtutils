@@ -43,7 +43,7 @@ from jgtutils.jgtcliconstants import (_ARG_GROUP_BARS_DESCRIPTION, _ARG_GROUP_BA
                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                       NOT_FRESH_FLAG_ARGNAME,
                       BALLIGATOR_FLAG_ARGNAME,
-                      BALLIGATOR_FLAG_ARGNAME_ALIAS,
+                      BALLIGATOR_FLAG_ARGNAME_ALIAS, QUOTES_COUNT_ARGNAME, QUOTES_COUNT_ARGNAME_ALIAS,
                       TALLIGATOR_FLAG_ARGNAME,
                       TALLIGATOR_FLAG_ARGNAME_ALIAS,
                       MFI_FLAG_ARGNAME,
@@ -410,8 +410,8 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None)->argparse.Argum
         parser=default_parser
     
     group_bars=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
-    print("DEPRECATION: Use: add_bars_amount_V2_arguments")
-    group_bars.add_argument('-c','--quotescount',
+    print("DEPRECATION: Use: add_bars_amount_V2_arguments intead of add_max_bars_arguments and add_use_full_argument")
+    group_bars.add_argument('-'+QUOTES_COUNT_ARGNAME_ALIAS,'--'+QUOTES_COUNT_ARGNAME,
                         metavar="MAX",
                         default=-1,
                         type=int,
@@ -429,16 +429,16 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse
     bars_exclusive_subgroup=bars_group.add_mutually_exclusive_group()
     
     
-    bars_exclusive_subgroup.add_argument('-c','--quotescount',
+    bars_exclusive_subgroup.add_argument('-'+QUOTES_COUNT_ARGNAME_ALIAS,'--'+QUOTES_COUNT_ARGNAME,
                         metavar="MAX",
                         default=-1,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
     g_full_notfull=bars_exclusive_subgroup.add_mutually_exclusive_group()
-    g_full_notfull.add_argument('-uf','--full',
+    g_full_notfull.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input uses the full store. ')
-    g_full_notfull.add_argument('-un','--notfull',
+    g_full_notfull.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input uses NOT the full store. ')
 
@@ -805,8 +805,8 @@ def __quotescount__post_parse()->argparse.Namespace:
     global args
     __check_if_parsed()
     try:
-        if not hasattr(args, 'quotescount'):
-            setattr(args, 'quotescount',-1)
+        if not hasattr(args, QUOTES_COUNT_ARGNAME):
+            setattr(args, QUOTES_COUNT_ARGNAME,-1)
     except:
         pass
     return args
