@@ -104,6 +104,12 @@ except:
 # except:
 #     pass
 
+
+def new_parser(description: str):
+    global default_parser
+    default_parser = argparse.ArgumentParser(description=description)
+    return default_parser
+
 # Get a group by its title
 def _get_group_by_title(parser, title,description=""):
     for group in parser._action_groups:
