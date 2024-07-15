@@ -526,6 +526,60 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None):
                         help='Remove Bid/Ask in storage. ')
     return parser
 
+#Load a json content from the argument --json
+def add_load_json_file_argument(parser: argparse.ArgumentParser=None):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-jsonf','--json_file',
+                        help='JSON filepath content to be loaded.')
+    
+    return parser
+
+def __json_post_parse1():
+    global args
+    __check_if_parsed()
+    try:
+        if hasattr(args, 'json_file') and args.json_file is not None:
+            filepath = args.json_file
+            #raise exception if file does not exist
+            if not os.path.exists(filepath):
+                raise Exception("File does not exist."+filepath)
+            with open(filepath, 'r') as f:
+                try:
+                    json_obj = json.load(f)
+                    json_string=json.dumps(json_obj)
+                    setattr(args, 'json_content', json_string)
+                except:
+                    pass
+    except:
+        pass
+    return args   
+
+def __json_post_parse():
+    global args
+    __check_if_parsed()
+    
+    try:
+        #Create args from the json_file
+        if hasattr(args, 'json_file') and args.json_file is not None:
+            filepath = args.json_file
+            #raise exception if file does not exist
+            if not os.path.exists(filepath):
+                raise Exception("File does not exist."+filepath)
+            with open(filepath, 'r') as f:
+                try:
+                    json_obj = json.load(f)
+                    for key in json_obj:
+                        #print("key:"+key, " value:"+str(json_obj[key]))
+                        setattr(args, key, json_obj[key])
+                except:
+                    pass
+    except:
+        pass
+    return args
+
+
 def add_exit_if_error(parser: argparse.ArgumentParser=None):
     global default_parser
     if parser is None:
@@ -750,7 +804,7 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__talligator_flag__post_parse()
     args=__mfi_flag__post_parse()
     args=__use_fresh__post_parse()
-    
+    args=__json_post_parse()    
     return args
 
 
