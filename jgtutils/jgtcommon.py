@@ -447,6 +447,7 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse
     g_full_notfull.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
                         help='Output/Input uses NOT the full store. ')
+    return parser
 
 
 def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
