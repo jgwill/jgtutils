@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
 
-from jgtutils.jgtcliconstants import (_ARG_GROUP_BARS_DESCRIPTION, _ARG_GROUP_BARS_TITLE, _ARG_GROUP_CLEANUP_DESCRIPTION, _ARG_GROUP_CLEANUP_TITLE, _ARG_GROUP_INDICATOR_DESCRIPTION, _ARG_GROUP_INDICATOR_TITLE, _ARG_GROUP_INTERACTION_DESCRIPTION, _ARG_GROUP_INTERACTION_TITLE, _ARG_GROUP_OUTPUT_DESCRIPTION, _ARG_GROUP_OUTPUT_TITLE, _ARG_GROUP_POV_DESCRIPTION, _ARG_GROUP_POV_TITLE, _ARG_GROUP_RANGE_DESCRIPTION, _ARG_GROUP_RANGE_TITLE, _ARG_GROUP_VERBOSITY_DESCRIPTION, _ARG_GROUP_VERBOSITY_TITLE, FRESH_FLAG_ARGNAME,
+from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION, ARG_GROUP_BARS_TITLE, ARG_GROUP_CLEANUP_DESCRIPTION, ARG_GROUP_CLEANUP_TITLE, ARG_GROUP_INDICATOR_DESCRIPTION, ARG_GROUP_INDICATOR_TITLE, ARG_GROUP_INTERACTION_DESCRIPTION, ARG_GROUP_INTERACTION_TITLE, ARG_GROUP_OUTPUT_DESCRIPTION, ARG_GROUP_OUTPUT_TITLE, ARG_GROUP_POV_DESCRIPTION, ARG_GROUP_POV_TITLE, ARG_GROUP_RANGE_DESCRIPTION, ARG_GROUP_RANGE_TITLE, ARG_GROUP_VERBOSITY_DESCRIPTION, ARG_GROUP_VERBOSITY_TITLE, FRESH_FLAG_ARGNAME,
                       FRESH_FLAG_ARGNAME_ALIAS,
                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                       NOT_FRESH_FLAG_ARGNAME,
@@ -214,7 +214,7 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
     global default_parser
     if parser is None:
         parser=default_parser
-    pov_group=_get_group_by_title(parser,_ARG_GROUP_POV_TITLE,_ARG_GROUP_POV_DESCRIPTION)
+    pov_group=_get_group_by_title(parser,ARG_GROUP_POV_TITLE,ARG_GROUP_POV_DESCRIPTION)
     pov_group.add_argument('-i','--instrument',
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
@@ -352,7 +352,7 @@ def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     if parser is None:
         parser=default_parser
     #print("Tlid range active")
-    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
+    group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
     group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     return parser
@@ -362,7 +362,7 @@ def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = T
     if parser is None:
         parser=default_parser
     
-    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
+    group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
     if date_from:
         group_range.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
@@ -388,7 +388,7 @@ def add_report_date_arguments(parser: argparse.ArgumentParser=None, date_from: b
     global default_parser
     if parser is None:
         parser=default_parser
-    group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
+    group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
     if date_from:
         group_range.add_argument('-s','--datefrom',
                             metavar="\"m.d.Y H:M:S\"",
@@ -415,7 +415,7 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None)->argparse.Argum
     if parser is None:
         parser=default_parser
     
-    group_bars=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
+    group_bars=_get_group_by_title(parser,ARG_GROUP_BARS_TITLE,ARG_GROUP_BARS_DESCRIPTION)
     print("DEPRECATION: Use: add_bars_amount_V2_arguments intead of add_max_bars_arguments and add_use_full_argument")
     group_bars.add_argument('-'+QUOTES_COUNT_ARGNAME_ALIAS,'--'+QUOTES_COUNT_ARGNAME,
                         metavar="MAX",
@@ -430,7 +430,7 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse
     if parser is None:
         parser=default_parser
     #help='Specify the number of bars to download or use the full number of bars available from the store.'
-    bars_group=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
+    bars_group=_get_group_by_title(parser,ARG_GROUP_BARS_TITLE,ARG_GROUP_BARS_DESCRIPTION)
     #g=parser.add_argument_group('Bars Amount', 'Specify the number of bars to download or use the full number of bars available from the store.')
     bars_exclusive_subgroup=bars_group.add_mutually_exclusive_group()
     
@@ -482,7 +482,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     global default_parser
     if parser is None:
         parser=default_parser
-    group_output=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    group_output=_get_group_by_title(parser,ARG_GROUP_OUTPUT_TITLE,ARG_GROUP_OUTPUT_DESCRIPTION)
     group_output.add_argument('-z','--compress',
                         action='store_true',
                         help='Compress the output. If specified, it will also activate the output flag.')
@@ -527,7 +527,7 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.Argum
     global default_parser
     if parser is None:
         parser=default_parser
-    bars_group=_get_group_by_title(parser,_ARG_GROUP_BARS_TITLE,_ARG_GROUP_BARS_DESCRIPTION)
+    bars_group=_get_group_by_title(parser,ARG_GROUP_BARS_TITLE,ARG_GROUP_BARS_DESCRIPTION)
     
     fresh_old_group=bars_group.add_mutually_exclusive_group()
     fresh_old_group.add_argument('-'+FRESH_FLAG_ARGNAME_ALIAS,'--'+FRESH_FLAG_ARGNAME,
@@ -554,7 +554,7 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     if parser is None:
         parser=default_parser
     
-    cleanupGroup=_get_group_by_title(parser,_ARG_GROUP_CLEANUP_TITLE,_ARG_GROUP_CLEANUP_DESCRIPTION)
+    cleanupGroup=_get_group_by_title(parser,ARG_GROUP_CLEANUP_TITLE,ARG_GROUP_CLEANUP_DESCRIPTION)
     group_kba=cleanupGroup.add_mutually_exclusive_group()
     
     group_kba.add_argument('-'+KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+KEEP_BID_ASK_FLAG_ARGNAME,
@@ -660,7 +660,7 @@ def add_load_json_file_argument(parser: argparse.ArgumentParser=None)->argparse.
     global default_parser
     if parser is None:
         parser=default_parser
-    output_group=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    output_group=_get_group_by_title(parser,ARG_GROUP_OUTPUT_TITLE,ARG_GROUP_OUTPUT_DESCRIPTION)
     output_group.add_argument('-jsonf','--json_file',
                         help='JSON filepath content to be loaded.')
     
@@ -706,7 +706,7 @@ def add_dropna_volume_argument(parser: argparse.ArgumentParser=None)->argparse.A
     if parser is None:
         parser=default_parser
     
-    cleanupGroup=_get_group_by_title(parser,_ARG_GROUP_CLEANUP_TITLE,_ARG_GROUP_CLEANUP_DESCRIPTION)
+    cleanupGroup=_get_group_by_title(parser,ARG_GROUP_CLEANUP_TITLE,ARG_GROUP_CLEANUP_DESCRIPTION)
     
     dv_group=cleanupGroup.add_mutually_exclusive_group()
     
@@ -956,7 +956,7 @@ def add_viewpath_argument(parser: argparse.ArgumentParser=None)->argparse.Argume
     global default_parser
     if parser is None:
         parser=default_parser
-    output_group=_get_group_by_title(parser,_ARG_GROUP_OUTPUT_TITLE,_ARG_GROUP_OUTPUT_DESCRIPTION)
+    output_group=_get_group_by_title(parser,ARG_GROUP_OUTPUT_TITLE,ARG_GROUP_OUTPUT_DESCRIPTION)
     output_group.add_argument('-vp','--viewpath',
                         action='store_true',
                         dest='viewpath',
@@ -976,7 +976,7 @@ def add_verbose_argument(parser: argparse.ArgumentParser=None)->argparse.Argumen
     if parser is None:
         parser=default_parser
     
-    group_verbosity=_get_group_by_title(parser,_ARG_GROUP_VERBOSITY_TITLE,_ARG_GROUP_VERBOSITY_DESCRIPTION)
+    group_verbosity=_get_group_by_title(parser,ARG_GROUP_VERBOSITY_TITLE,ARG_GROUP_VERBOSITY_DESCRIPTION)
     
     group_verbosity.add_argument('-v', '--verbose',
                         type=int,
@@ -1014,7 +1014,7 @@ def add_ids_mfi_argument(parser: argparse.ArgumentParser=None)->argparse.Argumen
     global default_parser
     if parser is None:
         parser=default_parser
-    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     mfi_exclusive_subgroup=group_indicators.add_mutually_exclusive_group()
     mfi_exclusive_subgroup.add_argument(
         "-"+MFI_FLAG_ARGNAME_ALIAS,
@@ -1036,7 +1036,7 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None)->arg
     if parser is None:
         parser=default_parser
 
-    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-"+GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
         "--"+GATOR_OSCILLATOR_FLAG_ARGNAME,
@@ -1050,7 +1050,7 @@ def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None
     global default_parser
     if parser is None:
         parser=default_parser
-    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-lfp",
         "--largest_fractal_period",
@@ -1071,9 +1071,9 @@ def add_ids_balligator_argument(parser: argparse.ArgumentParser=None)->argparse.
     _argname_full=BALLIGATOR_FLAG_ARGNAME
     
     
-    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser,group_title=_ARG_GROUP_INDICATOR_TITLE,group_description=_ARG_GROUP_INDICATOR_DESCRIPTION)
+    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser,group_title=ARG_GROUP_INDICATOR_TITLE,group_description=ARG_GROUP_INDICATOR_DESCRIPTION)
     
-    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-bjaw",
         "--balligator_period_jaws",
@@ -1090,7 +1090,7 @@ def add_ids_talligator_argument(parser: argparse.ArgumentParser=None)->argparse.
     if parser is None:
         parser=default_parser
     
-    group_indicators=_get_group_by_title(parser,_ARG_GROUP_INDICATOR_TITLE,_ARG_GROUP_INDICATOR_DESCRIPTION)
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-"+TALLIGATOR_FLAG_ARGNAME_ALIAS,
         "--"+TALLIGATOR_FLAG_ARGNAME,
@@ -1112,7 +1112,7 @@ def add_ads_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentPar
     global default_parser
     if parser is None:
         parser=default_parser
-    interaction_group=_get_group_by_title(parser,_ARG_GROUP_INTERACTION_TITLE,_ARG_GROUP_INTERACTION_DESCRIPTION)
+    interaction_group=_get_group_by_title(parser,ARG_GROUP_INTERACTION_TITLE,ARG_GROUP_INTERACTION_DESCRIPTION)
     interaction_group.add_argument('-ads','--ads',
                         action='store_true',
                         default=False,
@@ -1137,7 +1137,7 @@ def add_debug_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentP
     if parser is None:
         parser=default_parser
 
-    group_verbosity=_get_group_by_title(parser,_ARG_GROUP_VERBOSITY_TITLE,_ARG_GROUP_VERBOSITY_DESCRIPTION)
+    group_verbosity=_get_group_by_title(parser,ARG_GROUP_VERBOSITY_TITLE,ARG_GROUP_VERBOSITY_DESCRIPTION)
     group_verbosity.add_argument('-debug','--debug',
                         action='store_true',
                         default=False,
