@@ -63,7 +63,7 @@ from jgtutils.jgtcliconstants import (_ARG_GROUP_BARS_DESCRIPTION, _ARG_GROUP_BA
                       DROPNA_VOLUME_FLAG_ARGNAME,
                       DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
                       DONT_DROPNA_VOLUME_FLAG_ARGNAME,
-                      DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS
+                      DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS, TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME, TLID_RANGE_ARGNAME_ALIAS, TLID_RANGE_HELP_STRING
                       )
 
 
@@ -316,8 +316,8 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.A
     
     group1 = parser.add_argument_group('Group 1 (TLID Range)')
     g1x=group1.add_mutually_exclusive_group()
-    g1x.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
-                        help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
+    g1x.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+                        help=TLID_RANGE_HELP_STRING)
     g2x=g1x.add_mutually_exclusive_group()
     
     raise Exception("Not implemented - Complicated")
@@ -353,8 +353,8 @@ def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
         parser=default_parser
     #print("Tlid range active")
     group_range=_get_group_by_title(parser,_ARG_GROUP_RANGE_TITLE,_ARG_GROUP_RANGE_DESCRIPTION)
-    group_range.add_argument('-r', '--range', type=str, required=False, dest='tlidrange',
-                        help='TLID range in the format YYMMDDHHMM_YYMMDDHHMM.')
+    group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+                        help=TLID_RANGE_HELP_STRING)
     return parser
 
 def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
