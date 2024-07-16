@@ -798,7 +798,10 @@ def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_ar
         keep_bid_ask_value=True        
         
         if hasattr(args, rm_bid_ask_argname) or hasattr(args,'rm_bid_ask'):
-            keep_bid_ask_value=False
+            if hasattr(args, rm_bid_ask_argname) and args.rmbidask:
+                keep_bid_ask_value=False
+            if hasattr(args, 'rm_bid_ask') and args.rm_bid_ask:
+                keep_bid_ask_value=False
         
         setattr(args, keep_bid_ask_argname,keep_bid_ask_value)
         setattr(args, 'keep_bid_ask',keep_bid_ask_value) # Future refactoring will be called just that.
