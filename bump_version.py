@@ -1,5 +1,5 @@
 import re
-#jgtutils/__init__.py
+
 def bump_version(version):
     major, minor, patch = map(int, version.split('.'))
     patch += 1
@@ -7,6 +7,7 @@ def bump_version(version):
 
 with open('jgtutils/__init__.py', 'r') as file:
     package_init_content = file.read()
+    #print(package_init_content)
 
 version_match = re.search(r"version=['\"]([^'\"]*)['\"]", package_init_content)
 if version_match:
@@ -33,4 +34,4 @@ if version_match:
     
     print(new_version)
 else:
-    raise ValueError("Version string not found in setup.py")
+    raise ValueError("Version string not found")

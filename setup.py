@@ -1,10 +1,11 @@
 from setuptools import setup, find_packages
+import re
 
 def read_version():
     with open("jgtutils/__init__.py") as f:
-        for line in f:
-            if line.startswith("version"):
-                return line.strip().split()[-1][1:-1]
+        content=f.read()
+        version_match = re.search(r"version=['\"]([^'\"]*)['\"]", content)
+        return version_match.group(1)
 
 version = read_version()
 

@@ -72,3 +72,17 @@ release:
 	git push --tags
 	make pypi-release
 
+.PHONY: dev-pypi-release
+dev-pypi-release:
+	twine --version
+	twine upload --repository pypi-dev dist/*
+
+.PHONY: dev-release
+dev-release:
+	python bump_version.py
+	make dist
+	make dev-pypi-release
+
+.PHONY: bump_version
+bump_version:
+	python bump_version.py

@@ -209,6 +209,15 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None)->a
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
     return parser
 
+def add_demo_flag_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-d','--demo',
+                        action='store_true',
+                        help='Use the demo server. Optional parameter.')
+    return parser
+
 def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False):
     
     global default_parser
@@ -1182,8 +1191,35 @@ def export_env_if_any(config):
 
 _JGT_CONFIG_JSON_SECRET=None
 
-def readconfig(json_config_str=None,config_file = 'config.json',export_env=False,config_file_path_env_name='JGT_CONFIG_PATH',config_values_env_name='JGT_CONFIG'):
+def readconfig(json_config_str=None,config_file = 'config.json',export_env=False,config_file_path_env_name='JGT_CONFIG_PATH',config_values_env_name='JGT_CONFIG',force_read_json=False,demo=False,use_demo_json_config=False):
     global _JGT_CONFIG_JSON_SECRET
+    
+    #demo_config are assumed to be $HOME/.jgt/config_demo.json
+    if demo and use_demo_json_config:
+        config_file = os.path.join(os.path.expanduser("~"), '.jgt/config_demo.json')
+        #check if exist, advise and raise exception if not
+        if not os.path.exists(config_file):
+            print("Configuration not found. create : {config_file} or we will try to use the _demo in the usual config.json")
+            config=readconfig(force_read_json=True)
+            _set_demo_credential(config,demo)
+            return config
+            #raise Exception(f"Configuration not found. create : {config_file})")
+ 
+    #force_read_json are assumed to be $HOME/.jgt/config.json
+    if force_read_json:
+        config_file = os.path.join(os.path.expanduser("~"), '.jgt/config.json')
+        #check if exist, advise and raise exception if not
+        if not os.path.exists(config_file):
+            raise Exception(f"Configuration not found. create : {config_file})")
+        #load and return config
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            if export_env:
+                export_env_if_any(config)
+            _set_demo_credential(config,demo)
+            return config
+            
+    
     #print argument values to debug
     _DEBUG_240619=False
     if _DEBUG_240619:
@@ -1200,6 +1236,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
         _JGT_CONFIG_JSON_SECRET=json_config_str
         if export_env:
             export_env_if_any(config)
+        _set_demo_credential(config,demo)
         return config
     
     
@@ -1207,6 +1244,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
         config = json.loads(_JGT_CONFIG_JSON_SECRET)
         if export_env:
             export_env_if_any(config)
+        _set_demo_credential(config,demo)
         return config
     
     config = None
@@ -1220,6 +1258,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
             config = json.load(f)
             if export_env:
                 export_env_if_any(config)
+            _set_demo_credential(config,demo)
             return config
     else:
         # If config file not found, check home directory
@@ -1235,6 +1274,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
                 config = json.loads(config_json_str)
                 if export_env:
                     export_env_if_any(config)
+                _set_demo_credential(config,demo)
                 return config
 
 
@@ -1272,4 +1312,12 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
     
     if export_env:
         export_env_if_any(config)
+    _set_demo_credential(config,demo)
     return config
+
+def _set_demo_credential(config,demo=False):
+    if demo:
+        config["user_id"]=config["user_id_demo"]
+        config["password"]=config["password_demo"]
+        config["account"]=config["account_demo"]
+        config["connection"]="Demo"
