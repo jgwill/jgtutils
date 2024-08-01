@@ -932,9 +932,15 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__use_fresh__post_parse()
     args=__json_post_parse()   
     args=__jgtclirqdata_post_parse()
+    args=_demo_flag()
     return args
 
-
+def _demo_flag():
+    global args
+    if hasattr(args, 'demo') and args.demo:
+        setattr(args, 'connection', 'Demo')
+        setattr(args, 'demo', True)
+    return args
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
     global default_parser,args
