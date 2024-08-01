@@ -1,4 +1,4 @@
-version := $(shell python3 -c 'from jgtutils import __version__; print(__version__)')
+version := $(shell python3 -c 'from jgtutils import version; print(version)')
 
 .PHONY: venv
 venv:

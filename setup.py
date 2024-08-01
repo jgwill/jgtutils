@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
-#from jgtpy import __version__ as version
+
 def read_version():
     with open("jgtutils/__init__.py") as f:
         for line in f:
-            if line.startswith("__version__"):
+            if line.startswith("version"):
                 return line.strip().split()[-1][1:-1]
 
 version = read_version()
