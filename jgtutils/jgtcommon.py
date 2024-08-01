@@ -940,6 +940,9 @@ def _demo_flag():
     if hasattr(args, 'demo') and args.demo:
         setattr(args, 'connection', 'Demo')
         setattr(args, 'demo', True)
+    else:
+        setattr(args, 'connection', 'Real')
+        setattr(args, 'demo', False)
     return args
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
