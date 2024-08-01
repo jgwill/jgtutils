@@ -213,7 +213,7 @@ def add_demo_flag_argument(parser: argparse.ArgumentParser=None)->argparse.Argum
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-d','--demo',
+    parser.add_argument('--demo',
                         action='store_true',
                         help='Use the demo server. Optional parameter.')
     return parser
