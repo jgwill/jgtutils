@@ -1203,9 +1203,16 @@ _JGT_CONFIG_JSON_SECRET=None
 def readconfig(json_config_str=None,config_file = 'config.json',export_env=False,config_file_path_env_name='JGT_CONFIG_PATH',config_values_env_name='JGT_CONFIG',force_read_json=False,demo=False,use_demo_json_config=False):
     global _JGT_CONFIG_JSON_SECRET
     
+    try:
+        home_dir = os.path.expanduser("~")
+    except:
+        home_dir=os.environ["HOME"]
+    if home_dir=="":
+        home_dir=os.environ["HOME"]
+        
     #demo_config are assumed to be $HOME/.jgt/config_demo.json
     if demo and use_demo_json_config:
-        config_file = os.path.join(os.path.expanduser("~"), '.jgt/config_demo.json')
+        config_file = os.path.join(home_dir, '.jgt/config_demo.json')
         #check if exist, advise and raise exception if not
         if not os.path.exists(config_file):
             print("Configuration not found. create : {config_file} or we will try to use the _demo in the usual config.json")
@@ -1216,7 +1223,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
  
     #force_read_json are assumed to be $HOME/.jgt/config.json
     if force_read_json:
-        config_file = os.path.join(os.path.expanduser("~"), '.jgt/config.json')
+        config_file = os.path.join(home_dir, '.jgt/config.json')
         #check if exist, advise and raise exception if not
         if not os.path.exists(config_file):
             raise Exception(f"Configuration not found. create : {config_file})")
@@ -1260,7 +1267,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
 
     # if file does not exist try set the path to the file in the HOME
     if not os.path.exists(config_file):
-        config_file = os.path.join(os.path.expanduser("~"), config_file)
+        config_file = os.path.join(home_dir, config_file)
         
     if os.path.exists(config_file):
         with open(config_file, 'r') as f:
@@ -1270,8 +1277,7 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
             _set_demo_credential(config,demo)
             return config
     else:
-        # If config file not found, check home directory
-        home_dir = os.path.expanduser("~")
+
         config_file = os.path.join(home_dir, config_file)
         if os.path.isfile(config_file):
             with open(config_file, 'r') as f:
@@ -1311,13 +1317,20 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
                
     # Read config file
     if config is None:
-        print("config_file:",config_file)
+        #print("config_file:",config_file)
         if config_file is not None and os.path.exists(config_file) :
             with open(config_file, 'r') as file:
                 config = json.load(file)
         
     if config is None:
-        raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")
+        #Last attempt to read
+        another_config = "config.json"
+        if not os.path.exists(another_config):
+            another_config = "/etc/jgt/config.json"
+        with open(another_config, 'r') as file:
+            config = json.load(file)
+        if config is None:    
+            raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")
     
     if export_env:
         export_env_if_any(config)
