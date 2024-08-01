@@ -1330,3 +1330,12 @@ def _set_demo_credential(config,demo=False):
         config["password"]=config["password_demo"]
         config["account"]=config["account_demo"]
         config["connection"]="Demo"
+
+
+def read_fx_str_from_config(demo=False)->tuple[str,str,str,str]:
+    config = readconfig(demo=demo)
+    str_user_id=config['user_id']
+    str_password=config['password']
+    str_url=config['url']
+    str_connection=config['connection']
+    return str_user_id,str_password,str_url,str_connection
