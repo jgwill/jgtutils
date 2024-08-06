@@ -60,6 +60,10 @@ indicator_sixDegreeLarger_alligator_lips_column_name = 'blips' # 34 periods movi
 BJAW=indicator_sixDegreeLarger_alligator_jaw_column_name
 BTEETH=indicator_sixDegreeLarger_alligator_teeth_column_name
 BLIPS=indicator_sixDegreeLarger_alligator_lips_column_name
+BJAW_PERIODS=89
+BTEETH_PERIODS=55
+BLIPS_PERIODS=34
+
 
 TJAW='tjaw'
 TJAW_PERIODS=377

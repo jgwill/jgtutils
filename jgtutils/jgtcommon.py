@@ -259,6 +259,13 @@ def add_rate_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentP
                             help='Desired price of an entry order.')
     return parser
 
+def add_stop_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-stop','--stop', metavar="STOP", required=True, type=float,
+                            help='Desired price of the stop order.')
+    return parser
 
 def add_lots_arguments(parser):
     parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
