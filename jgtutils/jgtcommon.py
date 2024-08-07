@@ -272,7 +272,7 @@ def add_lots_arguments(parser):
                             help='Trade amount in lots.')
 
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
-                                      lots: bool = True):
+                                      lots: bool = True, stop: bool = True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -283,6 +283,8 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
         add_rate_arguments(parser)
     if lots:
         add_lots_arguments(parser)
+    if stop:
+        add_stop_arguments(parser)
     
     return parser
 
