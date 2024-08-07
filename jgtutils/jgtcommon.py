@@ -289,6 +289,13 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
     return parser
 
 
+def add_orderid_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-id','--orderid', metavar="OrderID", required=True,
+                        help='The order identifier.')
+    return parser
 
 def add_account_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
