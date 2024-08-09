@@ -29,7 +29,7 @@ import tlid
 
 
 #import logging
-import datetime
+from datetime import datetime, time
 import traceback
 import argparse
 import sys
@@ -1369,3 +1369,28 @@ def read_fx_str_from_config(demo=False)->tuple[str,str,str,str,str]:
     str_connection=config['connection']
     str_account=config['account']
     return str_user_id,str_password,str_url,str_connection,str_account
+
+
+
+def is_market_open(current_time=None):
+    if current_time is None:
+        current_time = datetime.utcnow()
+
+    # Define market open and close times
+    market_open_time = time(21, 0)  # 21:00 UTC
+    market_close_time = time(21, 15)  # 21:15 UTC
+
+    # Get the current day of the week (0=Monday, 6=Sunday)
+    current_day = current_time.weekday()
+
+    # Check if the market is open
+    if current_day == 6:  # Sunday
+        if current_time.time() >= market_open_time:
+            return True
+    elif current_day == 4:  # Friday
+        if current_time.time() < market_close_time:
+            return True
+    elif 0 <= current_day < 4:  # Monday to Thursday
+        return True
+
+    return False
