@@ -2,6 +2,12 @@
 import datetime
 import json
 
+import os
+
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 from jgtfxhelper import offer_id_to_instrument
 
     
