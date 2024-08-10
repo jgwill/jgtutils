@@ -1363,10 +1363,12 @@ def _set_demo_credential(config,demo=False):
 
 def read_fx_str_from_config(demo=False)->tuple[str,str,str,str,str]:
     config = readconfig(demo=demo)
+    if config["connection"]=="Real" and demo: #Make sure we have our demo credentials
+        _set_demo_credential(config,True)
     str_user_id=config['user_id']
     str_password=config['password']
     str_url=config['url']
-    str_connection=config['connection']
+    str_connection="Real" if not demo else "Demo"
     str_account=config['account']
     return str_user_id,str_password,str_url,str_connection,str_account
 
@@ -1383,12 +1385,13 @@ def is_market_open(current_time=None):
     # Get the current day of the week (0=Monday, 6=Sunday)
     current_day = current_time.weekday()
 
+    current_time_utc = current_time.time()
     # Check if the market is open
     if current_day == 6:  # Sunday
-        if current_time.time() >= market_open_time:
+        if current_time_utc >= market_open_time:
             return True
     elif current_day == 4:  # Friday
-        if current_time.time() < market_close_time:
+        if current_time_utc < market_close_time:
             return True
     elif 0 <= current_day < 4:  # Monday to Thursday
         return True

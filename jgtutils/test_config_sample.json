@@ -1,0 +1,39 @@
+{
+  "user_id": "010101010",
+  "account": "0001",
+  "password": "MyRealFXCMPassword",
+  "user_id_demo": "U10D8798797",
+  "password_demo": "MyDemoFXCMPassword",
+  "account_demo": "002342343",
+  "url": "https://www.fxcorporate.com/Hosts.jsp",
+  "connection": "Real",
+  "quotes_count": 1000,
+  "pds_server_url": "http://localhost:5000",
+  "columns_to_remove": [
+    "fdbbhigh",
+    "fdbblow",
+    "fdbshigh",
+    "fdbslow",
+    "aofhighao",
+    "aoflowao",
+    "aofhigh",
+    "aoflow"
+  ],
+  "columns_to_remove_ori": [
+    "aofvalue",
+    "aofhighao",
+    "aoflowao",
+    "aofhigh",
+    "aoflow",
+    "aocolor",
+    "accolor",
+    "fdbbhigh",
+    "fdbblow",
+    "fdbshigh",
+    "fdbslow"
+  ],
+  "quit_on_stop": "false",
+  "instrument": "SPX500",
+  "timeframe": "D1",
+  "keep_bid_ask": "true"
+}
