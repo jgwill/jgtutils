@@ -1,12 +1,13 @@
-import subprocess
-
 import os
+import subprocess
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
+import platform
 
 import jgtos
 
-import platform
 
 def pwsd_wsl_run_command1(bash_command_to_run):
     powershell_command = 'wsl.exe bash -c \'' + bash_command_to_run + '\''

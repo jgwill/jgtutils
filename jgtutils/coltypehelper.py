@@ -1,5 +1,6 @@
 from jgtconstants import *
 
+
 def get_constant_col_type_by_name(colname:str):
     """
     Get the type of the column based on the column name.

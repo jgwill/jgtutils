@@ -1,7 +1,7 @@
 # %%  
-import jgtutils.jgtos as jos
 import os
 
+import jgtutils.jgtos as jos
 
 i = "EUR/USD"
 t = "H4"

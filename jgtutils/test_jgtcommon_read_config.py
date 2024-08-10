@@ -4,6 +4,7 @@ from unittest.mock import patch
 # Assuming read_fx_str_from_config is defined in jgtcommon.py
 from jgtcommon import read_fx_str_from_config
 
+
 class TestReadFxStrFromConfig(unittest.TestCase):
     @patch('jgtcommon.readconfig')
     def test_read_fx_str_from_config_demo_false(self, mock_readconfig):

@@ -1,6 +1,8 @@
 import unittest
 from datetime import datetime, timezone
+
 from jgtcommon import is_market_open
+
 
 class TestMarketOpen(unittest.TestCase):
     def test_market_open_sunday(self):

@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
 import re
+
+from setuptools import find_packages, setup
+
 
 def read_version():
     with open("jgtutils/__init__.py") as f:

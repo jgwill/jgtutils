@@ -1,5 +1,6 @@
 import re
 
+
 def bump_version(version):
     major, minor, patch = map(int, version.split('.'))
     patch += 1

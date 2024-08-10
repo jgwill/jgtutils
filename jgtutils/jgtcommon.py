@@ -17,10 +17,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
-from enum import Enum
+import argparse
 import json
 import os
+import sys
+import traceback
+#import logging
+from datetime import datetime, time
+from enum import Enum
+from typing import List
+
 import tlid
 
 #------------------------#
@@ -28,48 +34,63 @@ import tlid
 # common.py
 
 
-#import logging
-from datetime import datetime, time
-import traceback
-import argparse
-import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from jgtos import tlid_range_to_start_end_datetime,tlid_range_to_jgtfxcon_start_end_str,tlid_dt_to_string,tlidmin_to_dt
+from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
+                   tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
-from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION, ARG_GROUP_BARS_TITLE, ARG_GROUP_CLEANUP_DESCRIPTION, ARG_GROUP_CLEANUP_TITLE, ARG_GROUP_INDICATOR_DESCRIPTION, ARG_GROUP_INDICATOR_TITLE, ARG_GROUP_INTERACTION_DESCRIPTION, ARG_GROUP_INTERACTION_TITLE, ARG_GROUP_OUTPUT_DESCRIPTION, ARG_GROUP_OUTPUT_TITLE, ARG_GROUP_POV_DESCRIPTION, ARG_GROUP_POV_TITLE, ARG_GROUP_RANGE_DESCRIPTION, ARG_GROUP_RANGE_TITLE, ARG_GROUP_VERBOSITY_DESCRIPTION, ARG_GROUP_VERBOSITY_TITLE, FRESH_FLAG_ARGNAME,
-                      FRESH_FLAG_ARGNAME_ALIAS,
-                      NOT_FRESH_FLAG_ARGNAME_ALIAS,
-                      NOT_FRESH_FLAG_ARGNAME,
-                      BALLIGATOR_FLAG_ARGNAME,
-                      BALLIGATOR_FLAG_ARGNAME_ALIAS, QUOTES_COUNT_ARGNAME, QUOTES_COUNT_ARGNAME_ALIAS,
-                      TALLIGATOR_FLAG_ARGNAME,
-                      TALLIGATOR_FLAG_ARGNAME_ALIAS,
-                      MFI_FLAG_ARGNAME,
-                      MFI_FLAG_ARGNAME_ALIAS,
-                      NO_MFI_FLAG_ARGNAME,
-                      NO_MFI_FLAG_ARGNAME_ALIAS,
-                      GATOR_OSCILLATOR_FLAG_ARGNAME,
-                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
-                      KEEP_BID_ASK_FLAG_ARGNAME,
-                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,
-                      REMOVE_BID_ASK_FLAG_ARGNAME,
-                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,
-                      FULL_FLAG_ARGNAME,
-                      FULL_FLAG_ARGNAME_ALIAS,
-                      NOT_FULL_FLAG_ARGNAME,
-                      NOT_FULL_FLAG_ARGNAME_ALIAS,
-                      DROPNA_VOLUME_FLAG_ARGNAME,
-                      DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
-                      DONT_DROPNA_VOLUME_FLAG_ARGNAME,
-                      DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS, TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME, TLID_RANGE_ARGNAME_ALIAS, TLID_RANGE_HELP_STRING
-                      )
-
+from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
+                                      ARG_GROUP_BARS_TITLE,
+                                      ARG_GROUP_CLEANUP_DESCRIPTION,
+                                      ARG_GROUP_CLEANUP_TITLE,
+                                      ARG_GROUP_INDICATOR_DESCRIPTION,
+                                      ARG_GROUP_INDICATOR_TITLE,
+                                      ARG_GROUP_INTERACTION_DESCRIPTION,
+                                      ARG_GROUP_INTERACTION_TITLE,
+                                      ARG_GROUP_OUTPUT_DESCRIPTION,
+                                      ARG_GROUP_OUTPUT_TITLE,
+                                      ARG_GROUP_POV_DESCRIPTION,
+                                      ARG_GROUP_POV_TITLE,
+                                      ARG_GROUP_RANGE_DESCRIPTION,
+                                      ARG_GROUP_RANGE_TITLE,
+                                      ARG_GROUP_VERBOSITY_DESCRIPTION,
+                                      ARG_GROUP_VERBOSITY_TITLE,
+                                      BALLIGATOR_FLAG_ARGNAME,
+                                      BALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      DONT_DROPNA_VOLUME_FLAG_ARGNAME,
+                                      DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
+                                      DROPNA_VOLUME_FLAG_ARGNAME,
+                                      DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
+                                      FRESH_FLAG_ARGNAME,
+                                      FRESH_FLAG_ARGNAME_ALIAS,
+                                      FULL_FLAG_ARGNAME,
+                                      FULL_FLAG_ARGNAME_ALIAS,
+                                      GATOR_OSCILLATOR_FLAG_ARGNAME,
+                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
+                                      KEEP_BID_ASK_FLAG_ARGNAME,
+                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
+                                      NO_MFI_FLAG_ARGNAME,
+                                      NO_MFI_FLAG_ARGNAME_ALIAS,
+                                      NOT_FRESH_FLAG_ARGNAME,
+                                      NOT_FRESH_FLAG_ARGNAME_ALIAS,
+                                      NOT_FULL_FLAG_ARGNAME,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS,
+                                      QUOTES_COUNT_ARGNAME,
+                                      QUOTES_COUNT_ARGNAME_ALIAS,
+                                      REMOVE_BID_ASK_FLAG_ARGNAME,
+                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      TALLIGATOR_FLAG_ARGNAME,
+                                      TALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
+                                      TLID_RANGE_ARGNAME_ALIAS,
+                                      TLID_RANGE_HELP_STRING)
 
 args:argparse.Namespace=None # Default args when we are done parsing
 try :
     import __main__
+
     # logging.basicConfig(filename='{0}.log'.format(__main__.__file__), level=logging.INFO,
     #                 format='%(asctime)s %(levelname)s %(message)s', datefmt='%m.%d.%Y %H:%M:%S')
     # console = logging.StreamHandler(sys.stdout)
@@ -592,6 +613,8 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     return parser
 
 import jgtclirqdata
+
+
 def add_jgtclirqdata_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
@@ -790,6 +813,7 @@ def __timeframes_post_parse(timeframes=None)->argparse.Namespace:
     return args
 
 from jgtconstants import TIMEFRAMES_ALL
+
 
 def parse_timeframes_helper(timeframes):
     if timeframes in TIMEFRAMES_ALL:

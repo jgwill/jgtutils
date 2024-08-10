@@ -1,7 +1,7 @@
 import datetime
-
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
@@ -75,6 +75,7 @@ def mk_fn_range(instrument:str,
     return _fn
 
 import subprocess
+
 
 def create_directory_with_sudo(path):
     # Construct the command

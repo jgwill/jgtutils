@@ -1,6 +1,8 @@
 #%% Imports
+import os
+
 import jgtutils.jgtos as jos
-import os 
+
 #%% Pov
 i="EUR/USD";t="H4"
 tlid_range = "231010_240105"

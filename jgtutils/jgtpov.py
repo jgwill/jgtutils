@@ -1,9 +1,10 @@
+import os
+import re
 from datetime import datetime, timedelta
+
+import tlid
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-import tlid
-import re
-import os
 
 
 def get_dt_format_pattern(end_datetime):

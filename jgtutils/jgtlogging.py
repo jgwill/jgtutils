@@ -1,12 +1,6 @@
+import logging
 import sys
-
-import logging
-
 import traceback
-
-
-import logging
-
 
 _loglevel = logging.WARNING
 
