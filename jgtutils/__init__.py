@@ -2,7 +2,7 @@
 jgtutils package
 """
 
-version='0.1.141'
+version='0.1.142'
 
 
 from jgtos import (tlid_range_to_jgtfxcon_start_end_str,
