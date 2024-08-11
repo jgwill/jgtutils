@@ -118,12 +118,46 @@ except:
     default_parser = argparse.ArgumentParser(description='JGWill Trading Utilities')
     pass
 
+
+
+settings: dict = None
+
 # try:
 #     #indicator's group
 #     indicator_group = default_parser.add_argument_group(INDICATOR_GROUP_TITLE, 'Indicators to use in the processing.')
 #     #indicator_group = _get_group_by_title(default_parser, INDICATOR_GROUP_TITLE)
 # except:
 #     pass
+
+def _load_settings_from_path(path):
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            return json.load(f)
+    return {}
+
+def load_settings():
+    home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
+    current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
+    
+    settings = _load_settings_from_path(home_settings_path)
+    current_settings = _load_settings_from_path(current_settings_path)
+    
+    # Merge settings, with current directory settings taking precedence
+    settings.update(current_settings)
+    
+    return settings
+
+
+
+def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
+    global settings
+    if settings is None:
+        settings=load_settings()
+    
+    _value = settings.get(argname,default_value)
+    if alias is not None and _value==default_value:
+        _value = settings.get(alias,default_value) #try alias might be used
+    return _value
 
 
 def new_parser(description: str,epilog: str=None,prog: str=None)->argparse.ArgumentParser:
@@ -148,11 +182,13 @@ def init_default_parser(description: str):
 
 
 
-def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true",group_title="",group_description=""):
+def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true",group_title="",group_description="",load_default_from_settings=True,flag_default_value=False):
 
 
     __alias_cmd_prefix = "-"
     __full_arg_prefix = "--"
+    
+    __flag_setting_value=load_arg_default_from_settings(_argname_full,flag_default_value)
     
     _argname_alias = __alias_cmd_prefix+_argname_alias
     _argname_full = __full_arg_prefix+_argname_full
@@ -162,6 +198,7 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
         _argname_full,
         action=_action_value,
         help=_description,
+        default=__flag_setting_value
         )
     else:
         #try get group name or create it.
@@ -171,6 +208,7 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
             _argname_full,
             action=_action_value,
             help=_description,
+            default=__flag_setting_value
         )
     
     return parser
@@ -230,31 +268,39 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None)->a
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
     return parser
 
-def add_demo_flag_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtutils.jgtcliconstants import (DEMO_FLAG_ARGNAME)
+
+def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
+    default_value = load_arg_default_from_settings(DEMO_FLAG_ARGNAME,flag_default_value) if load_default_from_settings else flag_default_value
     parser.add_argument('--demo',
                         action='store_true',
-                        help='Use the demo server. Optional parameter.')
+                        help='Use the demo server. Optional parameter.',
+                        default=default_value)
     return parser
 
-def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False):
+def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False,load_instrument_from_settings=True,load_timeframe_from_settings=True)->argparse.ArgumentParser:
     
     global default_parser
     if parser is None:
         parser=default_parser
     pov_group=_get_group_by_title(parser,ARG_GROUP_POV_TITLE,ARG_GROUP_POV_DESCRIPTION)
+    instrument_setting_value=None if not load_instrument_from_settings else load_arg_default_from_settings("instrument",None,alias="i")
     pov_group.add_argument('-i','--instrument',
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
-                                  For example, "EUR/USD".')
+                                  For example, "EUR/USD".',
+                                  default=instrument_setting_value)
 
     if timeframe:
+        timeframe_setting_value=None if not load_timeframe_from_settings else load_arg_default_from_settings("timeframe",None,alias="t")
         pov_group.add_argument('-t','--timeframe',
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
-                                      For example, m1 - for 1 minute, H1 - for 1 hour.')
+                                      For example, m1 - for 1 minute, H1 - for 1 hour.',
+                                      default=timeframe_setting_value)
     if add_IndicatorPattern:
         parser.add_argument('-ip',
                         metavar="IndicatorPattern",
@@ -587,7 +633,7 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.Argum
     return parser
 
 
-def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_keepbidask_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=True)->argparse.ArgumentParser:
     """
     Adds a keep Bid/Ask argument to the given argument parser.
     
@@ -604,12 +650,16 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     cleanupGroup=_get_group_by_title(parser,ARG_GROUP_CLEANUP_TITLE,ARG_GROUP_CLEANUP_DESCRIPTION)
     group_kba=cleanupGroup.add_mutually_exclusive_group()
     
+    default_value = load_arg_default_from_settings(KEEP_BID_ASK_FLAG_ARGNAME,flag_default_value,alias=KEEP_BID_ASK_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    #print("keepbidask  value:"+str(default_value))
     group_kba.add_argument('-'+KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+KEEP_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
-                        help='Keep Bid/Ask in storage. ')
+                        help='Keep Bid/Ask in storage. ',
+                        default=default_value)
     group_kba.add_argument('-'+REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+REMOVE_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
-                        help='Remove Bid/Ask in storage. ')
+                        help='Remove Bid/Ask in storage. ',
+                        default=not default_value)
     return parser
 
 import jgtclirqdata
@@ -1070,103 +1120,179 @@ def add_ids_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentPar
                         help='Action the creation of IDS')
     return parser
 
-
-def add_ids_mfi_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_ids_mfi_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=True)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
+    default_value = load_arg_default_from_settings(MFI_FLAG_ARGNAME,flag_default_value,alias=MFI_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    #settings.get(MFI_FLAG_ARGNAME,flag_default_value) if settings else flag_default_value
+    
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     mfi_exclusive_subgroup=group_indicators.add_mutually_exclusive_group()
     mfi_exclusive_subgroup.add_argument(
         "-"+MFI_FLAG_ARGNAME_ALIAS,
         "--"+MFI_FLAG_ARGNAME,
         action="store_true",
+        default=default_value,
         help="Enable the Market Facilitation Index indicator.",
     )
     mfi_exclusive_subgroup.add_argument(
         "-"+NO_MFI_FLAG_ARGNAME_ALIAS,
         "--"+NO_MFI_FLAG_ARGNAME,  
         action="store_true",
+        default=not default_value,
         help="Disable the Market Facilitation Index indicator.",
     )  
     return parser
 
-def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
 
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
+    
+    default_value = load_arg_default_from_settings(GATOR_OSCILLATOR_FLAG_ARGNAME,flag_default_value,alias=GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    
     group_indicators.add_argument(
         "-"+GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
         "--"+GATOR_OSCILLATOR_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Gator Oscillator indicator.",
+        default=default_value
     )
     return parser
 
-def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtcliconstants import  (LARGEST_FRACTAL_PERIOD_ARGNAME,
+                                LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS,)
+def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,default_value=89)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
+    
+    default_value = load_arg_default_from_settings(LARGEST_FRACTAL_PERIOD_ARGNAME,default_value,alias=LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS) if load_default_from_settings else default_value
+    
     group_indicators.add_argument(
-        "-lfp",
-        "--largest_fractal_period",
+        "-"+LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS,
+        "--"+LARGEST_FRACTAL_PERIOD_ARGNAME,
         type=int,
-        default=89,
-        help="The largest fractal period.",
+        default=default_value,
+        help=f"The largest fractal period. ({default_value})",
     )
     return parser
 
-def add_ids_balligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+
+
+from jgtconstants import BJAW_PERIODS,BTEETH_PERIODS,BLIPS_PERIODS
+from jgtcliconstants import  (BALLIGATOR_PERIOD_JAWS_ARGNAME,
+                              BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+                              BALLIGATOR_PERIOD_TEETH_ARGNAME,
+                              BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+                              BALLIGATOR_PERIOD_LIPS_ARGNAME,
+                              BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,)
+def add_ids_balligator_argument(parser: argparse.ArgumentParser=None,add_periods_arg=True,load_default_from_settings=True,flag_default_value=False,period_jaws_default = BJAW_PERIODS,period_teeth_default=BTEETH_PERIODS,period_lips_default=BLIPS_PERIODS)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
     
-    _description = "Enable the Big Alligator indicator."
-    _argname_alias=BALLIGATOR_FLAG_ARGNAME_ALIAS
-    _argname_full=BALLIGATOR_FLAG_ARGNAME
-    
-    
-    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser,group_title=ARG_GROUP_INDICATOR_TITLE,group_description=ARG_GROUP_INDICATOR_DESCRIPTION)
+    flag_default_value=load_arg_default_from_settings(BALLIGATOR_FLAG_ARGNAME,flag_default_value,alias=BALLIGATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
     
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
-        "-bjaw",
-        "--balligator_period_jaws",
-        type=int,
-        default=89,
-        help="The period of the Big Alligator jaws.",
+        "-"+BALLIGATOR_FLAG_ARGNAME_ALIAS,
+        "--"+BALLIGATOR_FLAG_ARGNAME,
+        action="store_true",
+        help="Enable the Big Alligator indicator.",
+        default=flag_default_value
     )
+    
+    if add_periods_arg:
+        balligator_period_jaws_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_JAWS_ARGNAME,period_jaws_default,alias=BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_JAWS_ARGNAME,
+            type=int,
+            default=balligator_period_jaws_default,
+            help="The period of the Big Alligator jaws.",
+        )
+        balligator_period_teeth_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_TEETH_ARGNAME,period_teeth_default,alias=BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_TEETH_ARGNAME,
+            type=int,
+            default=balligator_period_teeth_default,
+            help="The period of the Big Alligator teeth.",
+        )
+        balligator_period_lips_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_LIPS_ARGNAME,period_lips_default,alias=BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_LIPS_ARGNAME,
+            type=int,
+            default=balligator_period_lips_default,
+            help="The period of the Big Alligator lips.",
+        )
     return parser
 
-  
-def add_ids_talligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtconstants import TJAW_PERIODS,TTEETH_PERIODS,TLIPS_PERIODS
+from jgtcliconstants import  (TALLIGATOR_PERIOD_JAWS_ARGNAME,
+                              TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+                              TALLIGATOR_PERIOD_TEETH_ARGNAME,
+                              TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+                              TALLIGATOR_PERIOD_LIPS_ARGNAME,
+                              TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,)
+def add_ids_talligator_argument(parser: argparse.ArgumentParser=None,add_periods_arg=True,load_default_from_settings=True,flag_default_value=False,period_jaws_default = TJAW_PERIODS,period_teeth_default=TTEETH_PERIODS,period_lips_default=TLIPS_PERIODS)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
+    
+    flag_default_value=load_arg_default_from_settings(TALLIGATOR_FLAG_ARGNAME,flag_default_value,alias=TALLIGATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
     
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-"+TALLIGATOR_FLAG_ARGNAME_ALIAS,
         "--"+TALLIGATOR_FLAG_ARGNAME,
         action="store_true",
-        help="Enable the Tide Alligator indicator."
+        help="Enable the Tide Alligator indicator.",
+        default=flag_default_value
     )
     
-    group_indicators.add_argument(
-        "-tjaw",
-        "--talligator_period_jaws",
-        type=int,
-        default=377,
-        help="The period of the Tide Alligator jaws.",
-    )
+    if add_periods_arg:
+        talligator_period_jaws_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_JAWS_ARGNAME,period_jaws_default,alias=TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_JAWS_ARGNAME,
+            type=int,
+            default=talligator_period_jaws_default,
+            help="The period of the Tide Alligator jaws.",
+        )
+        talligator_period_teeth_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_TEETH_ARGNAME,period_teeth_default,alias=TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_TEETH_ARGNAME,
+            type=int,
+            default=talligator_period_teeth_default,
+            help="The period of the Tide Alligator teeth.",
+        )
+        talligator_period_lips_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_LIPS_ARGNAME,period_lips_default,alias=TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_LIPS_ARGNAME,
+            type=int,
+            default=talligator_period_lips_default,
+            help="The period of the Tide Alligator lips.",
+        )
     return parser
 
 def add_ads_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
