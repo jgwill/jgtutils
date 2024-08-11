@@ -179,15 +179,7 @@ def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
         parser=default_parser
     
     args, unknown = parser.parse_known_args()
-    
-    if hasattr(args, SETTING_ARGNAME):
-        _custom_setting_file = getattr(args,SETTING_ARGNAME,None)
-        if _custom_setting_file is not None and not os.path.exists(_custom_setting_file) and isinstance(_custom_setting_file,str):
-            raise Exception("Settings file does not exist:"+_custom_setting_file)
-        settings = load_settings(_custom_setting_file)
-        print("Custom settings loaded from file:"+_custom_setting_file)
-    else:
-        settings=load_settings()
+    settings = load_settings(getattr(args,SETTING_ARGNAME,None))
     
     return parser
 
