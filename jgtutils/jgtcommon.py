@@ -136,10 +136,14 @@ def _load_settings_from_path(path):
     return {}
 
 def load_settings(custom_path=None):
+    system_settings_path = os.path.join('/etc', 'jgt', 'settings.json')
     home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
     current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
     
-    settings = _load_settings_from_path(home_settings_path)
+    settings=_load_settings_from_path(system_settings_path)
+    user_settings = _load_settings_from_path(home_settings_path)
+     # Merge settings, with user directory settings taking precedence
+    settings.update(user_settings)
     current_settings = _load_settings_from_path(current_settings_path)
     
     # Merge settings, with current directory settings taking precedence
@@ -169,7 +173,7 @@ def add_settings_argument(parser: argparse.ArgumentParser=None)->argparse.Argume
         parser=default_parser
     parser.add_argument('-'+SETTING_ARGNAME_ALIAS,'--'+SETTING_ARGNAME,
                        type=str,
-                        help='Load settings from a specific settings file (overrides default settings (HOME/.jgt/settings.json and .jgt/settings.json)).',
+                        help='Load settings from a specific settings file (overrides default settings (/etc/jgt/settings.json and HOME/.jgt/settings.json and .jgt/settings.json)).',
                         required=False)
     return parser
 
