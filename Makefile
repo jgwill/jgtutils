@@ -83,6 +83,11 @@ dev-release:
 	make dist
 	make dev-pypi-release
 
+.PHONY: dev-release-plus
+dev-release-plus:
+	make dev-release
+	twine upload dist/*
+
 .PHONY: bump_version
 bump_version:
 	python bump_version.py
