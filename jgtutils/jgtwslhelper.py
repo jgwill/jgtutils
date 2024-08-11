@@ -88,40 +88,31 @@ def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=N
     base_args = mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask)
     
     if tlid_range is not None and tlid_range != "":
-        bash_command_to_run = f"{base_args}  -tlid \"{tlid_range}\" "
+        bash_command_to_run = f"{base_args} -tlid \"{tlid_range}\""
     else:
         if use_full:
-            bash_command_to_run = f"{base_args} --full "
+            bash_command_to_run = f"{base_args} --full"
         else:
-            quote_args = " "
+            quote_args = ""
             if quote_count > 0:
-                quote_args = f"-c {quote_count} "
-            bash_command_to_run = f"{base_args}  {quote_args} "
+                quote_args = f" -c {quote_count}"
+            bash_command_to_run = f"{base_args}{quote_args}"
         
     
     return bash_command_to_run
 
 def mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask):
     cli_path=resolve_cli_path(cli_path)
-    bidask_arg = " "
+    bidask_arg = ""
     
     if keep_bid_ask:
-        bidask_arg = " -kba "
+        bidask_arg = " -kba"
     
-    base_args=f"{cli_path} -i \"{instrument}\" -t \"{timeframe}\"  {bidask_arg} -v {verbose_level} "
+    base_args=f"{cli_path} -i \"{instrument}\" -t \"{timeframe}\"{bidask_arg} -v {verbose_level}"
     return base_args
-
-# def _mkbash_cmd_string_jgtfxcli_range1(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0):
-#     cli_path=resolve_cli_path(cli_path)
-    
-#     date_from,date_to=jgtos.tlid_range_to_jgtfxcon_start_end_str(tlid_range)
-    
-#     bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -s \"{date_from}\" -e \"{date_to}\" -v {verbose_level}"
-#     return bash_command_to_run
 
 def jgtfxcli_wsl_range(instrument:str, timeframe:str, quote_count:int,tlid_range=None,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
     bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
-    print(f"bash_command_to_run: {bash_command_to_run}")
     return run_bash_command_by_platform(bash_command_to_run)
 
 def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False):
@@ -129,7 +120,6 @@ def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose
 
 def getPH(instrument:str, timeframe:str, quote_count:int,tlid_range=None, verbose_level=0,use_full=False,keep_bid_ask=False):
     return jgtfxcli_wsl_range(instrument, timeframe, quote_count,tlid_range,"", verbose_level,use_full=use_full,keep_bid_ask=keep_bid_ask)
-
 
 def wsl_cd(directory):
     # Define the command to be executed
