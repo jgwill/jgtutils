@@ -101,11 +101,13 @@ def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=N
 
 def _mkbash_cmd_string_jgtfxcli_range1(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0):
     cli_path=resolve_cli_path(cli_path)
+# def _mkbash_cmd_string_jgtfxcli_range1(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0):
+#     cli_path=resolve_cli_path(cli_path)
     
-    date_from,date_to=jgtos.tlid_range_to_jgtfxcon_start_end_str(tlid_range)
+#     date_from,date_to=jgtos.tlid_range_to_jgtfxcon_start_end_str(tlid_range)
     
-    bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -s \"{date_from}\" -e \"{date_to}\" -v {verbose_level}"
-    return bash_command_to_run
+#     bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -s \"{date_from}\" -e \"{date_to}\" -v {verbose_level}"
+#     return bash_command_to_run
 
 def jgtfxcli_wsl_range(instrument:str, timeframe:str, quote_count:int,tlid_range=None,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
     bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
