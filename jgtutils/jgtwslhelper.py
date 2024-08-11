@@ -95,7 +95,7 @@ def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=N
         else:
             quote_args = " "
             if quote_count > 0:
-                quote_args = f"-c \"{quote_count}\" "
+                quote_args = f"-c {quote_count} "
             bash_command_to_run = f"{base_args}  {quote_args} "
         
     

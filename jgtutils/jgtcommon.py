@@ -145,7 +145,7 @@ def load_settings(custom_path=None):
     # Merge settings, with current directory settings taking precedence
     settings.update(current_settings)
     
-    if custom_path:
+    if custom_path is not None and custom_path != '':
         custom_settings = _load_settings_from_path(custom_path)
         settings.update(custom_settings)
         
@@ -182,7 +182,7 @@ def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
     
     if hasattr(args, SETTING_ARGNAME):
         _custom_setting_file = getattr(args,SETTING_ARGNAME,None)
-        if not os.path.exists(_custom_setting_file):
+        if not os.path.exists(_custom_setting_file) and isinstance(_custom_setting_file,str):
             raise Exception("Settings file does not exist:"+_custom_setting_file)
         settings = load_settings(_custom_setting_file)
         print("Custom settings loaded from file:"+_custom_setting_file)
