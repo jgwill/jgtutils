@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
-from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
+from jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_BARS_TITLE,
                                       ARG_GROUP_CLEANUP_DESCRIPTION,
                                       ARG_GROUP_CLEANUP_TITLE,
@@ -135,7 +135,7 @@ def _load_settings_from_path(path):
             return json.load(f)
     return {}
 
-def load_settings():
+def load_settings(custom_path=None):
     home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
     current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
     
@@ -145,6 +145,10 @@ def load_settings():
     # Merge settings, with current directory settings taking precedence
     settings.update(current_settings)
     
+    if custom_path:
+        custom_settings = _load_settings_from_path(custom_path)
+        settings.update(custom_settings)
+        
     return settings
 
 
@@ -159,10 +163,43 @@ def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
         _value = settings.get(alias,default_value) #try alias might be used
     return _value
 
+def add_settings_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    parser.add_argument('-'+SETTING_ARGNAME_ALIAS,'--'+SETTING_ARGNAME,
+                       type=str,
+                        help='Load settings from a specific settings file (overrides default settings (HOME/.jgt/settings.json and .jgt/settings.json)).',
+                        required=False)
+    return parser
 
-def new_parser(description: str,epilog: str=None,prog: str=None)->argparse.ArgumentParser:
+def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
+    global default_parser,settings
+    if parser is None:
+        parser=default_parser
+    
+    args, unknown = parser.parse_known_args()
+    
+    if hasattr(args, SETTING_ARGNAME):
+        _custom_setting_file = getattr(args,SETTING_ARGNAME,None)
+        if not os.path.exists(_custom_setting_file):
+            raise Exception("Settings file does not exist:"+_custom_setting_file)
+        settings = load_settings(_custom_setting_file)
+        print("Custom settings loaded from file:"+_custom_setting_file)
+    else:
+        settings=load_settings()
+    
+    return parser
+
+def new_parser(description: str,epilog: str=None,prog: str=None,enable_specified_settings=True)->argparse.ArgumentParser:
     global default_parser
     default_parser = argparse.ArgumentParser(description=description,epilog=epilog,prog=prog)
+    
+    if enable_specified_settings:
+        default_parser=add_settings_argument(default_parser)
+        if not '--help' in sys.argv:
+            default_parser=_preload_settings_from_args(default_parser)
+    
     return default_parser
 
 # Get a group by its title
@@ -268,7 +305,7 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None)->a
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
     return parser
 
-from jgtutils.jgtcliconstants import (DEMO_FLAG_ARGNAME)
+from jgtcliconstants import (DEMO_FLAG_ARGNAME)
 
 def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False)->argparse.ArgumentParser:
     global default_parser
@@ -1003,6 +1040,8 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     global args
     __check_if_parsed()
     
+    #args=_load_settings_from_args() #@STCIssue - THis has to load before we do any other argparsing, like preloading the settings.
+    
     args=__quiet__post_parse()
     
     
@@ -1025,6 +1064,7 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=_demo_flag()
     return args
 
+    
 def _demo_flag():
     global args
     if hasattr(args, 'demo') and args.demo:
@@ -1166,7 +1206,7 @@ def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None,load_
     return parser
 
 from jgtcliconstants import  (LARGEST_FRACTAL_PERIOD_ARGNAME,
-                                LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS,)
+                                LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS, SETTING_ARGNAME, SETTING_ARGNAME_ALIAS,)
 def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,default_value=89)->argparse.ArgumentParser:
 
     global default_parser
