@@ -1532,11 +1532,26 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
         
     if config is None:
         #Last attempt to read
-        another_config = "config.json"
-        if not os.path.exists(another_config):
-            another_config = "/etc/jgt/config.json"
-        with open(another_config, 'r') as file:
-            config = json.load(file)
+        try:
+            another_config = "config.json"
+            if not os.path.exists(another_config):
+                another_config = os.path.join(os.path.expanduser('~'), '.jgt', 'config.json')
+                
+            if not os.path.exists(another_config):
+                another_config = "/etc/jgt/config.json"
+            with open(another_config, 'r') as file:
+                config = json.load(file)
+        except:
+            pass
+        # try:
+        #     home_config_path_try2 = os.path.join(os.path.expanduser('~'), '.jgt', 'config.json')
+        #     if not os.path.exists(another_config):
+        #         another_config = "/etc/jgt/config.json"
+        #     with open(another_config, 'r') as file:
+        #         config = json.load(file)
+        # except:
+        #     pass
+                
         if config is None:    
             raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")
     
