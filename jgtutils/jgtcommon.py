@@ -578,7 +578,7 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None)->argparse.Argum
     
     return parser
 
-def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -587,19 +587,22 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse
     #g=parser.add_argument_group('Bars Amount', 'Specify the number of bars to download or use the full number of bars available from the store.')
     bars_exclusive_subgroup=bars_group.add_mutually_exclusive_group()
     
-    
+    quotescount_value=load_arg_default_from_settings(QUOTES_COUNT_ARGNAME,-1,QUOTES_COUNT_ARGNAME_ALIAS) if load_from_settings else -1
     bars_exclusive_subgroup.add_argument('-'+QUOTES_COUNT_ARGNAME_ALIAS,'--'+QUOTES_COUNT_ARGNAME,
                         metavar="MAX",
-                        default=-1,
+                        default=quotescount_value,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
     g_full_notfull=bars_exclusive_subgroup.add_mutually_exclusive_group()
+    use_full_value=load_arg_default_from_settings(FULL_FLAG_ARGNAME,False,FULL_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     g_full_notfull.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses the full store. ')
+                        help='Output/Input uses the full store. ',
+                        default=use_full_value)
     g_full_notfull.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses NOT the full store. ')
+                        help='Output/Input uses NOT the full store. ',
+                        default=not use_full_value)
     return parser
 
 
@@ -643,7 +646,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     return parser
 
 
-def add_use_full_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_use_full_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds a use full argument to the given argument parser.
     
@@ -659,16 +662,19 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None)->argparse.Argume
     
     #print("DEPRECATION: Use: add_bars_amount_V2_arguments")
     full_notfull_group = parser.add_mutually_exclusive_group()
+    use_full_value=load_arg_default_from_settings(FULL_FLAG_ARGNAME,False,FULL_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     full_notfull_group.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses the full store. ')
+                        help='Output/Input uses the full store. ',
+                        default=use_full_value)
     full_notfull_group.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses NOT the full store. ')
+                        help='Output/Input uses NOT the full store. ',
+                        default=not use_full_value)
  
     return parser
 
-def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_use_fresh_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds a use fresh argument to the given argument parser.
     
@@ -684,12 +690,15 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.Argum
     bars_group=_get_group_by_title(parser,ARG_GROUP_BARS_TITLE,ARG_GROUP_BARS_DESCRIPTION)
     
     fresh_old_group=bars_group.add_mutually_exclusive_group()
+    use_fresh_value=load_arg_default_from_settings(FRESH_FLAG_ARGNAME,False,FRESH_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     fresh_old_group.add_argument('-'+FRESH_FLAG_ARGNAME_ALIAS,'--'+FRESH_FLAG_ARGNAME,
                         action='store_true',
-                        help='Freshening the storage with latest market. ')
+                        help='Freshening the storage with latest market. ',
+                        default=use_fresh_value)
     fresh_old_group.add_argument('-'+NOT_FRESH_FLAG_ARGNAME_ALIAS,'--'+NOT_FRESH_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input wont be freshed from storage (weekend or tests). ')
+                        help='Output/Input wont be freshed from storage (weekend or tests). ',
+                        default=not use_fresh_value)
  
     return parser
 
