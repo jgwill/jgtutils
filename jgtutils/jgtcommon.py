@@ -399,7 +399,7 @@ def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=T
     
     stop_value=load_arg_default_from_settings(STOP_ARGNAME,None,STOP_ARGNAME_ALIAS) if load_from_settings else None
     
-    parser.add_argument('-'+STOP_ARGNAME_ALIAS,'--'+STOP_ARGNAME, metavar="STOP", required=True, type=float,
+    parser.add_argument('-'+STOP_ARGNAME_ALIAS,'-'+STOP_ARGNAME,'--'+STOP_ARGNAME, metavar="STOP", required=True, type=float,
                             help='Desired price of the stop order.',
                             default=stop_value)
     return parser
