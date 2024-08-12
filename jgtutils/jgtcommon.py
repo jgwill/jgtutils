@@ -135,33 +135,47 @@ def _load_settings_from_path(path):
             return json.load(f)
     return {}
 
-def load_settings(custom_path=None):
+def load_settings(custom_path=None,old=None):
     system_settings_path = os.path.join('/etc', 'jgt', 'settings.json')
     home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
     current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
     
-    settings=_load_settings_from_path(system_settings_path)
+    _settings={}
+    if old is not None:
+        _settings=old
+    
+    system_settings=_load_settings_from_path(system_settings_path)
+     # Merge settings
+    _settings.update(system_settings)
+    
     user_settings = _load_settings_from_path(home_settings_path)
      # Merge settings, with user directory settings taking precedence
-    settings.update(user_settings)
+    _settings.update(user_settings)
     current_settings = _load_settings_from_path(current_settings_path)
     
     # Merge settings, with current directory settings taking precedence
-    settings.update(current_settings)
+    _settings.update(current_settings)
     
     if custom_path is not None and custom_path != '':
         custom_settings = _load_settings_from_path(custom_path)
-        settings.update(custom_settings)
+        _settings.update(custom_settings)
     
-    _settings_loaded()
+    _settings_loaded(_settings)
     
-    return settings
+    return _settings
 
-def get_settings():
+def _settings_loaded(_settings):
+    return
+
+def get_settings()->dict:
     global settings
+    if settings is None:
+        settings = load_settings()
     return settings
 
-    return settings
+def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
+    global settings
+    if settings is None:
         settings=load_settings()
     
     _value = settings.get(argname,default_value)
@@ -1130,10 +1144,15 @@ def _demo_flag():
     return args
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
-    global default_parser,args
+    global default_parser,args,settings
     if parser is None:
         parser=default_parser
     args= parser.parse_args()
+    try:
+        #set a key jgtcommon_settings in the args to store settings
+        setattr(args, 'jgtcommon_settings', get_settings())
+    except:
+        pass
     
     
     args=_post_parse_dependent_arguments_rules()
