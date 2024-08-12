@@ -157,9 +157,13 @@ def load_settings(custom_path=None):
     
     return settings
 
-def get_settings():
+def _settings_loaded():
     global settings
-    return settings
+    if settings is None:
+        settings = load_settings()
+    #if key defined in settings: 'QM_HISTORY_PATH', set an env variable to it
+    if hasattr(settings,'QM_HISTORY_PATH'):
+        os.environ['QM_HISTORY_PATH'] = getattr(settings,'QM_HISTORY_PATH')
 
 def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
     global settings
