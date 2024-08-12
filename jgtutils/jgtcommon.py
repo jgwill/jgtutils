@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
-from jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
+from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_BARS_TITLE,
                                       ARG_GROUP_CLEANUP_DESCRIPTION,
                                       ARG_GROUP_CLEANUP_TITLE,
@@ -57,7 +57,7 @@ from jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_TITLE,
                                       BALLIGATOR_FLAG_ARGNAME,
-                                      BALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
                                       DROPNA_VOLUME_FLAG_ARGNAME,
@@ -69,18 +69,18 @@ from jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
                                       GATOR_OSCILLATOR_FLAG_ARGNAME,
                                       GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
                                       KEEP_BID_ASK_FLAG_ARGNAME,
-                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS,
                                       MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
                                       NO_MFI_FLAG_ARGNAME,
                                       NO_MFI_FLAG_ARGNAME_ALIAS,
                                       NOT_FRESH_FLAG_ARGNAME,
                                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                                       NOT_FULL_FLAG_ARGNAME,
-                                      NOT_FULL_FLAG_ARGNAME_ALIAS,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS,
                                       QUOTES_COUNT_ARGNAME,
-                                      QUOTES_COUNT_ARGNAME_ALIAS,
+                                      QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
-                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
                                       TALLIGATOR_FLAG_ARGNAME,
                                       TALLIGATOR_FLAG_ARGNAME_ALIAS,
                                       TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
@@ -371,66 +371,83 @@ def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_
     return parser
 
 
-def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-d','--bs', metavar="TYPE", required=True,
-                        help='The order direction. Possible values are: B - buy, S - sell.')
+    
+    bs_value=load_arg_default_from_settings(BUYSELL_ARGNAME,None,BUYSELL_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+BUYSELL_ARGNAME_ALIAS,'--'+BUYSELL_ARGNAME, metavar="TYPE", required=True,
+                        help='The order direction. Possible values are: B - buy, S - sell.',default=bs_value)
     return parser
 
-def add_rate_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_rate_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-r','--rate', metavar="RATE", required=True, type=float,
-                            help='Desired price of an entry order.')
+    
+    rate_value=load_arg_default_from_settings(RATE_ARGNAME,None,RATE_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+RATE_ARGNAME_ALIAS,'--'+RATE_ARGNAME, metavar="RATE", required=True, type=float,
+                            help='Desired price of an entry order.',
+                            default=rate_value)
     return parser
 
-def add_stop_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-stop','--stop', metavar="STOP", required=True, type=float,
-                            help='Desired price of the stop order.')
+    
+    stop_value=load_arg_default_from_settings(STOP_ARGNAME,None,STOP_ARGNAME_ALIAS) if load_from_settings else None
+    
+    parser.add_argument('-'+STOP_ARGNAME_ALIAS,'--'+STOP_ARGNAME, metavar="STOP", required=True, type=float,
+                            help='Desired price of the stop order.',
+                            default=stop_value)
     return parser
 
-def add_lots_arguments(parser):
-    parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
+def add_lots_arguments(parser,load_from_settings=True,default_value = 1):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    lots_value=load_arg_default_from_settings(LOTS_ARGNAME,default_value,LOTS_ARGNAME_ALIAS) if load_from_settings else default_value
+    parser.add_argument('-'+LOTS_ARGNAME_ALIAS,'--'+LOTS_ARGNAME, metavar="LOTS", default=lots_value, type=int,
                             help='Trade amount in lots.')
 
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
-                                      lots: bool = True, stop: bool = True)->argparse.ArgumentParser:
+                                      lots: bool = True, stop: bool = True,load_from_settings=True,lots_default_value=1)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
 
     if direction:
-        add_direction_buysell_arguments(parser)
+        add_direction_buysell_arguments(parser,load_from_settings)
     if rate:
-        add_rate_arguments(parser)
+        add_rate_arguments(parser,load_from_settings)
     if lots:
-        add_lots_arguments(parser)
+        add_lots_arguments(parser,load_from_settings,lots_default_value)
     if stop:
-        add_stop_arguments(parser)
+        add_stop_arguments(parser,load_from_settings)
     
     return parser
 
 
-def add_orderid_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_orderid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-id','--orderid', metavar="OrderID", required=True,
-                        help='The order identifier.')
+    orderid_value=load_arg_default_from_settings(ORDERID_ARGNAME,None,ORDERID_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+ORDERID_ARGNAME_ALIAS,'--'+ORDERID_ARGNAME, metavar="OrderID", required=True,
+                        help='The order identifier.',
+                        default=orderid_value)
     return parser
 
-def add_account_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_account_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-account', metavar="ACCOUNT",
-                        help='An account which you want to use in sample.')
+    account_value=load_arg_default_from_settings(ACCOUNT_ARGNAME,None) if load_from_settings else None
+    parser.add_argument('-'+ACCOUNT_ARGNAME, metavar="ACCOUNT",
+                        help='An account which you want to use in sample.',default=account_value)
     return parser
 
 
