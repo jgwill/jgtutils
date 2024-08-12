@@ -347,7 +347,19 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
                         help='The indicator Pattern. For example, \
                                  "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
     return parser
+
+
+TIMEFRAME_DEFAULT_STANDALONE = "D1"
+def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
     
+    tf_default_value=load_arg_default_from_settings("timeframe",TIMEFRAME_DEFAULT_STANDALONE) if load_from_settings else None
+    
+    parser.add_argument("-t","--timeframe", help="Timeframe", default=tf_default_value)
+    return parser
+
 
 def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
@@ -700,6 +712,50 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None,load_default_fr
                         help='Remove Bid/Ask in storage. ',
                         default=not default_value)
     return parser
+
+def add_format_outputs_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  out_group=_get_group_by_title(parser,"Outputs")
+  json_flag_default_value=load_arg_default_from_settings("json_output",False,"json") if load_from_settings else False
+  f_exclusive=out_group.add_mutually_exclusive_group()
+  f_exclusive.add_argument("-json", "--json_output", help="Output in JSON format", action="store_true",default=json_flag_default_value)
+  #Markdown
+  markdown_flag_default_value=load_arg_default_from_settings("markdown_output",False,"md") if load_from_settings else False
+  f_exclusive.add_argument("-md", "--markdown_output", help="Output in Markdown format", action="store_true",default=markdown_flag_default_value)
+  return parser
+
+def add_patterns_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  pn_group=_get_group_by_title(parser,"Patterns")
+  clh_default_value=load_arg_default_from_settings("columns_list_from_higher_tf",None,"clh") if load_from_settings else None
+  pn_group.add_argument("-clh", "--columns_list_from_higher_tf", nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=clh_default_value)
+  
+  pn_default_value=load_arg_default_from_settings("patternname",None,"pn") if load_from_settings else None
+  pn_group.add_argument("-pn", "--patternname", help="Pattern Name",default=pn_default_value)
+  
+  pn_group.add_argument("-pls", "--list-patterns", help="List Patterns", action="store_true")
+  
+  #Add the format outputs
+  parser=add_format_outputs_arguments(parser,load_from_settings)
+  return parser
+
+
+
+
+
+
+
+
+
+
+
+
 
 import jgtclirqdata
 
