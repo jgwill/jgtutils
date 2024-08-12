@@ -410,7 +410,7 @@ def add_lots_arguments(parser,load_from_settings=True,default_value = 1):
         parser=default_parser
     
     lots_value=load_arg_default_from_settings(LOTS_ARGNAME,default_value,LOTS_ARGNAME_ALIAS) if load_from_settings else default_value
-    parser.add_argument('-'+LOTS_ARGNAME_ALIAS,'--'+LOTS_ARGNAME, metavar="LOTS", default=lots_value, type=int,
+    parser.add_argument('-'+LOTS_ARGNAME_ALIAS,'-'+LOTS_ARGNAME,'--'+LOTS_ARGNAME, metavar="LOTS", default=lots_value, type=int,
                             help='Trade amount in lots.')
 
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
