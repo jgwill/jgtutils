@@ -169,7 +169,7 @@ def _settings_loaded(_settings):
 
 def get_settings()->dict:
     global settings
-    if settings is None:
+    if settings is None or len(settings)==0:
         settings = load_settings()
     return settings
 
