@@ -20,12 +20,28 @@
       "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_01.json"
     },
     {
+      "name": "timeframes_from_settings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_04_timeframes.json"
+    },
+    {
       "name": "tf_cli_test_2408",
       "type": "debugpy",
       "request": "launch",
       "program": "jgtutils/cli_test_timeframes.py",
       "console": "integratedTerminal",
       "args": "-i EUR/CAD -t D1,W1,H4"
+    },
+    {
+      "name": "tf1_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD -t D1"
     },
     {
       "name": "Setting_jgtfxcli_test_2408",
