@@ -464,13 +464,13 @@ def add_tradeid_arguments(parser: argparse.ArgumentParser=None,load_from_setting
     return parser
 
 
-def add_account_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+def add_account_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     account_value=load_arg_default_from_settings(ACCOUNT_ARGNAME,None) if load_from_settings else None
     parser.add_argument('-'+ACCOUNT_ARGNAME, metavar="ACCOUNT",
-                        help='An account which you want to use in sample.',default=account_value)
+                        help='An account which you want to use in sample.',default=account_value,required=required)
     return parser
 
 
