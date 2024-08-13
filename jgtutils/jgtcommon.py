@@ -1007,9 +1007,12 @@ def __timeframes_post_parse()->argparse.Namespace:
     
     if hasattr(args, "timeframes"):
         _timeframes=getattr(args, "timeframes")
-    else: 
-        if settings["timeframes"]:
-            _timeframes =settings["timeframes"]
+    else:
+        try:
+            if settings["timeframes"]:
+                _timeframes =settings["timeframes"]
+        except:
+            pass
             
             
     if not isinstance(_timeframes, list) and _timeframes is not None:
