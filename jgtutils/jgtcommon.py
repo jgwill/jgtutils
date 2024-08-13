@@ -999,23 +999,32 @@ def __quiet__post_parse():
 
 
 def __timeframes_post_parse()->argparse.Namespace:
-    global args
+    global args,settings
     __check_if_parsed()
     
     _timeframes=None
     
-    if hasattr(args, 'timeframes'):
-        _timeframes=getattr(args, 'timeframes')
-        if not isinstance(_timeframes, list):
-            _timeframes=parse_timeframes_helper(_timeframes)
     
-    if _timeframes is None:
-        if hasattr(args, 'timeframe'):
-            _timeframes=getattr(args, 'timeframe')
+    if hasattr(args, "timeframes"):
+        _timeframes=getattr(args, "timeframes")
+    else: 
+        if settings["timeframes"]:
+            _timeframes =settings["timeframes"]
+            
+            
+    if not isinstance(_timeframes, list) and _timeframes is not None:
+        _timeframes=parse_timeframes_helper(_timeframes)
+
+    if _timeframes is None and hasattr(args, 'timeframe'):
+        _timeframes=getattr(args, 'timeframe')
+        #if we have coma in the string
+        if "," in _timeframes:
             _timeframes=parse_timeframes_helper(_timeframes)
-    
+        else:
+            _timeframes = os.getenv("T",None)
+            
     setattr(args, 'timeframes',_timeframes)
-    
+
     return args
 
 from jgtconstants import TIMEFRAMES_ALL, TIMEFRAMES_DEFAULT
