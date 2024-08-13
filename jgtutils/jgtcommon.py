@@ -443,12 +443,12 @@ def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, dire
     return parser
 
 
-def add_orderid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+def add_orderid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     orderid_value=load_arg_default_from_settings(ORDERID_ARGNAME,None,ORDERID_ARGNAME_ALIAS) if load_from_settings else None
-    parser.add_argument('-'+ORDERID_ARGNAME_ALIAS,'--'+ORDERID_ARGNAME, metavar="OrderID", required=True,
+    parser.add_argument('-'+ORDERID_ARGNAME_ALIAS,'--'+ORDERID_ARGNAME, metavar="OrderID", required=required,
                         help='The order identifier.',
                         default=orderid_value)
     return parser
