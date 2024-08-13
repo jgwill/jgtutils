@@ -85,7 +85,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       TALLIGATOR_FLAG_ARGNAME_ALIAS,
                                       TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
                                       TLID_RANGE_ARGNAME_ALIAS,
-                                      TLID_RANGE_HELP_STRING)
+                                      TLID_RANGE_HELP_STRING, TRADEID_ARGNAME, TRADEID_ARGNAME_ALIAS)
 
 args:argparse.Namespace=None # Default args when we are done parsing
 try :
@@ -452,6 +452,17 @@ def add_orderid_arguments(parser: argparse.ArgumentParser=None,load_from_setting
                         help='The order identifier.',
                         default=orderid_value)
     return parser
+
+def add_tradeid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    tradeid_value=load_arg_default_from_settings(TRADEID_ARGNAME,None,TRADEID_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+TRADEID_ARGNAME_ALIAS,'--'+TRADEID_ARGNAME, metavar="TradeID", required=required,
+                        help='The trade identifier.',
+                        default=tradeid_value)
+    return parser
+
 
 def add_account_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
