@@ -358,16 +358,28 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
                                  "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
     return parser
 
+def add_instrument_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    instrument_value=load_arg_default_from_settings("instrument",None,"i") if load_from_settings else None
+    parser.add_argument('-i','--instrument',
+                        metavar="INSTRUMENT",
+                        help='An instrument which you want to use in sample. \
+                                  For example, "EUR/USD".',
+                                  default=instrument_value,
+                                  required=required)
+    return parser
 
 TIMEFRAME_DEFAULT_STANDALONE = "D1"
-def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False,load_default_timeframe=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     
-    tf_default_value=load_arg_default_from_settings("timeframe",TIMEFRAME_DEFAULT_STANDALONE) if load_from_settings else None
+    tf_default_value=load_arg_default_from_settings("timeframe",TIMEFRAME_DEFAULT_STANDALONE if load_default_timeframe else None,"t") if load_from_settings else None
     
-    parser.add_argument("-t","--timeframe", help="Timeframe", default=tf_default_value)
+    parser.add_argument("-t","--timeframe", help="Timeframe", default=tf_default_value, required=required)
     return parser
 
 
