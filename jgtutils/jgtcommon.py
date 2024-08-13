@@ -175,7 +175,7 @@ def get_settings()->dict:
 
 def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
     global settings
-    if settings is None:
+    if settings is None or len(settings)==0:
         settings=load_settings()
     
     _value = settings.get(argname,default_value)
