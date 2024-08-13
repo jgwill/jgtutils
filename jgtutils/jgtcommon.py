@@ -998,33 +998,41 @@ def __quiet__post_parse():
 
 
 
-def __timeframes_post_parse(timeframes=None)->argparse.Namespace:
+def __timeframes_post_parse()->argparse.Namespace:
     global args
     __check_if_parsed()
-    if hasattr(args, 'timeframes'):
-        _timeframes=args.timeframes 
-    else :
-        setattr(args, 'timeframes',None)
-        return args
     
     _timeframes=None
     
-    if isinstance(timeframes, list):
-        _timeframes = timeframes
-    else:
-        _timeframes = parse_timeframes_helper(timeframes)
+    if hasattr(args, 'timeframes'):
+        _timeframes=getattr(args, 'timeframes')
+        if not isinstance(_timeframes, list):
+            _timeframes=parse_timeframes_helper(_timeframes)
+    
+    if _timeframes is None:
+        if hasattr(args, 'timeframe'):
+            _timeframes=getattr(args, 'timeframe')
+            _timeframes=parse_timeframes_helper(_timeframes)
+    
     setattr(args, 'timeframes',_timeframes)
+    
     return args
 
-from jgtconstants import TIMEFRAMES_ALL
+from jgtconstants import TIMEFRAMES_ALL, TIMEFRAMES_DEFAULT
 
 
 def parse_timeframes_helper(timeframes):
     if timeframes in TIMEFRAMES_ALL:
         return [timeframes]
+    
+    if timeframes == "default":
+        __timeframes = TIMEFRAMES_DEFAULT
+    if  timeframes == "all" :
+        __timeframes = TIMEFRAMES_ALL
+    
     if timeframes == "default" or timeframes == "all" :
         try:
-            _timeframes = os.getenv("T").split(",")
+            _timeframes = os.getenv("T",__timeframes).split(",")
         except:
             _timeframes = None
     else:
