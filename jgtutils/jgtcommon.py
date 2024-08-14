@@ -151,7 +151,6 @@ def load_settings(custom_path=None,old=None):
 
     #load json from env JGT_SETTINGS if exist
     if 'JGT_SETTINGS_SYSTEM' in os.environ:
-        print("JGT_SETTINGS_SYSTEM found")
         env_settings_system=json.loads(os.environ['JGT_SETTINGS_SYSTEM'])
         update_settings(_settings, env_settings_system)
         
@@ -161,12 +160,10 @@ def load_settings(custom_path=None,old=None):
     update_settings(_settings, user_settings)
     
     if 'JGT_SETTINGS' in os.environ:
-        print("JGT_SETTINGS found")
         env_settings_user=json.loads(os.environ['JGT_SETTINGS'])
         update_settings(_settings, env_settings_user)
     
     if 'JGT_SETTINGS_USER' in os.environ:
-        print("JGT_SETTINGS_USER found")
         env_settings_user=json.loads(os.environ['JGT_SETTINGS_USER'])
         update_settings(_settings, env_settings_user)
     
@@ -180,7 +177,6 @@ def load_settings(custom_path=None,old=None):
         update_settings(_settings, custom_settings)
     
     if 'JGT_SETTINGS_PROCESS' in os.environ:
-        print("JGT_SETTINGS PROCESS found")
         env_settings_process=json.loads(os.environ['JGT_SETTINGS_PROCESS'])
         update_settings(_settings,env_settings_process )
     
