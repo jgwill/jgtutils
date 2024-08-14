@@ -15,7 +15,7 @@ def parse_args():
 def main():
     args = parse_args()
     settings = jgtcommon.get_settings()
-    print(json.dumps(settings, indent=4))
+    print(json.dumps(settings, indent=2))
 
 if __name__ == '__main__':
     main()
