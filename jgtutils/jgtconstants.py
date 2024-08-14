@@ -252,7 +252,7 @@ ML_DEFAULT_INSTRUMENTS = "SPX500,EUR/USD,GBP/USD"
 ML_DEFAULT_TIMEFRAMES = "D1,H8,H4"
 
 
-ML_DEFAULT_COLUMNS_TO_KEEP=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaos','vaob']
+ML_DEFAULT_COLUMNS_TO_KEEP=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaosc','vaobc','vaoc']
 
 ML_DEFAULT_COLUMNS_TO_DROP = ['Median', 'fh3', 'fl3', 'fh5', 'fl5', 'fh8', 'fl8','fh13', 'fl13', 'fh21', 'fl21', 'fh34', 'fl34', 'fh55', 'fl55', 'fh89','fl89','fdb', 'aof', 'aofvalue', 'aoaz', 'aobz', 'aocolor', 'accolor', 'zcol', 'sz', 'bz', 'acs', 'acb','ss', 'sb', 'price_peak_above', 'price_peak_bellow', 'ao_peak_bellow','ao_peak_above','zlc']
 
