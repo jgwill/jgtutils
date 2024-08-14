@@ -28,6 +28,14 @@
       "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_04_timeframes.json"
     },
     {
+      "name": "patterns_from_settings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_patterns.py",
+      "console": "integratedTerminal",
+      "args": "-pls -json"
+    },
+    {
       "name": "tf_cli_test_2408",
       "type": "debugpy",
       "request": "launch",
