@@ -267,3 +267,4 @@ IDS_COLUMNS_TO_NORMALIZE = ["ao", "ac"] #@a Migrate to jgtutils.jgtconstants
 TIMEFRAMES_ALL=["M1","W1","D1","H8","H6","H4","H3","H2","H1","m30","m15","m5","m1"]
 TIMEFRAMES_DEFAULT=["M1","W1","D1","H4","H1","m15","m5"]
 
+NB_BARS_BY_DEFAULT_IN_CDS=330
