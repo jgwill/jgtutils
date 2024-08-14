@@ -841,6 +841,16 @@ def add_patterns_arguments(parser:argparse.ArgumentParser=None,load_from_setting
 
 
 
+def add_selected_columns_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  sc_group=_get_group_by_title(parser,"Selected Columns")
+  sc_default_value=load_arg_default_from_settings("selected_columns",None,"sc") if load_from_settings else None
+  sc_group.add_argument("-sc", "--selected_columns", nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=sc_default_value)
+  #parser.add_argument('-sc', '--selected-columns', nargs='+', help='List of selected columns to keep', default=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaosc','vaobc'])
+  return parser
 
 
 
