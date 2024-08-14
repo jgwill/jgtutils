@@ -144,25 +144,64 @@ def load_settings(custom_path=None,old=None):
     if old is not None:
         _settings=old
     
+    
     system_settings=_load_settings_from_path(system_settings_path)
      # Merge settings
-    _settings.update(system_settings)
+    update_settings(_settings, system_settings)
+
+    #load json from env JGT_SETTINGS if exist
+    if 'JGT_SETTINGS_SYSTEM' in os.environ:
+        print("JGT_SETTINGS_SYSTEM found")
+        env_settings_system=json.loads(os.environ['JGT_SETTINGS_SYSTEM'])
+        update_settings(_settings, env_settings_system)
+        
     
     user_settings = _load_settings_from_path(home_settings_path)
      # Merge settings, with user directory settings taking precedence
-    _settings.update(user_settings)
-    current_settings = _load_settings_from_path(current_settings_path)
+    update_settings(_settings, user_settings)
     
+    if 'JGT_SETTINGS' in os.environ:
+        print("JGT_SETTINGS found")
+        env_settings_user=json.loads(os.environ['JGT_SETTINGS'])
+        update_settings(_settings, env_settings_user)
+    
+    if 'JGT_SETTINGS_USER' in os.environ:
+        print("JGT_SETTINGS_USER found")
+        env_settings_user=json.loads(os.environ['JGT_SETTINGS_USER'])
+        update_settings(_settings, env_settings_user)
+    
+    
+    current_settings = _load_settings_from_path(current_settings_path)    
     # Merge settings, with current directory settings taking precedence
-    _settings.update(current_settings)
+    update_settings(_settings, current_settings)
     
     if custom_path is not None and custom_path != '':
         custom_settings = _load_settings_from_path(custom_path)
-        _settings.update(custom_settings)
+        update_settings(_settings, custom_settings)
+    
+    if 'JGT_SETTINGS_PROCESS' in os.environ:
+        print("JGT_SETTINGS PROCESS found")
+        env_settings_process=json.loads(os.environ['JGT_SETTINGS_PROCESS'])
+        update_settings(_settings,env_settings_process )
     
     _settings_loaded(_settings)
     
     return _settings
+
+def update_settings(old_settings, new_settings,keys=['patterns']):
+    #if our old settings has a key in our keys list, then we will update it on their own (meaning we will not merge it directly but update it independently)
+    for key in keys:
+        if key in old_settings:
+            tst_key_value_old=old_settings[key]
+            if key in new_settings:
+                old_settings[key].update(new_settings[key])
+                #new_settings.pop(key)
+                tst_key_value_new=old_settings[key]
+                #remove the key from the new settings
+                new_settings.pop(key)
+                #print("Updated key: "+key)
+    old_settings.update(new_settings)
+    #print("Updated settings")
 
 def _settings_loaded(_settings):
     return
@@ -1021,7 +1060,7 @@ def __timeframes_post_parse()->argparse.Namespace:
     if _timeframes is None and hasattr(args, 'timeframe'):
         _timeframes=getattr(args, 'timeframe')
         #if we have coma in the string
-        if "," in _timeframes:
+        if _timeframes is not None and "," in _timeframes:
             _timeframes=parse_timeframes_helper(_timeframes)
         else:
             _timeframes = os.getenv("T",None)
