@@ -34,4 +34,4 @@ dependencies = [
 
 [project.scripts]
 jgtutr = "jgtutils.cli_tlid_range:main"
-
+jgtset = "jgtutils.jgtsettingscli:main"

@@ -222,10 +222,17 @@ def add_settings_argument(parser: argparse.ArgumentParser=None)->argparse.Argume
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-'+SETTING_ARGNAME_ALIAS,'--'+SETTING_ARGNAME,
-                       type=str,
-                        help='Load settings from a specific settings file (overrides default settings (/etc/jgt/settings.json and HOME/.jgt/settings.json and .jgt/settings.json)).',
-                        required=False)
+    try:
+        parser.add_argument('-'+SETTING_ARGNAME_ALIAS,'--'+SETTING_ARGNAME,
+                        type=str,
+                            help='Load settings from a specific settings file (overrides default settings (/etc/jgt/settings.json and HOME/.jgt/settings.json and .jgt/settings.json)).',
+                            required=False)
+    #argparse.ArgumentError: argument -ls/--settings: conflicting option strings: -ls, --settings
+    except argparse.ArgumentError as e:
+        if not 'argument -ls/--settings: conflicting option strings: -ls, --settings' in str(e):
+            raise e
+        pass
+
     return parser
 
 def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
