@@ -2,7 +2,7 @@
 jgtutils package
 """
 
-version='0.2.45'
+version='0.2.46'
 
 import sys
 import os
