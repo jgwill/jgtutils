@@ -136,6 +136,10 @@ def _load_settings_from_path(path):
     return {}
 
 def load_settings(custom_path=None,old=None):
+    global args
+    if custom_path is None and args is not None and hasattr(args,SETTING_ARGNAME):
+        custom_path = getattr(args,SETTING_ARGNAME,None)
+    
     system_settings_path = os.path.join('/etc', 'jgt', 'settings.json')
     home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
     current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
