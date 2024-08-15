@@ -4,6 +4,8 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtutils.jgtcliconstants import (PDSCLI_PROG_NAME)
+
 import platform
 
 import jgtos
@@ -34,7 +36,7 @@ def run_bash_command_by_platform(bash_cmd):
             # The system is Linux
             return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
     except Exception as e:
-        print(f"An error occurred running jgtfxcli: {str(e)}")
+        print(f"An error occurred running {PDSCLI_PROG_NAME}: {str(e)}")
         print(f"   bash_cmd: {bash_cmd}")
         raise e
         #return None
@@ -53,35 +55,19 @@ def run(bash_command):
     return run_bash_command_by_platform(bash_command)
 
 
-    
+
 
 def resolve_cli_path(cli_path=""):
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
-        cli_path = os.path.join(os.getenv('HOME'), '.local', 'bin', 'jgtfxcli')
+        cli_path = os.path.join(os.getenv('HOME'), '.local', 'bin', PDSCLI_PROG_NAME)
     if not os.path.exists(cli_path):
-        cli_path = 'jgtfxcli'    
+        cli_path = PDSCLI_PROG_NAME    
     
     return cli_path #@STCIssue Should install : pip install --user jgtfxcon    (if not found)
 
 def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
-    
-    
-    # if use_full:
-    #     bash_command_to_run = f"{base_args} --full "
-    # else:
-    #     bash_command_to_run = f"{base_args} -c \"{quote_count}\" "
 
-    # if use_full:
-    #     bash_command_to_run = f"{base_args} --full "
-    # else:
-    #     bash_command_to_run = f"{base_args} -c \"{quote_count}\" "
-
-
-    # if verbose_level > 0:
-    #     print(f"bash_command_to_run: {bash_command_to_run}")
     
-    # if verbose_level > 0:
-    #     print(f"bash_command_to_run: {bash_command_to_run}")
     bash_command_to_run=_mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,cli_path=cli_path, verbose_level=verbose_level,quote_count=quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
     
     return run_bash_command_by_platform(bash_command_to_run)
