@@ -586,7 +586,7 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.A
     
     group1 = parser.add_argument_group('Group 1 (TLID Range)')
     g1x=group1.add_mutually_exclusive_group()
-    g1x.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+    g1x.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS,'--'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     g2x=g1x.add_mutually_exclusive_group()
     
@@ -623,7 +623,7 @@ def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
         parser=default_parser
     #print("Tlid range active")
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
-    group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+    group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME_ALIAS,'--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     return parser
 
