@@ -80,6 +80,7 @@ dev-pypi-release:
 .PHONY: dev-release
 dev-release:
 	python bump_version.py
+	git commit pyproject.toml jgtutils/__init__.py package.json -m bump:dev &>/dev/null
 	make dist
 	make dev-pypi-release
 
