@@ -160,3 +160,11 @@ cython_debug/
 #.idea/
 output/
 tests/jgtutils_dotvs/
+jgtutils/test-bytlid.py
+jgtutils/test-jgtutr.py
+test-jgtutils.jgtlogging.py
+test-jlog-app.py
+test-log.py
+.stc/stcgoal_from_log.md
+.stc/stclog-2407151750_from-2401-tag-STC.md
+.stc/stclog-2407151754_from-2401-tag-STC.md
