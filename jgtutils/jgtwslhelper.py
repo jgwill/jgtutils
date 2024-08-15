@@ -64,18 +64,22 @@ def resolve_cli_path(cli_path=""):
     return cli_path #@STCIssue Should install : pip install --user jgtfxcon    (if not found)
 
 def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
-    # cli_path=resolve_cli_path(cli_path)
-    # if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
-    #     cli_path = '$HOME/.local/bin/jgtfxcli'
-    #     #cli_path = "/home/jgi/.local/bin/jgtfxcli"
     
-    # base_args=mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask)
     
     # if use_full:
     #     bash_command_to_run = f"{base_args} --full "
     # else:
     #     bash_command_to_run = f"{base_args} -c \"{quote_count}\" "
 
+    # if use_full:
+    #     bash_command_to_run = f"{base_args} --full "
+    # else:
+    #     bash_command_to_run = f"{base_args} -c \"{quote_count}\" "
+
+
+    # if verbose_level > 0:
+    #     print(f"bash_command_to_run: {bash_command_to_run}")
+    
     # if verbose_level > 0:
     #     print(f"bash_command_to_run: {bash_command_to_run}")
     bash_command_to_run=_mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,cli_path=cli_path, verbose_level=verbose_level,quote_count=quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
