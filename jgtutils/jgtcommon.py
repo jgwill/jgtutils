@@ -76,7 +76,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       NOT_FRESH_FLAG_ARGNAME,
                                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                                       NOT_FULL_FLAG_ARGNAME,
-                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, PIPS_ARGNAME,
                                       QUOTES_COUNT_ARGNAME,
                                       QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS, REAL_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
@@ -476,7 +476,7 @@ def add_rate_arguments(parser: argparse.ArgumentParser=None,load_from_settings=T
                             default=rate_value)
     return parser
 
-def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,pips_flag=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -486,6 +486,11 @@ def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=T
     parser.add_argument('-'+STOP_ARGNAME_ALIAS,'-'+STOP_ARGNAME,'--'+STOP_ARGNAME, metavar="STOP", required=True, type=float,
                             help='Desired price of the stop order.',
                             default=stop_value)
+    if pips_flag:
+        pips_value=load_arg_default_from_settings(PIPS_ARGNAME,False) if load_from_settings else False
+        parser.add_argument('-'+PIPS_ARGNAME,'--'+PIPS_ARGNAME,
+                        action='store_true',
+                        help='The value is in pips. Optional parameter.',default=pips_value)
     return parser
 
 def add_lots_arguments(parser,load_from_settings=True,default_value = 1):
