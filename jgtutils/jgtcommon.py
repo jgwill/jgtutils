@@ -55,7 +55,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_TITLE,
                                       BALLIGATOR_FLAG_ARGNAME,
-                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS, DATEFROM_ARGNAME, DATEFROM_ARGNAME_ALIAS,
+                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS, DATEFROM_ARGNAME, DATEFROM_ARGNAME_ALIAS, DATETO_ARGNAME, DATETO_ARGNAME_ALIAS,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
                                       DROPNA_VOLUME_FLAG_ARGNAME,
@@ -610,39 +610,45 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.A
     return parser
 
 
-def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_tlid_range_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     #print("Tlid range active")
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
+    tlid_value=load_arg_default_from_settings(TLID_RANGE_ARGNAME,None,TLID_RANGE_ARGNAME_ALIAS) if load_from_settings else None
     group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME_ALIAS,'--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     return parser
 
-def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
+def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
+    
     if date_from:
+        date_from_value=load_arg_default_from_settings(DATEFROM_ARGNAME,None,DATEFROM_ARGNAME_ALIAS) if load_from_settings else None
         group_range.add_argument('-'+DATEFROM_ARGNAME_ALIAS,'--'+DATEFROM_ARGNAME,
                             metavar="\"m.d.Y H:M:S\"",
                             help='Date/time from which you want to receive\
                                       historical prices. If you leave this argument as it \
                                       is, it will mean from last trading day. Format is \
                                       "m.d.Y H:M:S". Optional parameter.',
-                            type=valid_datetime(True)
+                            type=valid_datetime(True),
+                            default=date_from_value
                             )
     if date_to:
-        group_range.add_argument('-e','--dateto',
+        date_to_value=load_arg_default_from_settings(DATETO_ARGNAME,None,DATETO_ARGNAME_ALIAS) if load_from_settings else None
+        group_range.add_argument('-'+DATETO_ARGNAME_ALIAS,'--'+DATETO_ARGNAME,
                             metavar="\"m.d.Y H:M:S\"",
                             help='Datetime until which you want to receive \
                                       historical prices. If you leave this argument as it is, \
                                       it will mean to now. Format is "m.d.Y H:M:S". \
                                       Optional parameter.',
-                            type=valid_datetime(False)
+                            type=valid_datetime(False),
+                            default=date_to_value
         )
     return parser
 
