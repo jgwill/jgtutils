@@ -71,6 +71,7 @@ class FXTrade:
         self.trail_rate = trail_rate
         self.trail_step = trail_step
         self.close_commission = close_commission
+        self.message = ''
 
     def to_dict(self):
         return {
@@ -104,7 +105,8 @@ class FXTrade:
             "instrument": self.instrument,
             "trail_rate": self.trail_rate,
             "trail_step": self.trail_step,
-            "close_commission": self.close_commission
+            "close_commission": self.close_commission,
+            "message": self.message
         }
     
     def from_json_string(self, json_string):
@@ -140,7 +142,8 @@ class FXTrade:
             instrument=trade_data.get('instrument', ''),
             trail_rate=trade_data.get('trail_rate', 0.0),
             trail_step=trade_data.get('trail_step', 0.0),
-            close_commission=trade_data.get('close_commission', 0.0)
+            close_commission=trade_data.get('close_commission', 0.0),
+            message=trade_data.get('message', '')
         )
     
     def tojson(self,indent=2):
@@ -194,7 +197,7 @@ class FXTrade:
         )
 
     def __repr__(self):
-        return f"Trade(trade_id={self.trade_id}, account_id={self.account_id}, account_name='{self.account_name}', account_kind={self.account_kind}, offer_id={self.offer_id}, amount={self.amount}, buy_sell='{self.buy_sell}', open_rate={self.open_rate}, open_time='{self.open_time}', open_quote_id='{self.open_quote_id}', open_order_id='{self.open_order_id}', open_order_req_id='{self.open_order_req_id}', open_order_request_txt='{self.open_order_request_txt}', commission={self.commission}, rollover_interest={self.rollover_interest}, trade_id_origin='{self.trade_id_origin}', used_margin={self.used_margin}, value_date='{self.value_date}', parties='{self.parties}', dividends={self.dividends}, pl={self.pl}, gross_pl={self.gross_pl}, close={self.close}, stop={self.stop}, limit={self.limit}, stop_order_id='{self.stop_order_id}', limit_order_id='{self.limit_order_id}', instrument='{self.instrument}', trail_rate={self.trail_rate}, trail_step={self.trail_step}, close_commission={self.close_commission})"
+        return f"Trade(trade_id={self.trade_id}, account_id={self.account_id}, account_name='{self.account_name}', account_kind={self.account_kind}, offer_id={self.offer_id}, amount={self.amount}, buy_sell='{self.buy_sell}', open_rate={self.open_rate}, open_time='{self.open_time}', open_quote_id='{self.open_quote_id}', open_order_id='{self.open_order_id}', open_order_req_id='{self.open_order_req_id}', open_order_request_txt='{self.open_order_request_txt}', commission={self.commission}, rollover_interest={self.rollover_interest}, trade_id_origin='{self.trade_id_origin}', used_margin={self.used_margin}, value_date='{self.value_date}', parties='{self.parties}', dividends={self.dividends}, pl={self.pl}, gross_pl={self.gross_pl}, close={self.close}, stop={self.stop}, limit={self.limit}, stop_order_id='{self.stop_order_id}', limit_order_id='{self.limit_order_id}', instrument='{self.instrument}', trail_rate={self.trail_rate}, trail_step={self.trail_step}, close_commission={self.close_commission}, message='{self.message}')"
 
 
 class FXOrders:
@@ -276,6 +279,7 @@ class FXOrder:
         self.stop_trail_step = stop_trail_step
         self.stop_trail_rate = stop_trail_rate
         self.instrument = offer_id_to_instrument(offer_id)
+        self.message = ''
 
     def to_dict(self):
         return {
@@ -324,7 +328,8 @@ class FXOrder:
             "type_limit": self.type_limit,
             "stop_trail_step": self.stop_trail_step,
             "stop_trail_rate": self.stop_trail_rate,
-            "instrument": self.instrument
+            "instrument": self.instrument,
+            "message": self.message
         }
 
     def tojson(self, indent=2):
@@ -380,7 +385,8 @@ class FXOrder:
             type_limit=order_data.get('type_limit', 0),
             stop_trail_step=order_data.get('stop_trail_step', 0),
             stop_trail_rate=order_data.get('stop_trail_rate', 0.0),
-            instrument=offer_id_to_instrument(offer_id)
+            instrument=offer_id_to_instrument(offer_id),
+            message=order_data.get('message', '')
         )
     
     @classmethod
@@ -449,7 +455,7 @@ class FXOrder:
         )
 
     def __repr__(self):
-        return f"FXOrder(order_id={self.order_id}, request_id='{self.request_id}', rate={self.rate}, execution_rate={self.execution_rate}, rate_min={self.rate_min}, rate_max={self.rate_max}, trade_id={self.trade_id}, account_id={self.account_id}, account_name='{self.account_name}', offer_id={self.offer_id}, net_quantity={self.net_quantity}, buy_sell='{self.buy_sell}', stage='{self.stage}', type='{self.type}', status='{self.status}', status_time='{self.status_time}', amount={self.amount}, lifetime={self.lifetime}, at_market={self.at_market}, trail_step={self.trail_step}, trail_rate={self.trail_rate}, time_in_force='{self.time_in_force}', account_kind={self.account_kind}, request_txt='{self.request_txt}', contingent_order_id={self.contingent_order_id}, contingency_type={self.contingency_type}, primary_id='{self.primary_id}', origin_amount={self.origin_amount}, filled_amount={self.filled_amount}, working_indicator={self.working_indicator}, peg_type='{self.peg_type}', peg_offset={self.peg_offset}, peg_offset_min={self.peg_offset_min}, peg_offset_max={self.peg_offset_max}, expire_date='{self.expire_date}', value_date='{self.value_date}', parties='{self.parties}', side={self.side}, stop={self.stop}, limit={self.limit}, stop_order_id='{self.stop_order_id}', limit_order_id='{self.limit_order_id}', type_stop={self.type_stop}, type_limit={self.type_limit}, stop_trail_step={self.stop_trail_step}, stop_trail_rate={self.stop_trail_rate})"
+        return f"FXOrder(order_id={self.order_id}, request_id='{self.request_id}', rate={self.rate}, execution_rate={self.execution_rate}, rate_min={self.rate_min}, rate_max={self.rate_max}, trade_id={self.trade_id}, account_id={self.account_id}, account_name='{self.account_name}', offer_id={self.offer_id}, net_quantity={self.net_quantity}, buy_sell='{self.buy_sell}', stage='{self.stage}', type='{self.type}', status='{self.status}', status_time='{self.status_time}', amount={self.amount}, lifetime={self.lifetime}, at_market={self.at_market}, trail_step={self.trail_step}, trail_rate={self.trail_rate}, time_in_force='{self.time_in_force}', account_kind={self.account_kind}, request_txt='{self.request_txt}', contingent_order_id={self.contingent_order_id}, contingency_type={self.contingency_type}, primary_id='{self.primary_id}', origin_amount={self.origin_amount}, filled_amount={self.filled_amount}, working_indicator={self.working_indicator}, peg_type='{self.peg_type}', peg_offset={self.peg_offset}, peg_offset_min={self.peg_offset_min}, peg_offset_max={self.peg_offset_max}, expire_date='{self.expire_date}', value_date='{self.value_date}', parties='{self.parties}', side={self.side}, stop={self.stop}, limit={self.limit}, stop_order_id='{self.stop_order_id}', limit_order_id='{self.limit_order_id}', type_stop={self.type_stop}, type_limit={self.type_limit}, stop_trail_step={self.stop_trail_step}, stop_trail_rate={self.stop_trail_rate}, instrument='{self.instrument}', message='{self.message}')"
 
 #Wrapper classes for FXTrade and FXOrder
 class FXTransactWrapper:
@@ -485,5 +491,3 @@ class FXTransactWrapper:
         except Exception as e:
             print(f"Error writing to file: {e}")
             
-    
-        
