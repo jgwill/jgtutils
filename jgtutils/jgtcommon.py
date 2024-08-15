@@ -78,7 +78,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       NOT_FULL_FLAG_ARGNAME,
                                       NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS,
                                       QUOTES_COUNT_ARGNAME,
-                                      QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS,
+                                      QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS, REAL_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
                                       TALLIGATOR_FLAG_ARGNAME,
@@ -222,6 +222,16 @@ def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
         _value = settings.get(alias,default_value) #try alias might be used
     return _value
 
+def load_arg_default_from_settings_if_exist(argname:str,alias:str=None):
+    global settings
+    if settings is None or len(settings)==0:
+        settings=load_settings()
+    
+    _value = settings.get(argname,None)
+    if alias is not None and _value==None:
+        _value = settings.get(alias,None) #try alias might be used
+    return _value
+
 def add_settings_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
@@ -245,7 +255,8 @@ def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
         parser=default_parser
     
     args, unknown = parser.parse_known_args()
-    settings = load_settings(getattr(args,SETTING_ARGNAME,None))
+    custom_path = getattr(args,SETTING_ARGNAME,None)
+    settings = load_settings(custom_path)
     
     return parser
 
@@ -369,11 +380,26 @@ def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_fro
     global default_parser
     if parser is None:
         parser=default_parser
-    default_value = load_arg_default_from_settings(DEMO_FLAG_ARGNAME,flag_default_value) if load_default_from_settings else flag_default_value
-    parser.add_argument('--demo',
+    
+    type_of_account_group=_get_group_by_title(parser,"Type of Account","Real or Demo")
+    
+    demo_value = load_arg_default_from_settings_if_exist(DEMO_FLAG_ARGNAME) 
+    #if load_default_from_settings else flag_default_value
+    real_value = load_arg_default_from_settings_if_exist(REAL_FLAG_ARGNAME) #if load_default_from_settings else not demo_value
+    if real_value is not None and real_value:
+        demo_value=False
+    elif real_value is not None and not real_value:
+        demo_value=True
+    
+    type_of_excl=type_of_account_group.add_mutually_exclusive_group()
+    type_of_excl.add_argument('--demo',
                         action='store_true',
                         help='Use the demo server. Optional parameter.',
-                        default=default_value)
+                        default=demo_value)
+    type_of_excl.add_argument('--real',
+                        action='store_true',
+                        help='Use the real server. Optional parameter.',
+                        default=real_value)
     return parser
 
 def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False,load_instrument_from_settings=True,load_timeframe_from_settings=True)->argparse.ArgumentParser:
@@ -1263,8 +1289,10 @@ def _demo_flag():
     if hasattr(args, 'demo') and args.demo:
         setattr(args, 'connection', 'Demo')
         setattr(args, 'demo', True)
+        setattr(args, 'real', False)
     else:
         setattr(args, 'connection', 'Real')
+        setattr(args, 'real', True)
         setattr(args, 'demo', False)
     return args
 
