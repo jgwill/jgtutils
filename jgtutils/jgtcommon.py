@@ -402,7 +402,7 @@ def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_fro
                         default=real_value)
     return parser
 
-def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False,load_instrument_from_settings=True,load_timeframe_from_settings=True)->argparse.ArgumentParser:
+def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,load_instrument_from_settings=True,load_timeframe_from_settings=True)->argparse.ArgumentParser:
     
     global default_parser
     if parser is None:
