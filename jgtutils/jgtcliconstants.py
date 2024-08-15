@@ -1,4 +1,16 @@
 
+INSTRUMENT_ARGNAME='instrument'
+INSTRUMENT_ARGNAME_ALIAS='i'
+TIMEFRAME_ARGNAME='timeframe'
+TIMEFRAME_ARGNAME_ALIAS='t'
+
+
+DATEFROM_ARGNAME='datefrom'
+DATEFROM_ARGNAME_ALIAS='startdt'
+DATETO_ARGNAME='dateto'
+DATETO_ARGNAME_ALIAS='enddt'
+
+
 NOT_FRESH_FLAG_ARGNAME = 'notfresh'
 NOT_FRESH_FLAG_ARGNAME_ALIAS='old'
 FRESH_FLAG_ARGNAME = 'fresh'
@@ -69,8 +81,6 @@ ARG_GROUP_POV_DESCRIPTION="Point of view"
 ARG_GROUP_RANGE_TITLE="DTRange"
 ARG_GROUP_RANGE_DESCRIPTION="Date and range selection"
 
-ARG_GROUP_INDICATOR_TITLE = 'Indicators'
-ARG_GROUP_INDICATOR_DESCRIPTION = 'Indicators flags'
 
 ARG_GROUP_BARS_TITLE="Bars"
 ARG_GROUP_BARS_DESCRIPTION="Bars flags"
@@ -83,6 +93,11 @@ ARG_GROUP_VERBOSITY_DESCRIPTION="control the verbosity of the output"
 
 ARG_GROUP_OUTPUT_TITLE="Output"
 ARG_GROUP_OUTPUT_DESCRIPTION="Output arguments"
+
+MD_FLAG_ARGNAME = "markdown_output"
+MD_FLAG_ARGNAME_ALIAS = "md"
+JSON_FLAG_ARGNAME = "json_output"
+JSON_FLAG_ARGNAME_ALIAS = "json"
 
 ARG_GROUP_INTERACTION_TITLE="Interaction"
 ARG_GROUP_INTERACTION_DESCRIPTION="Interaction arguments"
@@ -124,6 +139,18 @@ TRADEID_ARGNAME_ALIAS='tid'
 
 ACCOUNT_ARGNAME='account'
 
+PN_GROUP_NAME = "Patterns"
+PN_ARGNAME = "patternname"
+PN_ARGNAME_ALIAS = "pn"
+PN_COLUMN_LIST_ARGNAME = "columns_list_from_higher_tf"
+PN_COLUMN_LIST_ARGNAME_ALIAS = "clh"
+PN_LIST_FLAG_ARGNAME = "list_patterns"
+PN_LIST_FLAG_ARGNAME_ALIAS = "pls"
+
+SELECTED_COLUMNS_GROUP_NAME = "Selected Columns"
+SELECTED_COLUMNS_ARGNAME = "selected_columns"
+SELECTED_COLUMNS_ARGNAME_ALIAS = "sc"
+SELECTED_COLUMNS_HELP = "List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao"
 
 
 PDSCLI_PROG_NAME='jgtfxcli'

@@ -44,8 +44,6 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_BARS_TITLE,
                                       ARG_GROUP_CLEANUP_DESCRIPTION,
                                       ARG_GROUP_CLEANUP_TITLE,
-                                      ARG_GROUP_INDICATOR_DESCRIPTION,
-                                      ARG_GROUP_INDICATOR_TITLE,
                                       ARG_GROUP_INTERACTION_DESCRIPTION,
                                       ARG_GROUP_INTERACTION_TITLE,
                                       ARG_GROUP_OUTPUT_DESCRIPTION,
@@ -57,7 +55,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_TITLE,
                                       BALLIGATOR_FLAG_ARGNAME,
-                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS,
+                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS, DATEFROM_ARGNAME, DATEFROM_ARGNAME_ALIAS,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
                                       DROPNA_VOLUME_FLAG_ARGNAME,
@@ -67,22 +65,22 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       FULL_FLAG_ARGNAME,
                                       FULL_FLAG_ARGNAME_ALIAS,
                                       GATOR_OSCILLATOR_FLAG_ARGNAME,
-                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
+                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS, INSTRUMENT_ARGNAME, INSTRUMENT_ARGNAME_ALIAS, JSON_FLAG_ARGNAME, JSON_FLAG_ARGNAME_ALIAS,
                                       KEEP_BID_ASK_FLAG_ARGNAME,
-                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS,
+                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS, MD_FLAG_ARGNAME, MD_FLAG_ARGNAME_ALIAS,
                                       MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
                                       NO_MFI_FLAG_ARGNAME,
                                       NO_MFI_FLAG_ARGNAME_ALIAS,
                                       NOT_FRESH_FLAG_ARGNAME,
                                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                                       NOT_FULL_FLAG_ARGNAME,
-                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, PIPS_ARGNAME,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, PIPS_ARGNAME, PN_ARGNAME, PN_ARGNAME_ALIAS, PN_COLUMN_LIST_ARGNAME, PN_COLUMN_LIST_ARGNAME_ALIAS, PN_GROUP_NAME, PN_LIST_FLAG_ARGNAME, PN_LIST_FLAG_ARGNAME_ALIAS,
                                       QUOTES_COUNT_ARGNAME,
                                       QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS, REAL_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
-                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
+                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, SELECTED_COLUMNS_ARGNAME, SELECTED_COLUMNS_ARGNAME_ALIAS, SELECTED_COLUMNS_GROUP_NAME, SELECTED_COLUMNS_HELP, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
                                       TALLIGATOR_FLAG_ARGNAME,
-                                      TALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      TALLIGATOR_FLAG_ARGNAME_ALIAS, TIMEFRAME_ARGNAME, TIMEFRAME_ARGNAME_ALIAS,
                                       TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
                                       TLID_RANGE_ARGNAME_ALIAS,
                                       TLID_RANGE_HELP_STRING, TRADEID_ARGNAME, TRADEID_ARGNAME_ALIAS)
@@ -392,11 +390,11 @@ def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_fro
         demo_value=True
     
     type_of_excl=type_of_account_group.add_mutually_exclusive_group()
-    type_of_excl.add_argument('--demo',
+    type_of_excl.add_argument('-'+DEMO_FLAG_ARGNAME,'--'+DEMO_FLAG_ARGNAME,
                         action='store_true',
                         help='Use the demo server. Optional parameter.',
                         default=demo_value)
-    type_of_excl.add_argument('--real',
+    type_of_excl.add_argument('-'+REAL_FLAG_ARGNAME,'--'+REAL_FLAG_ARGNAME,
                         action='store_true',
                         help='Use the real server. Optional parameter.',
                         default=real_value)
@@ -408,34 +406,29 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
     if parser is None:
         parser=default_parser
     pov_group=_get_group_by_title(parser,ARG_GROUP_POV_TITLE,ARG_GROUP_POV_DESCRIPTION)
-    instrument_setting_value=None if not load_instrument_from_settings else load_arg_default_from_settings("instrument",None,alias="i")
-    pov_group.add_argument('-i','--instrument',
+    instrument_setting_value=None if not load_instrument_from_settings else load_arg_default_from_settings(INSTRUMENT_ARGNAME,None,alias=INSTRUMENT_ARGNAME_ALIAS)
+    pov_group.add_argument('-'+INSTRUMENT_ARGNAME_ALIAS,'--'+INSTRUMENT_ARGNAME,
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
                                   For example, "EUR/USD".',
                                   default=instrument_setting_value)
 
     if timeframe:
-        timeframe_setting_value=None if not load_timeframe_from_settings else load_arg_default_from_settings("timeframe",None,alias="t")
-        pov_group.add_argument('-t','--timeframe',
+        timeframe_setting_value=None if not load_timeframe_from_settings else load_arg_default_from_settings(TIMEFRAME_ARGNAME,None,alias=TIMEFRAME_ARGNAME_ALIAS)
+        pov_group.add_argument('-t'+TIMEFRAME_ARGNAME_ALIAS,'--'+TIMEFRAME_ARGNAME,
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
                                       For example, m1 - for 1 minute, H1 - for 1 hour.',
                                       default=timeframe_setting_value)
-    if add_IndicatorPattern:
-        parser.add_argument('-ip',
-                        metavar="IndicatorPattern",
-                        required=False,
-                        help='The indicator Pattern. For example, \
-                                 "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
+
     return parser
 
 def add_instrument_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    instrument_value=load_arg_default_from_settings("instrument",None,"i") if load_from_settings else None
-    parser.add_argument('-i','--instrument',
+    instrument_value=load_arg_default_from_settings(INSTRUMENT_ARGNAME,None,INSTRUMENT_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+INSTRUMENT_ARGNAME_ALIAS,'--'+INSTRUMENT_ARGNAME,
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
                                   For example, "EUR/USD".',
@@ -449,9 +442,9 @@ def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_
     if parser is None:
         parser=default_parser
     
-    tf_default_value=load_arg_default_from_settings("timeframe",TIMEFRAME_DEFAULT_STANDALONE if load_default_timeframe else None,"t") if load_from_settings else None
+    tf_default_value=load_arg_default_from_settings(TIMEFRAME_ARGNAME,TIMEFRAME_DEFAULT_STANDALONE if load_default_timeframe else None,TIMEFRAME_ARGNAME_ALIAS) if load_from_settings else None
     
-    parser.add_argument("-t","--timeframe", help="Timeframe", default=tf_default_value, required=required)
+    parser.add_argument("-"+TIMEFRAME_ARGNAME_ALIAS,"--"+TIMEFRAME_ARGNAME, help="Timeframe", default=tf_default_value, required=required)
     return parser
 
 
@@ -634,7 +627,7 @@ def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = T
     
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
     if date_from:
-        group_range.add_argument('-s','--datefrom',
+        group_range.add_argument('-'+DATEFROM_ARGNAME_ALIAS,'--'+DATEFROM_ARGNAME,
                             metavar="\"m.d.Y H:M:S\"",
                             help='Date/time from which you want to receive\
                                       historical prices. If you leave this argument as it \
@@ -855,12 +848,13 @@ def add_format_outputs_arguments(parser:argparse.ArgumentParser=None,load_from_s
     parser=default_parser
   
   out_group=_get_group_by_title(parser,"Outputs")
-  json_flag_default_value=load_arg_default_from_settings("json_output",False,"json") if load_from_settings else False
+  json_flag_default_value=load_arg_default_from_settings(JSON_FLAG_ARGNAME,False,JSON_FLAG_ARGNAME_ALIAS) if load_from_settings else False
   f_exclusive=out_group.add_mutually_exclusive_group()
-  f_exclusive.add_argument("-json", "--json_output", help="Output in JSON format", action="store_true",default=json_flag_default_value)
+  f_exclusive.add_argument("-"+JSON_FLAG_ARGNAME_ALIAS, "--"+JSON_FLAG_ARGNAME_ALIAS, "--"+JSON_FLAG_ARGNAME, help="Output in JSON format", action="store_true",default=json_flag_default_value,dest=JSON_FLAG_ARGNAME)
   #Markdown
-  markdown_flag_default_value=load_arg_default_from_settings("markdown_output",False,"md") if load_from_settings else False
-  f_exclusive.add_argument("-md", "--markdown_output", help="Output in Markdown format", action="store_true",default=markdown_flag_default_value)
+  
+  markdown_flag_default_value=load_arg_default_from_settings(MD_FLAG_ARGNAME,False,MD_FLAG_ARGNAME_ALIAS) if load_from_settings else False
+  f_exclusive.add_argument("-"+MD_FLAG_ARGNAME_ALIAS, "--"+MD_FLAG_ARGNAME, help="Output in Markdown format", action="store_true",default=markdown_flag_default_value)
   return parser
 
 def add_patterns_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
@@ -868,14 +862,17 @@ def add_patterns_arguments(parser:argparse.ArgumentParser=None,load_from_setting
   if parser is None:
     parser=default_parser
   
-  pn_group=_get_group_by_title(parser,"Patterns")
-  clh_default_value=load_arg_default_from_settings("columns_list_from_higher_tf",None,"clh") if load_from_settings else None
-  pn_group.add_argument("-clh", "--columns_list_from_higher_tf", nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=clh_default_value)
   
-  pn_default_value=load_arg_default_from_settings("patternname",None,"pn") if load_from_settings else None
-  pn_group.add_argument("-pn", "--patternname", help="Pattern Name",default=pn_default_value)
+  pn_group=_get_group_by_title(parser,PN_GROUP_NAME)
+
+  clh_default_value=load_arg_default_from_settings(PN_COLUMN_LIST_ARGNAME,None,PN_COLUMN_LIST_ARGNAME_ALIAS) if load_from_settings else None
+  pn_group.add_argument("-"+PN_COLUMN_LIST_ARGNAME_ALIAS, "--"+PN_COLUMN_LIST_ARGNAME, nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=clh_default_value)
   
-  pn_group.add_argument("-pls", "--list-patterns", help="List Patterns", action="store_true")
+
+  pn_default_value=load_arg_default_from_settings(PN_ARGNAME,None,PN_ARGNAME_ALIAS) if load_from_settings else None
+  pn_group.add_argument("-"+PN_ARGNAME_ALIAS, "--"+PN_ARGNAME, help="Pattern Name",default=pn_default_value)
+  
+  pn_group.add_argument("-"+PN_LIST_FLAG_ARGNAME_ALIAS, "--"+PN_LIST_FLAG_ARGNAME, help="List Patterns", action="store_true")
   
   #Add the format outputs
   parser=add_format_outputs_arguments(parser,load_from_settings)
@@ -888,10 +885,13 @@ def add_selected_columns_arguments(parser:argparse.ArgumentParser=None,load_from
   if parser is None:
     parser=default_parser
   
-  sc_group=_get_group_by_title(parser,"Selected Columns")
-  sc_default_value=load_arg_default_from_settings("selected_columns",None,"sc") if load_from_settings else None
-  sc_group.add_argument("-sc", "--selected_columns", nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=sc_default_value)
-  #parser.add_argument('-sc', '--selected-columns', nargs='+', help='List of selected columns to keep', default=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaosc','vaobc'])
+  
+  sc_group=_get_group_by_title(parser,SELECTED_COLUMNS_GROUP_NAME)
+
+  sc_default_value=load_arg_default_from_settings(SELECTED_COLUMNS_ARGNAME,None,SELECTED_COLUMNS_ARGNAME_ALIAS) if load_from_settings else None
+  
+  sc_group.add_argument("-"+SELECTED_COLUMNS_ARGNAME_ALIAS, "--"+SELECTED_COLUMNS_ARGNAME, nargs='+', help=SELECTED_COLUMNS_HELP, default=sc_default_value)
+
   return parser
 
 

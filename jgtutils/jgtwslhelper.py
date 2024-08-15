@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from jgtutils.jgtcliconstants import (PDSCLI_PROG_NAME)
+from jgtutils.jgtcliconstants import (PDSCLI_PROG_NAME,TLID_RANGE_ARGNAME_ALIAS,FULL_FLAG_ARGNAME,QUOTES_COUNT_ARGNAME_ALIAS,KEEP_BID_ASK_FLAG_ARGNAME_ALIAS)
 
 import platform
 
@@ -78,14 +78,14 @@ def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=N
     base_args = mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask)
     
     if tlid_range is not None and tlid_range != "":
-        bash_command_to_run = f"{base_args} -tlid \"{tlid_range}\""
+        bash_command_to_run = f"{base_args} -{TLID_RANGE_ARGNAME_ALIAS} \"{tlid_range}\""
     else:
         if use_full:
-            bash_command_to_run = f"{base_args} --full"
+            bash_command_to_run = f"{base_args} --{FULL_FLAG_ARGNAME}"
         else:
             quote_args = ""
             if quote_count > 0:
-                quote_args = f" -c {quote_count}"
+                quote_args = f" -{QUOTES_COUNT_ARGNAME_ALIAS} {quote_count}"
             bash_command_to_run = f"{base_args}{quote_args}"
         
     
@@ -96,7 +96,7 @@ def mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask):
     bidask_arg = ""
     
     if keep_bid_ask:
-        bidask_arg = " -kba"
+        bidask_arg = f" -{KEEP_BID_ASK_FLAG_ARGNAME_ALIAS}"
     
     base_args=f"{cli_path} -i \"{instrument}\" -t \"{timeframe}\"{bidask_arg} -v {verbose_level}"
     return base_args
