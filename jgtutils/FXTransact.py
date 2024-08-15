@@ -28,8 +28,21 @@ class FXTrades:
         return {
             "trades": [trade.to_dict() for trade in self.trades]
         }
+    
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
+   
+    def _to_filename(self):
+        return f"trades.json"
+    
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
     
     @classmethod
     def from_string(cls, trades_string):
@@ -149,6 +162,18 @@ class FXTrade:
     def tojson(self,indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
+    def _to_filename(self):
+        return f"trade_{self.trade_id}.json"
+    
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+    
     @classmethod
     def from_string(cls, trade_string):
         trade_data = {}
@@ -222,6 +247,18 @@ class FXOrders:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
+    def _to_filename(self):
+        return f"orders.json"
+    
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+            
     @classmethod
     def from_string(cls, orders_string):
         orders = []
@@ -335,6 +372,18 @@ class FXOrder:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
+    def _to_filename(self):
+        return f"order_{self.order_id}.json"
+    
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+    
     def from_json_string(self,json_string):
         order_data = json.loads(json_string)
         offer_id = order_data.get('offer_id', 0)
@@ -389,6 +438,18 @@ class FXOrder:
             message=order_data.get('message', '')
         )
     
+    def _to_filename(self):
+        return f"order_{self.order_id}.json"
+    
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
+        try:
+            with open(filename, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+            
     @classmethod
     def from_string(cls, order_string):
         order_data = {}
@@ -491,3 +552,58 @@ class FXTransactWrapper:
         except Exception as e:
             print(f"Error writing to file: {e}")
             
+
+class FXTransactDataHelper:
+    @staticmethod
+    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+        connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
+        
+        fn = connection_prefix+save_prefix
+        savefile = fn+".json"
+        
+        if str_order_id:
+            savefile = fn+str_order_id+".json"
+        if str_instrument:
+            savefile = fn+str_instrument.replace("/","-")+".json"
+        if str_table == "orders":
+            savefile = fn+"orders.json"
+        if str_table == "trades":
+            savefile = fn+"trades.json"
+        saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        
+        fxtransactwrapper.tojsonfile(saved_file_fix)
+        print("FXTransact saved to file: "+saved_file_fix)
+    
+    @staticmethod
+    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+        connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
+        
+        fn = connection_prefix+save_prefix
+        savefile = fn+".json"
+        
+        if str_order_id:
+            savefile = fn+str_order_id+".json"
+        if str_instrument:
+            savefile = fn+str_instrument.replace("/","-")+".json"
+
+        saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        
+        fxorder.tojsonfile(saved_file_fix)
+        print("FXOrder saved to file: "+saved_file_fix)
+    
+    @staticmethod
+    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+        connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
+        
+        fn = connection_prefix+save_prefix
+        savefile = fn+".json"
+        
+        if str_order_id:
+            savefile = fn+str_order_id+".json"
+        if str_instrument:
+            savefile = fn+str_instrument.replace("/","-")+".json"
+
+        saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        
+        fxtrade.tojsonfile(saved_file_fix)
+        print("FXTrade saved to file: "+saved_file_fix)
