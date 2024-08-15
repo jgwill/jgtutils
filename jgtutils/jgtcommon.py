@@ -74,7 +74,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       NOT_FRESH_FLAG_ARGNAME,
                                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                                       NOT_FULL_FLAG_ARGNAME,
-                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, PIPS_ARGNAME, PN_ARGNAME, PN_ARGNAME_ALIAS, PN_COLUMN_LIST_ARGNAME, PN_COLUMN_LIST_ARGNAME_ALIAS, PN_GROUP_NAME, PN_LIST_FLAG_ARGNAME, PN_LIST_FLAG_ARGNAME_ALIAS,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, OUTPUT_ARGNAME, OUTPUT_ARGNAME_ALIAS, PIPS_ARGNAME, PN_ARGNAME, PN_ARGNAME_ALIAS, PN_COLUMN_LIST_ARGNAME, PN_COLUMN_LIST_ARGNAME_ALIAS, PN_GROUP_NAME, PN_LIST_FLAG_ARGNAME, PN_LIST_FLAG_ARGNAME_ALIAS,
                                       QUOTES_COUNT_ARGNAME,
                                       QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS, REAL_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
@@ -716,7 +716,7 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None,load_from_
     return parser
 
 
-def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_output_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds an output argument to the given argument parser.
 
@@ -729,10 +729,11 @@ def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.Argument
     global default_parser
     if parser is None:
         parser=default_parser
-        
-    parser.add_argument('-o','--output',
-                        action='store_true',
-                        help='Output PATH. If specified, output will be written in the filestore.')
+
+    output_value=load_arg_default_from_settings(OUTPUT_ARGNAME,None,OUTPUT_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+OUTPUT_ARGNAME_ALIAS,'--'+OUTPUT_ARGNAME,
+                        help='Output PATH. ',
+                        default=output_value)
     
     return parser
 

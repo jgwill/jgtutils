@@ -94,6 +94,9 @@ ARG_GROUP_VERBOSITY_DESCRIPTION="control the verbosity of the output"
 ARG_GROUP_OUTPUT_TITLE="Output"
 ARG_GROUP_OUTPUT_DESCRIPTION="Output arguments"
 
+OUTPUT_ARGNAME = 'output'
+OUTPUT_ARGNAME_ALIAS = 'o'
+
 MD_FLAG_ARGNAME = "markdown_output"
 MD_FLAG_ARGNAME_ALIAS = "md"
 JSON_FLAG_ARGNAME = "json_output"
