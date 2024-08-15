@@ -20,12 +20,52 @@
       "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_01.json"
     },
     {
+      "name": "DemoReal_Setting_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "--demo"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_Real",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "--real"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_demo.json"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS_RealOn",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_real_on.json"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS_DemoOn",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_demo_on.json"
+    },
+    {
       "name": "timeframes_from_settings",
       "type": "debugpy",
       "request": "launch",
       "program": "jgtutils/cli_test_timeframes.py",
       "console": "integratedTerminal",
-      "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_04_timeframes.json"
+      "args": "-ls tests/jgt_settings_04_timeframes.json"
     },
     {
       "name": "patterns_from_settings",
