@@ -415,7 +415,7 @@ def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, tim
 
     if timeframe:
         timeframe_setting_value=None if not load_timeframe_from_settings else load_arg_default_from_settings(TIMEFRAME_ARGNAME,None,alias=TIMEFRAME_ARGNAME_ALIAS)
-        pov_group.add_argument('-t'+TIMEFRAME_ARGNAME_ALIAS,'--'+TIMEFRAME_ARGNAME,
+        pov_group.add_argument('-'+TIMEFRAME_ARGNAME_ALIAS,'--'+TIMEFRAME_ARGNAME,
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
                                       For example, m1 - for 1 minute, H1 - for 1 hour.',
