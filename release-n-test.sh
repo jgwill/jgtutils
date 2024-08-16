@@ -1,6 +1,5 @@
 . $HOME/.bashrc&> /dev/null
 . .env||echo "No .env file found.  Assuming that is fine"
-git commit pyproject.toml jgtutils/__init__.py package.json -m bump &>/dev/null
 
 . scripts/version-patcher.sh
 cversion=$(cat pyproject.toml |tr '"' " " |awk '/version/ {print $3}')
