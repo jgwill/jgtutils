@@ -535,12 +535,24 @@ class FXTransactWrapper:
     
     def add_trade(self, trade_data:FXTrade):
         self.trades.add_trade(trade_data)
+        
+    def get_trade(self, trade_id):
+        for trade in self.trades.trades:
+            if str(trade['trade_id']) == str(trade_id):
+                return trade
+        return None
     
     def add_orders(self, orders:FXOrders):
         self.orders = orders if orders else FXOrders()
     
     def add_order(self, order_data:FXOrder):
         self.orders.add_order(order_data)
+    
+    def get_order(self, order_id):
+        for order in self.orders.orders:
+            if str(order['order_id']) == str(order_id):
+                return order
+        return None
     
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
@@ -671,4 +683,18 @@ class FXTransactDataHelper:
     @staticmethod
     def load_fxtrades_from_file(filename:str):
         return FXTrades.from_string(filename)
+    
+    @staticmethod
+    def load_fxtrade_from_fxtransact(fxtransact: FXTransactWrapper, str_trade_id) -> FXTrade:
+        for trade in fxtransact.trades.trades:
+            if str(trade['trade_id']) == str(str_trade_id):
+                return trade
+        return None
+    
+    @staticmethod
+    def load_fxorder_from_fxtransact(fxtransact: FXTransactWrapper, str_order_id) -> FXOrder:
+        for order in fxtransact.orders.orders:
+            if str(order['order_id']) == str(str_order_id):
+                return order
+        return None
 
