@@ -560,7 +560,7 @@ class FXTransactWrapper:
 
 class FXTransactDataHelper:
     @staticmethod
-    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
+    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,str_trade_id=None):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -568,6 +568,8 @@ class FXTransactDataHelper:
         
         if str_order_id:
             savefile = fn+str_order_id+".json"
+        if str_trade_id:
+            savefile = fn+str_trade_id+".json"
         if str_instrument:
             savefile = fn+str_instrument.replace("/","-")+".json"
         if str_table == "orders":
