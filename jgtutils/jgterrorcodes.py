@@ -16,6 +16,8 @@ ORDER_REMOVED_EXIT_ERROR_CODE = 16
 ORDER_STOP_INVALID_EXIT_ERROR_CODE = 17
 ORDER_REMOVAL_FAILED_BECOMED_A_TRADE_EXIT_ERROR_CODE = 18
 
+MARKET_DATA_UPDATE_FAILED_EXIT_ERROR_CODE = 19
+
 ORDER_PRICE_EXCEEDS_LIMIT_EXIT_ERROR_CODE=44 #Indicates that the order price exceeds the configured price limit.
 INVALID_ORDER_QUANTITY_EXIT_ERROR_CODE=45 #Indicates that the order quantity is invalid (e.g., too small, too large, or not a multiple of the minimum lot size).
 
