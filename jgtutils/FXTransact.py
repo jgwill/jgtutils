@@ -545,7 +545,12 @@ class FXTransactWrapper:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def tojsonfile(self, filename:str):
+    def _to_filename(self):
+        return f"fxtransact.json"
+
+    def tojsonfile(self, filename:str=None):
+        if not filename:
+            filename = self._to_filename()
         try:
             with open(filename, 'w') as f:
                 f.write(self.tojson())
@@ -555,7 +560,7 @@ class FXTransactWrapper:
 
 class FXTransactDataHelper:
     @staticmethod
-    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -572,10 +577,11 @@ class FXTransactDataHelper:
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
         fxtransactwrapper.tojsonfile(saved_file_fix)
-        print("FXTransact saved to file: "+saved_file_fix)
+        if not quiet:print("FXTransact saved to file: "+saved_file_fix)
+        return saved_file_fix
     
     @staticmethod
-    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -589,10 +595,11 @@ class FXTransactDataHelper:
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
         fxorder.tojsonfile(saved_file_fix)
-        print("FXOrder saved to file: "+saved_file_fix)
+        if not quiet:print("FXOrder saved to file: "+saved_file_fix)
+        return saved_file_fix
     
     @staticmethod
-    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None):
+    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -606,4 +613,6 @@ class FXTransactDataHelper:
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
         fxtrade.tojsonfile(saved_file_fix)
-        print("FXTrade saved to file: "+saved_file_fix)
+        if not quiet:print("FXTrade saved to file: "+saved_file_fix)
+        return saved_file_fix
+
