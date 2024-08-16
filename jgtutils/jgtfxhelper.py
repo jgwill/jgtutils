@@ -84,3 +84,16 @@ def instrument_to_offer_id(symbol):
         if line.split(",")[1] == symbol:
             return int(line.split(",")[0])
     return None
+
+def offers_to_dict():
+    dict = {}
+    for line in OFFERS_CSV_DATA.split("\n"):
+        dict[int(line.split(",")[0])] = line.split(",")[1]
+    return dict
+
+def instruments_to_dict():
+    dict={}
+    for line in OFFERS_CSV_DATA.split("\n"):
+        dict[line.split(",")[1]] = int(line.split(",")[0])
+    return dict
+
