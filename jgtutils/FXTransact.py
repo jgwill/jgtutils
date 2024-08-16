@@ -556,9 +556,35 @@ class FXTransactWrapper:
                 f.write(self.tojson())
         except Exception as e:
             print(f"Error writing to file: {e}")
+    
+    @staticmethod
+    def fromjsonstring(json_string):
+        data = json.loads(json_string)
+        trades = data.get('trades', [])
+        orders = data.get('orders', [])
+        return FXTransactWrapper(
+            trades=FXTrades(trades),
+            orders=FXOrders(orders)
+        )
+    
+    @staticmethod
+    def fromjsonfile(filename:str):
+        try:
+            with open(filename,"r") as f:
+                json_string = f.read()
+                return FXTransactWrapper.fromjsonstring(json_string)
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return None
+        
             
 
 class FXTransactDataHelper:
+    
+    @staticmethod
+    def load_fxtransact_from_file(filename:str):
+        return FXTransactWrapper.fromjsonfile(filename)
+    
     @staticmethod
     def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,str_trade_id=None):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
@@ -617,4 +643,32 @@ class FXTransactDataHelper:
         fxtrade.tojsonfile(saved_file_fix)
         if not quiet:print("FXTrade saved to file: "+saved_file_fix)
         return saved_file_fix
+    
+    @staticmethod
+    def load_fxorder_from_file(filename:str):
+        try:
+            with open(filename,"r") as f:
+                json_string = f.read()
+                return FXOrder.from_json_string(json_string)
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return None
+    
+    @staticmethod
+    def load_fxtrade_from_file(filename:str):
+        try:
+            with open(filename,"r") as f:
+                json_string = f.read()
+                return FXTrade.from_json_string(json_string)
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return None
+    
+    @staticmethod
+    def load_fxorders_from_file(filename:str):
+        return FXOrders.from_string(filename)
+
+    @staticmethod
+    def load_fxtrades_from_file(filename:str):
+        return FXTrades.from_string(filename)
 
