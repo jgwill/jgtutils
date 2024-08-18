@@ -94,3 +94,9 @@ dev-release-plus:
 bump_version:
 	python bump_version.py
 	git commit pyproject.toml jgtutils/__init__.py package.json -m bump:dev &>/dev/null
+
+.PHONY: quick-release
+quick-release:
+	make bump_version
+	make dist
+	make pypi-release
