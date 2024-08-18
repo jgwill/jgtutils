@@ -177,6 +177,16 @@ def print_settings_in_yaml(_settings,keys=None):
 
 def _select_keys_in_settings_or_env(_settings, keys):
     _what_to_export = {}
+    try:#jgtset_included
+        if 'jgtset_included' in _settings and keys is None:
+            keys=_settings['jgtset_included'].split(",")
+    except:
+        pass    
+    try:#jgtset_included
+        if 'JGTSET_INCLUDED' in os.environ and keys is None:
+            keys=os.environ['JGTSET_INCLUDED'].split(",")
+    except:
+        pass
     if keys is not None:
         for key in keys:
             if key in _settings:
@@ -191,6 +201,27 @@ def _select_keys_in_settings_or_env(_settings, keys):
                     _what_to_export[key] = os.environ[key]
     else:
         _what_to_export =_settings
+    #remove keys that should not be exported using _JGTSET_EXCLUDED_ENV_EXPORT_KEYS
+    for key in _JGTSET_EXCLUDED_ENV_EXPORT_KEYS:
+        if key in _what_to_export:
+            _what_to_export.pop(key)
+    
+    try:
+        if os.environ['JGTSET_EXCLUDED']:
+            for key in os.environ['JGTSET_EXCLUDED_ENV_EXPORT_KEYS'].split(","):
+                if key in _what_to_export:
+                    _what_to_export.pop(key)
+    except:
+        pass
+    
+    try:
+        if 'jgtset_excluded' in _settings:
+            for key in _settings['jgtset_excluded'].split(","):
+                if key in _what_to_export:
+                    _what_to_export.pop(key)
+            _what_to_export.pop('jgtset_excluded')
+    except:
+        pass      
     return _what_to_export
 
 
