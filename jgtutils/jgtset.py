@@ -78,9 +78,9 @@ def _add_value_to_jgt_export_file(key,value,quiet=True,env_file=None):
     except:
         exit(JGTFILES_EXIT_ERROR_CODE)        
 
-def _process_keys_to_env(_settings,keys=None,quiet=True,env_file=None):
+def export_keys_to_environ(_settings=None,keys=None,quiet=True,env_file=None,custom_path=None):
     _init_dotenv_jgt_export_file(env_file=env_file)
-    _what_to_export = _get_filtered_exportable_keys(_settings, keys)
+    _what_to_export = _get_filtered_exportable_keys(_settings, keys,custom_path)
     for key, value in _what_to_export.items():
         if key not in _JGTSET_EXCLUDED_ENV_EXPORT_KEYS:
             if keys is None:
@@ -167,15 +167,17 @@ def __format_list_to_string(value,enquote=True,single_quote=False):
     return list_fixed
 
 
-def dump_as_json_output(_settings,keys=None):
-    _what_to_export = _get_filtered_exportable_keys(_settings, keys)
+def dump_as_json_output(_settings=None,keys=None,custom_path=None):
+    _what_to_export = _get_filtered_exportable_keys(_settings, keys,custom_path)
     return json.dumps(_what_to_export, indent=2)
 
-def dump_as_yaml_output(_settings,keys=None):
-    _what_to_export = _get_filtered_exportable_keys(_settings, keys)
+def dump_as_yaml_output(_settings=None,keys=None,custom_path=None):
+    _what_to_export = _get_filtered_exportable_keys(_settings, keys,custom_path)
     return yaml.dump(_what_to_export, default_flow_style=False)
 
-def _get_filtered_exportable_keys(_settings, keys=None):
+def _get_filtered_exportable_keys(_settings=None, keys=None,custom_path=None):
+    if _settings is None:
+        _settings = _load_settings(custom_path)
     _what_to_export = {}
     try:#jgtset_included
         if 'jgtset_included' in _settings and keys is None:
@@ -249,7 +251,7 @@ def main():
 
 def process_env(env_flag,keys=None,json_flag=False,yaml_flag=False,silent_flag=False,output_file=None,view_flag=False,custom_path=None):
     
-    settings = jgtcommon.get_settings(custom_path=custom_path)
+    settings = _load_settings(custom_path)
     
     if view_flag:
         for key in settings.keys():
@@ -257,7 +259,7 @@ def process_env(env_flag,keys=None,json_flag=False,yaml_flag=False,silent_flag=F
         return ""
     
     if env_flag and not json_flag and not yaml_flag:
-        _process_keys_to_env(settings,keys=keys,quiet=False if not silent_flag else True,env_file=output_file)
+        export_keys_to_environ(settings,keys=keys,quiet=False if not silent_flag else True,env_file=output_file)
         return ""
     print_output=""
     if yaml_flag:
@@ -266,9 +268,12 @@ def process_env(env_flag,keys=None,json_flag=False,yaml_flag=False,silent_flag=F
         print_output = dump_as_json_output(settings,keys )
     
     if env_flag: #Quiet export with other outputs
-        _process_keys_to_env(settings,keys=keys,quiet=True,env_file=output_file)
+        export_keys_to_environ(settings,keys=keys,quiet=True,env_file=output_file)
 
     return print_output
+
+def _load_settings(custom_path):
+    return jgtcommon.get_settings(custom_path=custom_path)
 
 if __name__ == '__main__':
     main()
