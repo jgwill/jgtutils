@@ -19,6 +19,7 @@
 
 import argparse
 import json
+import yaml
 import os
 import sys
 import traceback
@@ -133,6 +134,17 @@ def _load_settings_from_path(path):
             return json.load(f)
     return {}
 
+def _load_settings_from_path_yaml(path,key=None):
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            if key is not None:
+                yaml_value = yaml.load(f, Loader=yaml.SafeLoader)
+                if key in yaml_value:
+                    return yaml_value[key]
+                else:
+                    return {}
+            return yaml.load(f, Loader=yaml.SafeLoader)
+    return {}
 def load_settings(custom_path=None,old=None):
     global args
     if custom_path is None and args is not None and hasattr(args,SETTING_ARGNAME):
@@ -141,6 +153,9 @@ def load_settings(custom_path=None,old=None):
     system_settings_path = os.path.join('/etc', 'jgt', 'settings.json')
     home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
     current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
+    yaml_current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.yml')
+    jgt_yaml_current_settings_path = os.path.join(os.getcwd(), 'jgt.yml')
+    jubook_jgt_yaml_current_settings_path = os.path.join(os.getcwd(), '_config.yml')
     
     _settings={}
     if old is not None:
@@ -174,8 +189,23 @@ def load_settings(custom_path=None,old=None):
     # Merge settings, with current directory settings taking precedence
     update_settings(_settings, current_settings)
     
+    current_settings_yaml = _load_settings_from_path_yaml(yaml_current_settings_path)
+    update_settings(_settings, current_settings_yaml)
+    
+    
+    jubook_jgt_current_settings_yaml = _load_settings_from_path_yaml(jubook_jgt_yaml_current_settings_path,key='jgt')
+    update_settings(_settings, jubook_jgt_current_settings_yaml)
+    
+    jgt_current_settings_yaml = _load_settings_from_path_yaml(jgt_yaml_current_settings_path)
+    update_settings(_settings, jgt_current_settings_yaml)
+    
     if custom_path is not None and custom_path != '':
-        custom_settings = _load_settings_from_path(custom_path)
+        custom_settings={}
+        if '.json' in custom_path:
+            custom_settings = _load_settings_from_path(custom_path)
+        else:
+            if '.yml' in custom_path:
+                custom_settings = _load_settings_from_path_yaml(custom_path)
         update_settings(_settings, custom_settings)
     
     if 'JGT_SETTINGS_PROCESS' in os.environ:
