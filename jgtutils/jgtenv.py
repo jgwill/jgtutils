@@ -6,8 +6,18 @@ from dotenv import load_dotenv
 from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME
 
 
+def get_dotjgt_env_sh_path():
+    return os.path.join(os.getcwd(),".jgt","env.sh")
 
-def get_jgt_env_export_path(in_jgt_subdir=False):
+def load_dotjgt_env_sh():
+    dotjgt_env_sh_path = get_dotjgt_env_sh_path()
+    if os.path.exists(dotjgt_env_sh_path):
+        load_dotenv(dotenv_path=dotjgt_env_sh_path)
+
+def is_dotjgt_env_sh_exist():
+    return os.path.exists(get_dotjgt_env_sh_path())
+
+def get_dotenv_jgtset_export_path(in_jgt_subdir=False):
     
     if in_jgt_subdir:
       jgt_export_directory = os.path.join(os.getcwd(),JGT_SUBDIR_NAME)
