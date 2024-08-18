@@ -3,7 +3,21 @@ import sys
 
 from dotenv import load_dotenv
 
+from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME
 
+
+
+def get_jgt_env_export_path(in_jgt_subdir=False):
+    
+    if in_jgt_subdir:
+      jgt_export_directory = os.path.join(os.getcwd(),JGT_SUBDIR_NAME)
+      os.makedirs(jgt_export_directory, exist_ok=True)#|print(f"Directory {subdir} created")
+    else :
+      jgt_export_directory = os.getcwd()
+      
+    batch_file_path = os.path.join(jgt_export_directory,JGT_ENV_EXPORT_NAME)
+    return batch_file_path
+  
 def get_openai_key():
     """Reads the OpenAI API key from the environment or a .env file."""
 

@@ -167,6 +167,13 @@ CLI_FXTR_PROG_NAME='fxtr'
 CLI_FXRMTRADE_PROG_NAME='fxrmtrade'
 CLI_FXMVSTOP_PROG_NAME='fxmvstop'
 
+JGT_SUBDIR_NAME = ".jgt"
+JGT_ENV_EXPORT_NAME=".env.jgtset"
+JGTSET_CLI_EPILOG = "Load,output and/or export settings as JSON/YML or environment variables in "+JGT_SUBDIR_NAME+"/"+JGT_ENV_EXPORT_NAME
+
+JGTSET_CLI_DESCRIPTION = "JGTFxCLI Settings Loader"
+JGTSET_CLI_PROG_NAME="jgtset"
+_JGTSET_EXCLUDED_ENV_EXPORT_KEYS=['QM_HISTORY_PATH']
 #@STCIssue Defined in jgtpy for now
 # IDSCLI_PROG_NAME='idscli'
 # JGTADS_PROG_NAME='jgtads'
