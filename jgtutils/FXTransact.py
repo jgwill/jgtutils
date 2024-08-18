@@ -1,7 +1,8 @@
 
 import datetime
 import json
-import yaml
+import ruamel.yaml;yaml = ruamel.yaml.YAML()
+
 import os
 import sys
 
@@ -638,7 +639,7 @@ class FXTransactWrapper:
     
     @staticmethod
     def fromyamlstring(yaml_string):
-        data = yaml.safe_load(yaml_string)
+        data = yaml.load(yaml_string)
         trades = data.get('trades', [])
         orders = data.get('orders', [])
         return FXTransactWrapper(

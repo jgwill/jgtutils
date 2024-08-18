@@ -19,7 +19,7 @@
 
 import argparse
 import json
-import yaml
+import ruamel.yaml;yaml = ruamel.yaml.YAML()
 import os
 import sys
 import traceback
@@ -138,12 +138,12 @@ def _load_settings_from_path_yaml(path,key=None):
     if os.path.exists(path):
         with open(path, 'r') as f:
             if key is not None:
-                yaml_value = yaml.load(f, Loader=yaml.SafeLoader)
+                yaml_value = yaml.load(f)
                 if key in yaml_value:
                     return yaml_value[key]
                 else:
                     return {}
-            return yaml.load(f, Loader=yaml.SafeLoader)
+            return yaml.load(f)
     return {}
 def load_settings(custom_path=None,old=None):
     global args

@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import yaml
+import ruamel.yaml;yaml = ruamel.yaml.YAML()
 
 import dotenv
 
@@ -173,7 +173,7 @@ def dump_as_json_output(_settings=None,keys=None,custom_path=None):
 
 def dump_as_yaml_output(_settings=None,keys=None,custom_path=None):
     _what_to_export = _get_filtered_exportable_keys(_settings, keys,custom_path)
-    return yaml.dump(_what_to_export, default_flow_style=False)
+    return yaml.dump(_what_to_export)
 
 def _get_filtered_exportable_keys(_settings=None, keys=None,custom_path=None):
     if _settings is None:
