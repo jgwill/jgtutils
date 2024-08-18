@@ -234,10 +234,10 @@ def update_settings(old_settings, new_settings,keys=['patterns']):
 def _settings_loaded(_settings):
     return
 
-def get_settings()->dict:
+def get_settings(custom_path=None)->dict:
     global settings
     if settings is None or len(settings)==0:
-        settings = load_settings()
+        settings = load_settings(custom_path=custom_path)
     return settings
 
 def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
