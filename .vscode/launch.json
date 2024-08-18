@@ -12,6 +12,30 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "jgtsettingscli_E",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtsettingscli.py",
+      "console": "integratedTerminal",
+      "args": "-E"
+    },
+    {
+      "name": "jgtsettingscli_E_YML",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtsettingscli.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y"
+    },
+    {
+      "name": "jgtsettingscli_E_JSON",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtsettingscli.py",
+      "console": "integratedTerminal",
+      "args": "-E -J"
+    },
+    {
       "name": "Setting_cli_test_2408",
       "type": "debugpy",
       "request": "launch",
