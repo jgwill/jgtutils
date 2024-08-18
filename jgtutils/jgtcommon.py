@@ -131,19 +131,26 @@ settings: dict = None
 def _load_settings_from_path(path):
     if os.path.exists(path):
         with open(path, 'r') as f:
-            return json.load(f)
+            loaded_data = json.load(f)
+            return loaded_data
     return {}
 
 def _load_settings_from_path_yaml(path,key=None):
     if os.path.exists(path):
         with open(path, 'r') as f:
             if key is not None:
-                yaml_value = yaml.load(f)
-                if key in yaml_value:
+                try:
+                    yaml_value = yaml.load(f)
+                except yaml.YAMLError as exc:
+                    print(exc)
+                if yaml_value is not None and key in yaml_value:
                     return yaml_value[key]
                 else:
                     return {}
-            return yaml.load(f)
+            yaml_data = yaml.load(f)
+            if yaml_data is None:
+                return {}
+            return yaml_data
     return {}
 def load_settings(custom_path=None,old=None):
     global args
@@ -221,14 +228,17 @@ def update_settings(old_settings, new_settings,keys=['patterns']):
     for key in keys:
         if key in old_settings:
             tst_key_value_old=old_settings[key]
-            if key in new_settings:
-                old_settings[key].update(new_settings[key])
+            if new_settings is not None and key in new_settings:
+                test_if_key_not_none = new_settings[key]
+                if test_if_key_not_none is not None:
+                    old_settings[key].update(new_settings[key])
                 #new_settings.pop(key)
                 tst_key_value_new=old_settings[key]
                 #remove the key from the new settings
                 new_settings.pop(key)
                 #print("Updated key: "+key)
-    old_settings.update(new_settings)
+    if new_settings is not None:
+        old_settings.update(new_settings)
     #print("Updated settings")
 
 def _settings_loaded(_settings):
