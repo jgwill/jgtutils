@@ -72,7 +72,7 @@ def _add_value_to_jgt_export_file(key,value,quiet=True,env_file=None):
         if var_type == "bool":
             fixed_value = str(value).lower()
         else:
-            if var_type == "list":
+            if var_type == "list" or var_type == 'CommentedSeq':
                 fixed_value = __format_list_to_string(value)
                 enquote = True
                 
@@ -93,7 +93,8 @@ def export_keys_to_environ(_settings=None,keys=None,quiet=True,env_file=None,cus
     for key, value in _what_to_export.items():
         if key not in _JGTSET_EXCLUDED_ENV_EXPORT_KEYS:
             if keys is None:
-                _export_key(key, value,quiet,env_file=env_file)
+                if value is not None:
+                    _export_key(key, value,quiet,env_file=env_file)
             else:
                 if key in keys:
                     _export_key(key, value,quiet,env_file=env_file)
