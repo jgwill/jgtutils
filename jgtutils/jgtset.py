@@ -10,7 +10,7 @@ import dotenv
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from jgtcliconstants import JGTSET_CLI_DESCRIPTION, JGTSET_CLI_EPILOG, JGTSET_CLI_PROG_NAME,_JGTSET_EXCLUDED_ENV_EXPORT_KEYS
-from jgtenv import get_dotenv_jgtset_export_path, is_dotjgt_env_sh_exist, load_dotjgt_env_sh
+from jgtenv import get_dotenv_jgtset_export_path, is_dotjgt_env_sh_exists, load_dotjgt_env_sh
 from jgterrorcodes import JGTFILES_EXIT_ERROR_CODE, JGTSETTING_EXIT_ERROR_CODE
 
 import jgtcommon
@@ -287,7 +287,7 @@ def _get_data_filtered_by_exportable_keys(data=None, keys=None,custom_path=None)
             if key not in _what_to_export and key in os.environ:
                 _what_to_export[key] = os.environ[key]
         for key in keys:
-            if key not in _what_to_export and is_dotjgt_env_sh_exist():
+            if key not in _what_to_export and is_dotjgt_env_sh_exists():
                 load_dotjgt_env_sh()
                 if key in os.environ:
                     _what_to_export[key] = os.environ[key]
