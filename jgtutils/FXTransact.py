@@ -2,6 +2,7 @@
 import datetime
 import json
 import ruamel.yaml;yaml = ruamel.yaml.YAML()
+OUTPUT_YAML_DISABLED=True
 
 import os
 import sys
@@ -69,11 +70,12 @@ class FXTrades:
     def toyamlfile(self, filename:str=None):
         if not filename:
             filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+        if not OUTPUT_YAML_DISABLED:
+            try:
+                with open(filename, 'w') as f:
+                    f.write(self.toyaml())
+            except Exception as e:
+                print(f"Error writing to file: {e}")
     
     @classmethod
     def from_string(cls, trades_string):
@@ -211,11 +213,12 @@ class FXTrade:
     def toyamlfile(self, filename:str=None):
         if not filename:
             filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+        if not OUTPUT_YAML_DISABLED:
+            try:
+                with open(filename, 'w') as f:
+                    f.write(self.toyaml())
+            except Exception as e:
+                print(f"Error writing to file: {e}")
     
     @classmethod
     def from_string(cls, trade_string):
@@ -308,11 +311,12 @@ class FXOrders:
     def toyamlfile(self, filename:str=None):
         if not filename:
             filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+        if not OUTPUT_YAML_DISABLED:
+            try:
+                with open(filename, 'w') as f:
+                    f.write(self.toyaml())
+            except Exception as e:
+                print(f"Error writing to file: {e}")
                 
     @classmethod
     def from_string(cls, orders_string):
@@ -445,11 +449,12 @@ class FXOrder:
     def toyamlfile(self, filename:str=None):
         if not filename:
             filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+        if not OUTPUT_YAML_DISABLED:
+            try:
+                with open(filename, 'w') as f:
+                    f.write(self.toyaml())
+            except Exception as e:
+                print(f"Error writing to file: {e}")
     
     def from_json_string(self,json_string):
         order_data = json.loads(json_string)
@@ -631,11 +636,13 @@ class FXTransactWrapper:
     def toyamlfile(self, filename:str=None):
         if not filename:
             filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+        if not OUTPUT_YAML_DISABLED:
+            try:
+                
+                with open(filename, 'w') as f:
+                    f.write(self.toyaml())
+            except Exception as e:
+                print(f"Error writing to file: {e}")
     
     @staticmethod
     def fromyamlstring(yaml_string):
@@ -704,7 +711,8 @@ class FXTransactDataHelper:
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
         fxtransactwrapper.tojsonfile(saved_file_fix)
-        fxtransactwrapper.toyamlfile(saved_file_fix.replace(".json",".yaml"))
+        if not OUTPUT_YAML_DISABLED:
+            fxtransactwrapper.toyamlfile(saved_file_fix.replace(".json",".yaml"))
         if not quiet:print("FXTransact saved to file: "+saved_file_fix)
         return saved_file_fix
     
@@ -723,7 +731,8 @@ class FXTransactDataHelper:
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
         fxorder.tojsonfile(saved_file_fix)
-        fxorder.toyamlfile(saved_file_fix.replace(".json",".yaml"))
+        if not OUTPUT_YAML_DISABLED:
+            fxorder.toyamlfile(saved_file_fix.replace(".json",".yaml"))
         if not quiet:print("FXOrder saved to file: "+saved_file_fix)
         return saved_file_fix
     
