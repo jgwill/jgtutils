@@ -51,8 +51,8 @@ class FXTrades:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def toyaml(self):
-        return yaml.dump(self.to_dict())
+    # def toyaml(self):
+    #     return yaml.dump(self.to_dict())
     
     def _to_filename(self,ext="json"):
         return f"trades.{ext}"
@@ -66,14 +66,14 @@ class FXTrades:
         except Exception as e:
             print(f"Error writing to file: {e}")
     
-    def toyamlfile(self, filename:str=None):
-        if not filename:
-            filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+    # def toyamlfile(self, filename:str=None):
+    #     if not filename:
+    #         filename = self._to_filename("yaml")
+    #     try:
+    #         with open(filename, 'w') as f:
+    #             f.write(self.toyaml())
+    #     except Exception as e:
+    #         print(f"Error writing to file: {e}")
     
     @classmethod
     def from_string(cls, trades_string):
@@ -193,8 +193,8 @@ class FXTrade:
     def tojson(self,indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def toyaml(self):
-        return yaml.dump(self.to_dict())
+    # def toyaml(self):
+    #     return yaml.dump(self.to_dict())
     
     def _to_filename(self,ext="json"):
         return f"trade_{self.trade_id}.{ext}"
@@ -208,14 +208,14 @@ class FXTrade:
         except Exception as e:
             print(f"Error writing to file: {e}")
     
-    def toyamlfile(self, filename:str=None):
-        if not filename:
-            filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+    # def toyamlfile(self, filename:str=None):
+    #     if not filename:
+    #         filename = self._to_filename("yaml")
+    #     try:
+    #         with open(filename, 'w') as f:
+    #             f.write(self.toyaml())
+    #     except Exception as e:
+    #         print(f"Error writing to file: {e}")
     
     @classmethod
     def from_string(cls, trade_string):
@@ -290,8 +290,8 @@ class FXOrders:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def toyaml(self):
-        return yaml.dump(self.to_dict())
+    # def toyaml(self):
+    #     return yaml.dump(self.to_dict())
     
     def _to_filename(self,ext="json",fn="orders"):
         return f"{fn}.{ext}"
@@ -305,14 +305,14 @@ class FXOrders:
         except Exception as e:
             print(f"Error writing to file: {e}")
     
-    def toyamlfile(self, filename:str=None):
-        if not filename:
-            filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+    # def toyamlfile(self, filename:str=None):
+    #     if not filename:
+    #         filename = self._to_filename("yaml")
+    #     try:
+    #         with open(filename, 'w') as f:
+    #             f.write(self.toyaml())
+    #     except Exception as e:
+    #         print(f"Error writing to file: {e}")
                 
     @classmethod
     def from_string(cls, orders_string):
@@ -427,8 +427,8 @@ class FXOrder:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def toyaml(self):
-        return yaml.dump(self.to_dict())
+    # def toyaml(self):
+    #     return yaml.dump(self.to_dict())
     
     def _to_filename(self,ext="json",fn="order_"):
         return f"{fn}{self.order_id}.{ext}"
@@ -442,14 +442,14 @@ class FXOrder:
         except Exception as e:
             print(f"Error writing to file: {e}")
     
-    def toyamlfile(self, filename:str=None):
-        if not filename:
-            filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+    # def toyamlfile(self, filename:str=None):
+    #     if not filename:
+    #         filename = self._to_filename("yaml")
+    #     try:
+    #         with open(filename, 'w') as f:
+    #             f.write(self.toyaml())
+    #     except Exception as e:
+    #         print(f"Error writing to file: {e}")
     
     def from_json_string(self,json_string):
         order_data = json.loads(json_string)
@@ -613,8 +613,8 @@ class FXTransactWrapper:
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
-    def toyaml(self):
-        return yaml.dump(self.to_dict())
+    # def toyaml(self):
+    #     return yaml.dump(self.to_dict())
     
     def _to_filename(self,ext="json",fn="fxtransact"):
         return f"{fn}.{ext}"
@@ -628,24 +628,24 @@ class FXTransactWrapper:
         except Exception as e:
             print(f"Error writing to file: {e}")
     
-    def toyamlfile(self, filename:str=None):
-        if not filename:
-            filename = self._to_filename("yaml")
-        try:
-            with open(filename, 'w') as f:
-                f.write(self.toyaml())
-        except Exception as e:
-            print(f"Error writing to file: {e}")
+    # def toyamlfile(self, filename:str=None):
+    #     if not filename:
+    #         filename = self._to_filename("yaml")
+    #     try:
+    #         with open(filename, 'w') as f:
+    #             f.write(self.toyaml())
+    #     except Exception as e:
+    #         print(f"Error writing to file: {e}")
     
-    @staticmethod
-    def fromyamlstring(yaml_string):
-        data = yaml.load(yaml_string)
-        trades = data.get('trades', [])
-        orders = data.get('orders', [])
-        return FXTransactWrapper(
-            trades=FXTrades(trades),
-            orders=FXOrders(orders)
-        )
+    # @staticmethod
+    # def fromyamlstring(yaml_string):
+    #     data = yaml.load(yaml_string)
+    #     trades = data.get('trades', [])
+    #     orders = data.get('orders', [])
+    #     return FXTransactWrapper(
+    #         trades=FXTrades(trades),
+    #         orders=FXOrders(orders)
+    #     )
     
     @staticmethod
     def fromjsonstring(json_string):
