@@ -4,5 +4,10 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"github.copilot.chat.customUserInstructions": [
+			"for yaml, we use ruamel.yaml.YAML, not the usual yaml lib.",
+			"You keep your answer short, no full example except if ask otherwise"
+		]
+	}
 }

@@ -12,10 +12,66 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "jgtset_conf_update",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_jgtset_config_update_yaml.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "jgtsettingscli_03_Y",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-Y"
+    },
+    {
+      "name": "jgtsettingscli_04_NO_U",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "jgtsettingscli_04_U",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-U"
+    },
+    {
+      "name": "jgtsettingscli_04_E",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E"
+    },
+    {
+      "name": "jgtsettingscli_04_U_Reset",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-U -R"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O_CusPath2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -S -O myenv.output -ls _jgtset_included.json"
+    },
+    {
       "name": "jgtsettingscli_E",
       "type": "debugpy",
       "request": "launch",
-      "program": "jgtutils/jgtsettingscli.py",
+      "program": "jgtutils/jgtset.py",
       "console": "integratedTerminal",
       "args": "-E"
     },
@@ -23,15 +79,31 @@
       "name": "jgtsettingscli_E_YML",
       "type": "debugpy",
       "request": "launch",
-      "program": "jgtutils/jgtsettingscli.py",
+      "program": "jgtutils/jgtset.py",
       "console": "integratedTerminal",
       "args": "-E -Y"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -O myenv.output"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O_CusPath",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -O myenv.output -ls tests/_jgtset_included.json"
     },
     {
       "name": "jgtsettingscli_E_JSON",
       "type": "debugpy",
       "request": "launch",
-      "program": "jgtutils/jgtsettingscli.py",
+      "program": "jgtutils/jgtset.py",
       "console": "integratedTerminal",
       "args": "-E -J"
     },
