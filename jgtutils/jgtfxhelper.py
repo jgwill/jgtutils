@@ -1,4 +1,7 @@
 
+
+import os
+
 OFFERS_CSV_DATA="""18,CAD/JPY
 1010,SPX500
 2020,WHEATF
@@ -96,4 +99,21 @@ def instruments_to_dict():
     for line in OFFERS_CSV_DATA.split("\n"):
         dict[line.split(",")[1]] = int(line.split(",")[0])
     return dict
+
+
+from jgtos import fix_path_ext, mkfn_cdata_filepath
+from jgtcliconstants import JGT_FXDATA_NS
+from jgtos import get_data_path
+def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
+    #.replace(f".{ext}.{ext}",f".{ext}")
+    if use_local:
+        fpath = mkfn_cdata_filepath( fn)
+
+    else :
+        fx_dir_path=get_data_path(JGT_FXDATA_NS)
+        fpath = os.path.join(fx_dir_path,fn)
+    if ext is not None:
+        fpath = fix_path_ext(ext, fpath)
+    return fpath
+
 

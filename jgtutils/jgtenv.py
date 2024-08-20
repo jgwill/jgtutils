@@ -13,6 +13,9 @@ def load_dotjgt_env_sh():
     dotjgt_env_sh_path = get_dotjgt_env_sh_path()
     if os.path.exists(dotjgt_env_sh_path):
         load_dotenv(dotenv_path=dotjgt_env_sh_path)
+        return True
+    else:
+        return False
 
 def is_dotjgt_env_sh_exists():
     return os.path.exists(get_dotjgt_env_sh_path())

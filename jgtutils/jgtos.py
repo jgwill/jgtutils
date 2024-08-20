@@ -271,3 +271,13 @@ def tlidmin_to_dt(tlid_str: str):
         pass
     
     return None
+
+from jgtcliconstants import JGT_DATA_DIR,JGT_DATA_SUBDIRDIR
+def mkfn_cdata_filepath(fn,*args):
+    cdata_jgt_dir = os.path.join(os.getcwd(),JGT_DATA_DIR,JGT_DATA_SUBDIRDIR,*args)
+    os.makedirs(cdata_jgt_dir, exist_ok=True)
+    cfilepath=os.path.join(cdata_jgt_dir,fn)
+    return cfilepath
+
+def fix_path_ext(ext, fpath):
+    return fpath.replace(f".{ext}.{ext}",f".{ext}")

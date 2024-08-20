@@ -174,6 +174,11 @@ JGTSET_CLI_EPILOG = "Load,output and/or export settings as JSON/YML or environme
 JGTSET_CLI_DESCRIPTION = "JGTFxCLI Settings Loader"
 JGTSET_CLI_PROG_NAME="jgtset"
 _JGTSET_EXCLUDED_ENV_EXPORT_KEYS=['QM_HISTORY_PATH']
+
+JGT_DATA_DIR="data"
+JGT_DATA_SUBDIRDIR="jgt"
+JGT_FXDATA_NS="fx"
+
 #@STCIssue Defined in jgtpy for now
 # IDSCLI_PROG_NAME='idscli'
 # JGTADS_PROG_NAME='jgtads'
