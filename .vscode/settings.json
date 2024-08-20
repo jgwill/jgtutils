@@ -10,6 +10,13 @@
   "python.testing.unittestEnabled": true,
   "python.analysis.exclude": [
     "/home/jgi/.local/lib/python3.10/site-packages/jgtutils",
-    "/home/jgi/.local/lib/python3.10/site-packages/jgtutils-0.2.77.dist-info"
+    "/home/jgi/.local/lib/python3.10/site-packages/jgtfxcon",
+    "/home/jgi/.local/lib/python3.10/site-packages/jgtfx2console",
+    "/home/jgi/.local/lib/python3.10/site-packages/jgtutils-0.2.77.dist-info",
+    "build/**"
+  ],
+  "python.analysis.ignore": [
+    "build/**",
+    "dist/**"
   ]
 }
