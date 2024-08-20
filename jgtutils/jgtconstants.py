@@ -191,6 +191,9 @@ signalBuy_saucer_column_name = 'sb'
 AOF = indicator_ao_fractalPeakOfMomentum_column_name
 AOFVALUE = indicator_ao_fractalPeakValue_column_name
 FDB = signalCode_fractalDivergentBar_column_name
+"""
+Fractal Divergent Bar Code (contains the signal value either buy, sell or nothing)
+"""
 FDBB = signalBuy_fractalDivergentBar_column_name
 FDBS = signalSell_fractalDivergentBar_column_name
 ACS = signalSell_AC_deceleration_column_name
@@ -241,6 +244,9 @@ VECTOR_AO_FDBB = 'vaob'
 
 
 VECTOR_AO_FDB_COUNT = 'vaoc'
+"""
+Count of the number AO Bars in the Fractal Divergent Bar Analysis.
+"""
 VECTOR_AO_FDB_COUNT_TYPE = int
 VECTOR_AO_FDBS_COUNT = 'vaosc'
 VECTOR_AO_FDBS_COUNT_TYPE = int
