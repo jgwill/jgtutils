@@ -169,6 +169,8 @@ CLI_FXMVSTOP_PROG_NAME='fxmvstop'
 
 JGT_SUBDIR_NAME = ".jgt"
 JGT_ENV_EXPORT_NAME=".env.jgtset"
+JGT_FXTRADE_ENV_FILENAME='.env.fxtrade'
+
 JGTSET_CLI_EPILOG = "Load,output and/or export settings as JSON/YML or environment variables in "+JGT_SUBDIR_NAME+"/"+JGT_ENV_EXPORT_NAME
 
 JGTSET_CLI_DESCRIPTION = "JGTFxCLI Settings Loader"
