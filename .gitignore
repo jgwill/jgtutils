@@ -168,3 +168,6 @@ test-log.py
 .stc/stcgoal_from_log.md
 .stc/stclog-2407151750_from-2401-tag-STC.md
 .stc/stclog-2407151754_from-2401-tag-STC.md
+_config.yml.bak
+_config.yml
+.env.jgtset
