@@ -78,6 +78,9 @@ dev-pypi-release:
 	twine --version
 	twine upload --repository pypi-dev dist/*
 
+.PHONY: test
+test:
+	pytest
 
 .PHONY: dev-release
 dev-release:
@@ -97,6 +100,7 @@ bump_version:
 
 .PHONY: quick-release
 quick-release:
+	make test
 	make bump_version
 	make dist
 	make pypi-release
