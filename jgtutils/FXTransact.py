@@ -9,8 +9,12 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtclihelper import print_jsonl_message
 from jgtfxhelper import offer_id_to_instrument as _offer_id_to_instrument
 
+from jgtfxhelper import                        mkfn_cfxdata_filepath as _mkfn_cfxdata_filepath 
+
+FXTRANSAC_FILE_PREFIX="fxtransact"
 
 #@STCGoal FUTURE YAML Simplified Representation
 """
@@ -616,6 +620,35 @@ class FXTransactWrapper:
                 return order
         return None
     
+    def find_matching_trade(self,order,quiet=False):
+        for trade in self.trades:
+            #open_order_id
+            order_id_name = 'OrderID'
+            if not order_id_name in order:
+                order_id_name = 'order_id' #Compatibility with old order_id
+            if trade['open_order_id'] == order[order_id_name]:
+                msg = "Matched trade found by open_order_id"
+                if not quiet:
+                    print_jsonl_message(msg, trade)
+                return trade
+            
+            if (trade['instrument'] == order['instrument'] and
+                trade['open_rate'] == order['entry_rate'] and
+                trade['stop'] == order['stop_rate'] and
+                trade['amount'] == order['lots']):
+                if not quiet:
+                    msg = "Matched trade found by instrument, entry_rate, stop_rate, and lots:"
+                    if not quiet:
+                        print_jsonl_message(msg, trade)
+                return trade
+        return None
+
+    @staticmethod
+    def from_ds(use_local=True):
+        fxtransact_filepath=_mkfn_cfxdata_filepath(FXTRANSAC_FILE_PREFIX,use_local=use_local)
+        return FXTransactWrapper.from_path(fxtransact_filepath)
+    
+    
     def tojson(self, indent=2):
         return json.dumps(self.to_dict(), indent=indent)
     
@@ -690,10 +723,10 @@ class FXTransactDataHelper:
     
     @staticmethod
     def load_fxtransact_from_file(filename:str):
-        return FXTransactWrapper.fromjsonfile(filename)
+        return FXTransactWrapper.from_path(filename)
     
     @staticmethod
-    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,str_trade_id=None):
+    def save_fxtransact_to_file(fxtransactwrapper:FXTransactWrapper,str_table:str="all",str_connection:str="",save_prefix:str= "fxtransact_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,str_trade_id=None,use_local=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -709,16 +742,20 @@ class FXTransactDataHelper:
             savefile = fn+"orders.json"
         if str_table == "trades":
             savefile = fn+"trades.json"
+        
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
-        fxtransactwrapper.tojsonfile(saved_file_fix)
+        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
+       
+        
+        fxtransactwrapper.tojsonfile(save_fullpath)
         if not OUTPUT_YAML_DISABLED:
             fxtransactwrapper.toyamlfile(saved_file_fix.replace(".json",".yaml"))
         if not quiet:print("FXTransact saved to file: "+saved_file_fix)
         return saved_file_fix
     
     @staticmethod
-    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
+    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -731,14 +768,16 @@ class FXTransactDataHelper:
 
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
         
-        fxorder.tojsonfile(saved_file_fix)
+        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
+        
+        fxorder.tojsonfile(save_fullpath)
         if not OUTPUT_YAML_DISABLED:
             fxorder.toyamlfile(saved_file_fix.replace(".json",".yaml"))
         if not quiet:print("FXOrder saved to file: "+saved_file_fix)
         return saved_file_fix
     
     @staticmethod
-    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True):
+    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -750,8 +789,9 @@ class FXTransactDataHelper:
             savefile = fn+str_instrument.replace("/","-")+".json"
 
         saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
         
-        fxtrade.tojsonfile(saved_file_fix)
+        fxtrade.tojsonfile(save_fullpath)
         if not quiet:print("FXTrade saved to file: "+saved_file_fix)
         return saved_file_fix
     
