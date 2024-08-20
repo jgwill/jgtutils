@@ -3,8 +3,21 @@ import sys
 
 from dotenv import load_dotenv
 
-from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME
+from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME,JGT_FXTRADE_ENV_FILENAME
 
+def get_dotfxtrade_env_path():
+    return os.path.join(os.getcwd(),JGT_FXTRADE_ENV_FILENAME)
+
+def load_dotfxtrade_env():
+    dotfxtrade_env_path = get_dotfxtrade_env_path()
+    if os.path.exists(dotfxtrade_env_path):
+        load_dotenv(dotenv_path=dotfxtrade_env_path)
+        return True
+    else:
+        return False
+
+def is_dotfxtrade_env_exists():
+    return os.path.exists(get_dotfxtrade_env_path())
 
 def get_dotjgt_env_sh_path():
     return os.path.join(os.getcwd(),".jgt","env.sh")
@@ -20,6 +33,14 @@ def load_dotjgt_env_sh():
 def is_dotjgt_env_sh_exists():
     return os.path.exists(get_dotjgt_env_sh_path())
 
+def load_dotjgtset_exported_env():
+  dotenv_path=get_dotenv_jgtset_export_path()
+  if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path=dotenv_path)
+    return True
+  else:
+    return False
+  
 def get_dotenv_jgtset_export_path(in_jgt_subdir=False):
     
     if in_jgt_subdir:
