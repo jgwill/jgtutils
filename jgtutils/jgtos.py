@@ -4,7 +4,11 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-
+def ensure_directory_exists(filepath):
+    directory = os.path.dirname(filepath)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+    return directory
 
 def create_filestore_path(
     instrument:str, 
