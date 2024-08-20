@@ -9,7 +9,8 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from jgtfxhelper import offer_id_to_instrument
+from jgtfxhelper import offer_id_to_instrument as _offer_id_to_instrument
+
 
 #@STCGoal FUTURE YAML Simplified Representation
 """
@@ -85,7 +86,7 @@ class FXTrades:
         return cls(trades)
 
 class FXTrade:
-    def __init__(self, trade_id, account_id, account_name, account_kind, offer_id, amount, buy_sell, open_rate, open_time, open_quote_id, open_order_id, open_order_req_id, open_order_request_txt, commission, rollover_interest, trade_id_origin, used_margin, value_date, parties, dividends, pl, gross_pl, close, stop, limit, stop_order_id, limit_order_id, instrument, trail_rate, trail_step, close_commission):
+    def __init__(self, trade_id, account_id, account_name, account_kind, offer_id, amount, buy_sell, open_rate, open_time, open_quote_id, open_order_id, open_order_req_id, open_order_request_txt, commission, rollover_interest, trade_id_origin, used_margin, value_date, parties, dividends, pl, gross_pl, close, stop, limit, stop_order_id, limit_order_id, instrument, trail_rate, trail_step, close_commission,message=''):
         self.trade_id = trade_id
         self.account_id = account_id
         self.account_name = account_name
@@ -117,7 +118,7 @@ class FXTrade:
         self.trail_rate = trail_rate
         self.trail_step = trail_step
         self.close_commission = close_commission
-        self.message = ''
+        self.message = message
 
     def to_dict(self):
         return {
@@ -327,7 +328,7 @@ class FXOrders:
 
 
 class FXOrder:
-    def __init__(self, order_id, request_id, rate, execution_rate, rate_min, rate_max, trade_id, account_id, account_name, offer_id, net_quantity, buy_sell, stage, type, status, status_time, amount, lifetime, at_market, trail_step, trail_rate, time_in_force, account_kind, request_txt, contingent_order_id, contingency_type, primary_id, origin_amount, filled_amount, working_indicator, peg_type, peg_offset, peg_offset_min, peg_offset_max, expire_date, value_date, parties, side, stop, limit, stop_order_id, limit_order_id, type_stop, type_limit, stop_trail_step, stop_trail_rate):
+    def __init__(self, order_id, request_id, rate, execution_rate, rate_min, rate_max, trade_id, account_id, account_name, offer_id, net_quantity, buy_sell, stage, type, status, status_time, amount, lifetime, at_market, trail_step, trail_rate, time_in_force, account_kind, request_txt, contingent_order_id, contingency_type, primary_id, origin_amount, filled_amount, working_indicator, peg_type, peg_offset, peg_offset_min, peg_offset_max, expire_date, value_date, parties, side, stop, limit, stop_order_id, limit_order_id, type_stop, type_limit, stop_trail_step, stop_trail_rate,message=''):
         self.order_id = order_id
         self.request_id = request_id
         self.rate = rate
@@ -374,8 +375,8 @@ class FXOrder:
         self.type_limit = type_limit
         self.stop_trail_step = stop_trail_step
         self.stop_trail_rate = stop_trail_rate
-        self.instrument = offer_id_to_instrument(offer_id)
-        self.message = ''
+        self.instrument = _offer_id_to_instrument(offer_id)
+        self.message = message
 
     def to_dict(self):
         return {
@@ -506,7 +507,7 @@ class FXOrder:
             type_limit=order_data.get('type_limit', 0),
             stop_trail_step=order_data.get('stop_trail_step', 0),
             stop_trail_rate=order_data.get('stop_trail_rate', 0.0),
-            instrument=offer_id_to_instrument(offer_id),
+            instrument=_offer_id_to_instrument(offer_id),
             message=order_data.get('message', '')
         )
     
