@@ -115,6 +115,6 @@ def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
     if ext is not None:
         fpath = fix_path_ext(ext, fpath)
     cleaned_filepath = fpath.replace("_.",".")
-    ensure_directory_exists(cleaned_filepath)
+    #ensure_directory_exists(cleaned_filepath)
     return cleaned_filepath
 
