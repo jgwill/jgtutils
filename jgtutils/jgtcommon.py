@@ -1369,7 +1369,7 @@ def _do_we_dropna_volume(_args=None):
         _args=args
     dropna_volume_value = _args.dropna_volume or not _args.dont_dropna_volume
     if args.timeframe == "M1" and dropna_volume_value:
-        print("We dont dropna volume for M1")
+        #print("We dont dropna volume for M1")
         return False # We dont drop for Monthly
     return dropna_volume_value
 
