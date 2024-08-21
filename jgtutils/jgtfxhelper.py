@@ -101,7 +101,7 @@ def instruments_to_dict():
     return dict
 
 
-from jgtos import fix_path_ext, mkfn_cdata_filepath
+from jgtos import ensure_directory_exists, fix_path_ext, mkfn_cdata_filepath
 from jgtcliconstants import JGT_FXDATA_NS
 from jgtos import get_data_path
 def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
@@ -114,6 +114,7 @@ def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
         fpath = os.path.join(fx_dir_path,fn)
     if ext is not None:
         fpath = fix_path_ext(ext, fpath)
-    return fpath
-
+    cleaned_filepath = fpath.replace("_.",".")
+    ensure_directory_exists(cleaned_filepath)
+    return cleaned_filepath
 
