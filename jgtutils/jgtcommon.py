@@ -1132,6 +1132,32 @@ def __quiet__post_parse():
 
 
 
+def get_instruments(default_instruments: List[str] = None, envvar="I") -> List[str]:
+    global args
+    if args.instrument:
+        return [args.instrument]
+    elif args.iflag:
+        return args.instruments
+    else:
+        return os.getenv(envvar, INSTRUMENT_ALL_STRING).split(",") if default_instruments is None else default_instruments
+    
+def get_instruments(default_instruments:list=None,envvar="I")->List[str]:
+    global args
+    _instruments=args.instruments if args.iflag \
+        else default_instruments \
+            if not args.instrument \
+                else [args.instrument] \
+                    if args.instrument \
+                        else os.getenv(envvar,INSTRUMENT_ALL_STRING).split(",")
+    return _instruments
+#     if envname is not None and envname in os.environ:
+#         return os.getenv(envname).split(",")
+#     iterable_instruments = _get_iterable_instruments_from_args()
+#     if iterable_instruments is None or len(iterable_instruments) ==0:
+#         iterable_instruments=parse_instruments_helper(default_instruments)
+#     return iterable_instruments
+
+
 def __timeframes_post_parse()->argparse.Namespace:
     global args,settings
     __check_if_parsed()
