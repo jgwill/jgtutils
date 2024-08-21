@@ -1,6 +1,6 @@
 {
   "name": "jgtutils",
-  "version": "0.2.155",
+  "version": "0.2.156",
   "description": "A utility package common to other JGT projects.",
   "main": "index.js",
   "directories": {
