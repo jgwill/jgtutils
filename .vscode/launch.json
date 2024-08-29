@@ -164,6 +164,46 @@
       "args": "-ls tests/jgt_settings_04_timeframes.json"
     },
     {
+      "name": "II_incli",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "II_incli2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "pov_not_req01",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "pov_not_req02",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": "--instrument EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "pov_not_req02b",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD,SPX500 -t H1,m15"
+    },
+    {
       "name": "patterns_from_settings",
       "type": "debugpy",
       "request": "launch",
@@ -194,6 +234,14 @@
       "program": "jgtutils/cli_test_jgtfxcli_helper.py",
       "console": "integratedTerminal",
       "args": "-ls tests/test_settings_01_spec_instrument_timeframe.json"
+    },
+    {
+      "name": "cli_test_cronrun_helper01",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_cronrun_helper.py",
+      "console": "integratedTerminal",
+      "args": "-t m5"
     },
   ]
 }
