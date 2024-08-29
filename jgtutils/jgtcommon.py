@@ -20,6 +20,7 @@
 import argparse
 import json
 import ruamel.yaml;yaml = ruamel.yaml.YAML()
+
 import os
 import sys
 import traceback
@@ -41,6 +42,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
+from jgtclihelper import add_exiting_quietly
 from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_BARS_TITLE,
                                       ARG_GROUP_CLEANUP_DESCRIPTION,
@@ -298,8 +300,12 @@ def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
     
     return parser
 
-def new_parser(description: str,epilog: str=None,prog: str=None,enable_specified_settings=True)->argparse.ArgumentParser:
+def new_parser(description: str,epilog: str=None,prog: str=None,enable_specified_settings=True,add_exiting_quietly_flag=False,exiting_quietly_message:str=None,exiting_quietly_handler=None)->argparse.ArgumentParser:
     global default_parser
+    if add_exiting_quietly_flag or exiting_quietly_handler is not None:
+        #print("We are adding exiting quietly")
+        add_exiting_quietly(exiting_quietly_message,exiting_quietly_handler)
+        
     default_parser = argparse.ArgumentParser(description=description,epilog=epilog,prog=prog)
     
     if enable_specified_settings:
@@ -1131,31 +1137,50 @@ def __quiet__post_parse():
     return args
 
 
+def _get_iterable_timeframes_from_args()->List[str]:
+    global args
+    __check_if_parsed()
+    if hasattr(args, 'timeframe') and \
+        hasattr(args, 'tflag')   and \
+            getattr(args, "tflag"):
+        return getattr(args, 'timeframes')
+    else: #Return just one timeframe
+        return [getattr(args, 'timeframe')]
+
+
+def _get_iterable_instruments_from_args()->List[str]:
+    global args
+    __check_if_parsed()
+    if hasattr(args, 'instrument') and \
+        hasattr(args, 'iflag')   and \
+            getattr(args, "iflag"):
+        return getattr(args, 'instruments')
+    else: #Return just one instrument
+        return [getattr(args, 'instrument')]
+
+from jgtconstants import TIMEFRAMES_DEFAULT_STRING,INSTRUMENT_ALL_STRING
+from jgtconstants import TIMEFRAMES_ALL, TIMEFRAMES_DEFAULT
+
+
+def get_timeframes(default_timeframes: List[str] = None, envvar="T") -> List[str]:
+    global args
+    if args.timeframe and not args.tflag:
+        return [args.timeframe]
+    elif args.tflag:
+        return args.timeframes
+    else:
+        return os.getenv(envvar, TIMEFRAMES_DEFAULT_STRING).split(",") if default_timeframes is None else default_timeframes if isinstance(default_timeframes, list) else default_timeframes.split(",")
 
 def get_instruments(default_instruments: List[str] = None, envvar="I") -> List[str]:
     global args
-    if args.instrument:
+    if args.instrument and not args.iflag:
         return [args.instrument]
     elif args.iflag:
         return args.instruments
     else:
-        return os.getenv(envvar, INSTRUMENT_ALL_STRING).split(",") if default_instruments is None else default_instruments
+        return os.getenv(envvar, INSTRUMENT_ALL_STRING).split(",") if default_instruments is None else default_instruments if isinstance(default_instruments, list) else default_instruments.split(",")
     
-def get_instruments(default_instruments:list=None,envvar="I")->List[str]:
-    global args
-    _instruments=args.instruments if args.iflag \
-        else default_instruments \
-            if not args.instrument \
-                else [args.instrument] \
-                    if args.instrument \
-                        else os.getenv(envvar,INSTRUMENT_ALL_STRING).split(",")
-    return _instruments
-#     if envname is not None and envname in os.environ:
-#         return os.getenv(envname).split(",")
-#     iterable_instruments = _get_iterable_instruments_from_args()
-#     if iterable_instruments is None or len(iterable_instruments) ==0:
-#         iterable_instruments=parse_instruments_helper(default_instruments)
-#     return iterable_instruments
+
 
 
 def __timeframes_post_parse()->argparse.Namespace:
@@ -1164,8 +1189,12 @@ def __timeframes_post_parse()->argparse.Namespace:
     
     _timeframes=None
     
+    setattr(args, 'tflag',False)
+    if hasattr(args, 'timeframe') and getattr(args, "timeframe") is not None  and ","  in getattr(args, "timeframe"):
+        setattr(args, 'tflag',True)
+        _timeframes=getattr(args, "timeframe").split(",")
     
-    if hasattr(args, "timeframes"):
+    elif hasattr(args, "timeframes"):
         _timeframes=getattr(args, "timeframes")
     else:
         try:
@@ -1175,22 +1204,22 @@ def __timeframes_post_parse()->argparse.Namespace:
             pass
             
             
-    if not isinstance(_timeframes, list) and _timeframes is not None:
+    if _timeframes is not None and not isinstance(_timeframes, list) :
         _timeframes=parse_timeframes_helper(_timeframes)
 
-    if _timeframes is None and hasattr(args, 'timeframe'):
-        _timeframes=getattr(args, 'timeframe')
-        #if we have coma in the string
-        if _timeframes is not None and "," in _timeframes:
-            _timeframes=parse_timeframes_helper(_timeframes)
-        else:
-            _timeframes = os.getenv("T",None)
-            
+
+    #if we have coma in the string
+    if _timeframes is None:
+        _timeframes = os.getenv("T",TIMEFRAMES_DEFAULT_STRING)
+    
+    if  "," in _timeframes:
+        _timeframes=parse_timeframes_helper(_timeframes)
+    
+    
     setattr(args, 'timeframes',_timeframes)
 
     return args
 
-from jgtconstants import TIMEFRAMES_ALL, TIMEFRAMES_DEFAULT
 
 
 def parse_timeframes_helper(timeframes):
@@ -1213,6 +1242,62 @@ def parse_timeframes_helper(timeframes):
         except:
             _timeframes = None
     return _timeframes
+
+
+
+from jgtconstants import INSTRUMENTS_DEFAULT,INSTRUMENT_ALL
+
+def __instruments_post_parse()->argparse.Namespace:
+    global args,settings
+    __check_if_parsed()
+    
+    _instruments=None
+    # if not hasattr(args, 'instrument') or args.instrument is None:
+    #     return args
+    
+    setattr(args, 'iflag',False)
+    if hasattr(args, 'instrument') and getattr(args, "instrument") is not None and "," in getattr(args, "instrument"):
+        setattr(args, 'iflag',True)
+        _instruments=getattr(args, "instrument")
+    else:
+        try:
+            if settings["instruments"]:
+                _instruments =settings["instruments"]
+        except:
+            pass
+            
+            
+    if _instruments is not None and not isinstance(_instruments, list) :
+        _instruments=parse_instruments_helper(_instruments)
+
+
+    if _instruments is None :
+        _instruments = os.getenv("I",None)
+            
+    setattr(args, 'instruments',_instruments)
+
+    return args
+
+
+def parse_instruments_helper(instruments):
+
+   
+    if instruments == "default":
+        __instruments = INSTRUMENTS_DEFAULT
+    if instruments == "all" :
+        __instruments=INSTRUMENT_ALL
+    
+    if instruments == "default" or instruments == "all" :
+        try:
+            _instruments = os.getenv("I",None).split(",")
+        except:
+            _instruments = None
+    else:
+        try:
+            _instruments = instruments.split(",")
+        except:
+            _instruments = None
+    return _instruments
 
 def __crop_last_dt__post_parse()->argparse.Namespace:
     global args
@@ -1349,6 +1434,8 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__keep_bid_ask__post_parse()
     
     args=__timeframes_post_parse()
+    args=__instruments_post_parse()
+    
     args=__crop_last_dt__post_parse()
     args=__verbose__post_parse()
     args=__quotescount__post_parse()
