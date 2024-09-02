@@ -36,3 +36,5 @@ dependencies = [
 [project.scripts]
 jgtutr = "jgtutils.cli_tlid_range:main"
 jgtset = "jgtutils.jgtset:main"
+tfw="jgtutils.cli_test_cronrun_helper:main"
+wtf="jgtutils.cli_test_cronrun_helper:main"

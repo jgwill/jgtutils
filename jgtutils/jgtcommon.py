@@ -39,6 +39,8 @@ import tlid
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtenv import load_env
+
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
@@ -252,7 +254,7 @@ def get_settings(custom_path=None)->dict:
         settings = load_settings(custom_path=custom_path)
     return settings
 
-def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
+def load_arg_default_from_settings(argname:str,default_value,alias:str=None,from_jgt_env=False):
     global settings
     if settings is None or len(settings)==0:
         settings=load_settings()
@@ -260,6 +262,15 @@ def load_arg_default_from_settings(argname:str,default_value,alias:str=None):
     _value = settings.get(argname,default_value)
     if alias is not None and _value==default_value:
         _value = settings.get(alias,default_value) #try alias might be used
+    
+    if from_jgt_env:        
+        loaded=load_env()
+        #if loaded:
+        if argname in os.environ or alias in os.environ:
+            _value = os.getenv(argname,None)
+            if alias is not None and _value is None:
+                _value = os.getenv(alias)
+    
     return _value
 
 def load_arg_default_from_settings_if_exist(argname:str,alias:str=None):

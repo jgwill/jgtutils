@@ -3,7 +3,9 @@ import time
 import os
 
 import sys
+import subprocess
 
+from jgtutils.jgterrorcodes import BASH_FUNCTION_RUN_EXIT_ERROR_CODE, BASH_LOADER_ERROR_EXIT_ERROR_CODE, SUBPROCESS_RUN_ERROR_EXIT_ERROR_CODE
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -25,6 +27,10 @@ def refreshTF( timeframe:str,quote_count:int=-1, quiet:bool=True,use_full:bool=F
     raise e
 
 timeframe=None
+current_time=None
+exit_on_error=False
+quiet=True
+
 from jgtclihelper import build_jsonl_message
 def _exit_quietly_handler():
   global timeframe
@@ -37,13 +43,24 @@ def parse_args():
     #parser=jgtcommon.add_settings_argument(parser)
     #parser=jgtcommon._preload_settings_from_args(parser)
     
-    parser= jgtcommon.add_timeframe_standalone_argument(parser,required=True)
+    parser= jgtcommon.add_timeframe_standalone_argument(parser,required=True,from_jgt_env=True)
+    
+    step_group=parser.add_mutually_exclusive_group()
     #exit the program when the timeframe is reached
-    parser.add_argument("-X", "--exit", action="store_true", help="Exit the program when the timeframe is reached.")
+    step_group.add_argument("-X", "--exit", action="store_true", help="Exit the program when the timeframe is reached.")
+    
+    #--script-to-run
+    step_group.add_argument("-S", "--script-to-run", help="Script to run when the timeframe is reached. (.jgt/tfw.sh)")
+    #--cli-to-run
+    step_group.add_argument("-C", "--cli-to-run", help="CLI to run when the timeframe is reached. (python -m jgtutils.cli_test_cronrun_helper)",nargs="*")
+    #--function
+    step_group.add_argument("-F", "--function", help="Function to run when the timeframe is reached.")
+    
     #--message
     parser.add_argument("-M", "--message", help="Message to display when the timeframe is reached.",default="Timeframe reached.")
     
     parser.add_argument("-I", "--in-message", help="Message to display when the timeframe wait starts.",default="Timeframe waiting started")
+    
     
     #--nooutput
     parser.add_argument("-N", "--no-output", action="store_true", help="Do not output anything.")
@@ -56,7 +73,7 @@ def parse_args():
     return args
 APP_SCOPE="tfwait"
 def main():
-    global timeframe
+    global timeframe,current_time,exit_on_error,quiet
     #add_exiting_quietly()
     
     args = parse_args()
@@ -76,17 +93,83 @@ def main():
      
       
       if current_time in ctx_times:  # Adjust the times as needed
+          adjusted_sleep_duration = sleep_duration
           if args.exit:
               #print(args.message," ",args.timeframe," reached at ",current_time)
               if not args.no_output:
                 _print_app_message(timeframe, args.message,state="reached")
-              #sys.stdout.flush()
               exit(0)
-          output = refreshTF(args.timeframe)
-          print(output)
-          time.sleep(sleep_duration)  # Sleep for 60 seconds to avoid multiple runs within the same minute
+          if args.script_to_run:
+            #@STCIssue We would need to calculate the time to run the script and substract that to the sleep_duration
+            try:
+              before_run = datetime.datetime.now()
+              _run_script_to_run(args.script_to_run)
+              after_run = datetime.datetime.now()
+              elapsed = after_run - before_run
+              elapsed_seconds = elapsed.total_seconds()
+              adjusted_sleep_duration = sleep_duration - elapsed_seconds
+              if adjusted_sleep_duration < 0:
+                adjusted_sleep_duration = 1
+            except Exception as e:
+              msg = f"Error running script{args.script_to_run}: {e}"
+              print_jsonl_message(msg,extra_dict={"timeframe":timeframe,"time":get_current_time(timeframe)},scope=APP_SCOPE,state="error",use_short=True)
+              if exit_on_error:
+                exit(SUBPROCESS_RUN_ERROR_EXIT_ERROR_CODE)
+          elif args.cli_to_run:
+            try:
+              subprocess.run(args.cli_to_run, check=True)
+            except Exception as e:
+              msg = f"Error running app {args.cli_to_run}: {e}"
+              print_jsonl_message(msg,extra_dict={"timeframe":timeframe,"time":get_current_time(timeframe)},scope=APP_SCOPE,state="error",use_short=True)
+              if exit_on_error:
+                exit(SUBPROCESS_RUN_ERROR_EXIT_ERROR_CODE)
+          else:
+            output = refreshTF(args.timeframe)
+            print(output)
+          time.sleep(adjusted_sleep_duration)  # Sleep for x seconds to avoid multiple runs within the same minute
       time.sleep(1)  # Check every second
       #print(".", end="")
+
+def _run_script_to_run(script_to_run):
+  global timeframe,current_time  
+  if os.path.exists(script_to_run):
+      subprocess.run(["bash",script_to_run,timeframe,current_time], check=True)
+  else:
+      print(f"Script {script_to_run} not found.")
+
+
+def _run_function(function_to_run,load_script = "/opt/binscripts/load.sh"):
+    global timeframe, current_time
+    alt_path = os.path.join((os.getcwd(),".jgt","load.sh"))
+    
+    if os.path.exists(alt_path):
+      load_script=alt_path # Assuming we override the loading required in there
+    
+    alt_path2 = os.path.join((os.getcwd(),"..",".jgt","load.sh")) # suport using ../.jgt/load.sh
+    
+    if os.path.exists(alt_path2) and not os.path.exists(alt_path):
+      load_script=alt_path2
+    
+    #if still not exist, try $HOME/.jgt/load.sh
+    if not os.path.exists(load_script):
+      home = os.path.expanduser("~")
+      alt_path3 = os.path.join(home,".jgt","load.sh")
+      if os.path.exists(alt_path3):
+        load_script=alt_path3
+    
+    if os.path.exists(load_script):
+        try:
+            subprocess.run(["/usr/bin/bash", "-c", f". /opt/binscripts/load.sh && {function_to_run} {timeframe} {current_time}"], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error occurred while running the function: {e}")
+            
+            if exit_on_error:
+              exit(BASH_FUNCTION_RUN_EXIT_ERROR_CODE)
+    else:
+        print(f"Script {load_script} not found.")
+        if exit_on_error:
+          exit(BASH_LOADER_ERROR_EXIT_ERROR_CODE)
+        
 
 def _print_app_message(timeframe, msg,state=None,use_short=True):
     print_jsonl_message(msg,extra_dict={"timeframe":timeframe,"time":get_current_time(timeframe)},scope=APP_SCOPE,state=state,use_short=use_short)
