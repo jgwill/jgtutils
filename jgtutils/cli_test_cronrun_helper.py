@@ -5,7 +5,7 @@ import os
 import sys
 import subprocess
 
-from jgtutils.jgterrorcodes import BASH_FUNCTION_RUN_EXIT_ERROR_CODE, BASH_LOADER_ERROR_EXIT_ERROR_CODE, SUBPROCESS_RUN_ERROR_EXIT_ERROR_CODE
+from jgtutils.jgterrorcodes import BASH_FUNCTION_RUN_EXIT_ERROR_CODE, BASH_LOADER_ERROR_EXIT_ERROR_CODE, DOTJGTENV_TIMEFRAME_NOT_FOUND_EXIT_ERROR_CODE, SUBPROCESS_RUN_ERROR_EXIT_ERROR_CODE
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -38,8 +38,9 @@ def _exit_quietly_handler():
   o=build_jsonl_message(msg,extra_dict={"timeframe":timeframe},state="canceled",scope=APP_SCOPE,use_short=True)
   return o
 
+APP_EPILOG="launching or unlocking (exit when specific timeframes arrives or run function.)(DEPRECATION NOTICE: -S will be deprecated confusion with -S for --silence)"
 def parse_args():
-    parser = jgtcommon.new_parser("JGT Cron Test","Test launching or unlocking (exit when specific timeframes arrives.)",enable_specified_settings=True,exiting_quietly_handler=_exit_quietly_handler)#add_exiting_quietly_flag=True,exiting_quietly_message=f"")
+    parser = jgtcommon.new_parser("JGT WTF CLI helper ",epilog=APP_EPILOG,enable_specified_settings=True,exiting_quietly_handler=_exit_quietly_handler)#add_exiting_quietly_flag=True,exiting_quietly_message=f"")
     #parser=jgtcommon.add_settings_argument(parser)
     #parser=jgtcommon._preload_settings_from_args(parser)
     
@@ -50,7 +51,7 @@ def parse_args():
     step_group.add_argument("-X", "--exit", action="store_true", help="Exit the program when the timeframe is reached.")
     
     #--script-to-run
-    step_group.add_argument("-S", "--script-to-run", help="Script to run when the timeframe is reached. (.jgt/tfw.sh)")
+    step_group.add_argument("-S","-B", "--script-to-run", help="Script to run when the timeframe is reached. (.jgt/tfw.sh). ",nargs="*")
     #--cli-to-run
     step_group.add_argument("-C", "--cli-to-run", help="CLI to run when the timeframe is reached. (python -m jgtutils.cli_test_cronrun_helper)",nargs="*")
     #--function
@@ -78,6 +79,9 @@ def main():
     
     args = parse_args()
     timeframe = args.timeframe
+    if timeframe is None or timeframe == "" or timeframe == " ":
+      msg="Timeframe is required. Probably assuming loading it from env but not found"
+      exit(DOTJGTENV_TIMEFRAME_NOT_FOUND_EXIT_ERROR_CODE)
     
     ctx_times = get_times_by_timeframe_str(timeframe)
     quiet = args.quiet
@@ -132,8 +136,18 @@ def main():
 
 def _run_script_to_run(script_to_run):
   global timeframe,current_time  
-  if os.path.exists(script_to_run):
-      subprocess.run(["bash",script_to_run,timeframe,current_time], check=True)
+  script_path = script_to_run[0]
+  if os.path.exists(script_path):
+    cmd_args=["bash",script_path]
+    cmd_args.append(timeframe)
+    cmd_args.append(current_time)
+    c=0
+    for a in script_to_run:
+      if c>0:
+        cmd_args.append(a)
+      c=c+1
+    old_args = ["bash",script_to_run,timeframe,current_time]
+    subprocess.run(cmd_args, check=True)
   else:
       print(f"Script {script_to_run} not found.")
 
