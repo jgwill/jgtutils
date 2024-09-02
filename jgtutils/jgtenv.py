@@ -3,6 +3,10 @@ import sys
 
 from dotenv import load_dotenv
 
+from ruamel.yaml import YAML
+
+yaml = YAML()
+
 from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME,JGT_FXTRADE_ENV_FILENAME
 
 def get_dotfxtrade_env_path():
@@ -40,7 +44,28 @@ def load_dotjgtset_exported_env():
     return True
   else:
     return False
+
+def load_env():
+  _load_dotjgt_env_sh=load_dotjgt_env_sh()
+  _load_dotjgtset_exported_env=load_dotjgtset_exported_env()
+  _load_dotfxtrade_env=load_dotfxtrade_env()
+  _load_jgtyaml_env=load_jgtyaml_env()
+  if _load_dotjgt_env_sh or _load_dotjgtset_exported_env or _load_dotfxtrade_env or _load_jgtyaml_env:
+    return True
+  return False
+
+def load_jgtyaml_env(config_file="_config.yaml",jgt_key="jgt"):
+  try:
+    with open(config_file) as f:
+      config = yaml.load(f)
+      jgt_env=config[jgt_key]
+      for key in jgt_env:
+        os.environ[key]=jgt_env[key]
+      return True
+  except Exception as e:
+    return False
   
+
 def get_dotenv_jgtset_export_path(in_jgt_subdir=False):
     
     if in_jgt_subdir:

@@ -180,6 +180,7 @@ _JGTSET_EXCLUDED_ENV_EXPORT_KEYS=['QM_HISTORY_PATH']
 JGT_DATA_DIR="data"
 JGT_DATA_SUBDIRDIR="jgt"
 JGT_FXDATA_NS="fx"
+JGT_HOOK_NS="hooks"#expecting .jgt/hooks
 
 #@STCIssue Defined in jgtpy for now
 # IDSCLI_PROG_NAME='idscli'

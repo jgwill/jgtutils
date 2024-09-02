@@ -9,15 +9,24 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtos import sanitize_filename
 from jgtclihelper import print_jsonl_message
 from jgtfxhelper import offer_id_to_instrument as _offer_id_to_instrument
 
-from jgtfxhelper import                        mkfn_cfxdata_filepath as _mkfn_cfxdata_filepath 
+import jgtfxhelper
 
 ORDER_FILE_PREFIX="order_"
 TRADE_FILE_PREFIX="trade_"
 TRADES_FILE_PREFIX="trades"
+ORDERS_FILE_PREFIX="orders"
 FXTRANSAC_FILE_PREFIX="fxtransact"
+TRADE_FXMVSTOP_PREFIX = "fxmvstop_"
+ORDER_ADD_PREFIX="fxaddorder_"
+ORDER_RM_PREFIX="fxrmorder_"
+TRADE_FXRM_PREFIX="fxrmtrade_"
+FXREPORT_FILE_PREFIX="fxreport_"
+
+#JGTAPP__PREFIX="fxmvstopgator_"
 
 #@STCGoal FUTURE YAML Simplified Representation
 """
@@ -68,19 +77,22 @@ class FXTrades:
     def mkfn(ext="json",fn=None):
         if fn is None:
             fn=TRADES_FILE_PREFIX
-        return f"{fn}.{ext}"
+        trades_filename = f"{fn}.{ext}"
+        return sanitize_filename(trades_filename)
     
     @staticmethod
     def mkpath(ext="json",use_local=True,fn=None):
         fn=FXTrades.mkfn(ext,fn)
-        return _mkfn_cfxdata_filepath(fn,use_local=use_local)
+        return jgtfxhelper.mkfn_cfxdata_filepath(fn,use_local=use_local)
     
+    def get_path(self,ext="json",use_local=True,fn=TRADES_FILE_PREFIX):
+        return FXTrades.mkpath(ext,use_local,fn)
+        
     def tojsonfile(self, filename:str=None,use_local=True):
         if not filename:
-            filename = self.tofn()
-        try:
-            fpath=_mkfn_cfxdata_filepath(filename,use_local=use_local)
-            with open(fpath, 'w') as f:
+            filename = self.get_path(use_local=use_local)
+        try:            
+            with open(filename, 'w') as f:
                 f.write(self.tojson())
         except Exception as e:
             print(f"Error writing to file: {e}")
@@ -219,19 +231,20 @@ class FXTrade:
     def tofn(self,ext="json",fn=TRADE_FILE_PREFIX):
         return FXTrade.mkfn(self.trade_id,ext,fn)
     
-    def topath(self,ext="json",use_local=True,fn=TRADE_FILE_PREFIX):
+    def get_path(self,ext="json",use_local=True,fn=TRADE_FILE_PREFIX):
         return FXTrade.mkpath(self.trade_id,ext,use_local,fn)
     
     @staticmethod
     def mkfn(trade_id,ext="json",fn=None):
         if fn is None:
             fn=TRADE_FILE_PREFIX
-        return f"{fn}{trade_id}.{ext}"
+        transaction_file = f"{fn}{trade_id}.{ext}"
+        return sanitize_filename(transaction_file)
     
     @staticmethod
     def mkpath(trade_id,ext="json",use_local=True,fn=None):
         fn=FXTrade.mkfn(trade_id,ext,fn)
-        return _mkfn_cfxdata_filepath(fn,use_local=use_local)
+        return jgtfxhelper.mkfn_cfxdata_filepath(fn,use_local=use_local)
     
     @staticmethod
     def from_path(fpath:str):
@@ -241,7 +254,12 @@ class FXTrade:
                 return FXTrade.from_json_string(trade_data)
         except Exception as e:
             print(f"Error reading from file: {e}")
-        
+        return None
+    
+    # @staticmethod
+    # def create_path(use_local):
+    #     fxtransact_filepath=jgtfxhelper.mkfn_cfxdata_filepath(TRADE_FILE_PREFIX,use_local=use_local)
+    #     return fxtransact_filepath
     
     @staticmethod
     def from_id(trade_id,use_local=True):
@@ -250,9 +268,11 @@ class FXTrade:
     
     
     
-    def tojsonfile(self, filename:str=None):
+    def tojsonfile(self, filename:str=None,use_local=True):
         if not filename:
-            filename = self.tofn()
+            filename = self.get_path(use_local=use_local)
+            # if use_local:
+            #     filename = jgtfxhelper.mkfn_cfxdata_filepath(filename,use_local=use_local) #@STCGoal Gets saved in the local data directory if flag use_local is given without a filename
         try:
             with open(filename, 'w') as f:
                 f.write(self.tojson())
@@ -345,12 +365,24 @@ class FXOrders:
     def toyaml(self):
         return yaml.dump(self.to_dict())
     
-    def _to_filename(self,ext="json",fn="orders"):
-        return f"{fn}.{ext}"
+    @staticmethod
+    def mkfn(ext="json",fn=None):
+        if fn is None:
+            fn=ORDERS_FILE_PREFIX
+        orders_filename = f"{fn}.{ext}"
+        return sanitize_filename(orders_filename)      
     
-    def tojsonfile(self, filename:str=None):
+    @staticmethod
+    def mkpath(ext="json",use_local=True,fn=None):
+        fn=FXOrders.mkfn(ext,fn)
+        return jgtfxhelper.mkfn_cfxdata_filepath(fn,use_local=use_local)
+    
+    def get_path(self,ext="json",fn=ORDERS_FILE_PREFIX,use_local=True):
+        return FXOrders.mkpath(ext,use_local,fn)
+    
+    def tojsonfile(self, filename:str=None,use_local=True):
         if not filename:
-            filename = self._to_filename()
+            filename = self.get_path(use_local=use_local)
         try:
             with open(filename, 'w') as f:
                 f.write(self.tojson())
@@ -359,7 +391,7 @@ class FXOrders:
     
     def toyamlfile(self, filename:str=None):
         if not filename:
-            filename = self._to_filename("yaml")
+            filename = self.get_path("yaml")
         if not OUTPUT_YAML_DISABLED:
             try:
                 with open(filename, 'w') as f:
@@ -487,23 +519,41 @@ class FXOrder:
     def tofn(self,ext="json",fn=ORDER_FILE_PREFIX):
         return FXOrder.mkfn(self.order_id,ext,fn)
     
-    def topath(self,ext="json",use_local=True,fn=ORDER_FILE_PREFIX):
+    def get_path(self,ext="json",use_local=True,fn=ORDER_FILE_PREFIX):
         return FXOrder.mkpath(self.order_id,ext,use_local,fn)
     
     @staticmethod
     def mkfn(order_id,ext="json",fn=None):
         if fn is None:
             fn=ORDER_FILE_PREFIX
-        return f"{fn}{order_id}.{ext}"
+        transaction_filename = f"{fn}{order_id}.{ext}"
+        return sanitize_filename(transaction_filename)
     
     @staticmethod
     def mkpath(order_id,ext="json",use_local=True,fn=None):
         fn=FXOrder.mkfn(order_id,ext,fn)
-        return _mkfn_cfxdata_filepath(fn,use_local=use_local)
+        return jgtfxhelper.mkfn_cfxdata_filepath(fn,use_local=use_local)
         
-    def tojsonfile(self, filename:str=None):
+    @staticmethod
+    def from_path(fpath:str):
+        try:
+            with open(fpath, 'r') as f:
+                order_data = f.read()
+                return FXOrder.from_json_string(order_data)
+        except Exception as e:
+            print(f"Error reading from file: {e}")
+        return None
+    
+    @staticmethod
+    def from_id(order_id,use_local=True):
+        fpath=FXOrder.mkpath(order_id,use_local=use_local)
+        return FXOrder.from_path(fpath)     
+    
+    def tojsonfile(self, filename:str=None,use_local=False):
         if not filename:
-            filename = self.topath()
+            filename = self.get_path(use_local=use_local)
+            # if use_local:
+            #     filename = jgtfxhelper.mkfn_cfxdata_filepath(filename,use_local=use_local) #@STCGoal Gets saved in the local data directory if flag use_local is given without a filename
         try:
             with open(filename, 'w') as f:
                 f.write(self.tojson())
@@ -703,9 +753,25 @@ class FXTransactWrapper:
         return None
 
     @staticmethod
-    def from_ds(use_local=True):
-        fxtransact_filepath=_mkfn_cfxdata_filepath(FXTRANSAC_FILE_PREFIX,use_local=use_local)
+    def from_ds(trade_id=None,use_local=True):
+        fxtransact_filepath = FXTransactWrapper.create_path(use_local=use_local)
         return FXTransactWrapper.from_path(fxtransact_filepath)
+
+    @staticmethod
+    def make_fxtransact_filename(trade_id=None,fn=FXTRANSAC_FILE_PREFIX,ext="json"):
+        suffix = f"_{trade_id}" if trade_id else ""
+        fpath = f"{fn}{suffix}.{ext}"
+        return FXTransactWrapper.sanitize_filename(ext, fpath)
+
+    @staticmethod
+    def sanitize_filename(ext, fpath):
+        return fpath.replace("__","_").replace("_.",".").replace(f".{ext}.{ext}",f".{ext}")
+    
+    @staticmethod
+    def create_path(trade_id=None,fn=FXTRANSAC_FILE_PREFIX,ext="json",use_local=True):
+        fpath = FXTransactWrapper.make_fxtransact_filename(trade_id=trade_id,fn=fn,ext=ext)
+        fxtransact_filepath=jgtfxhelper.mkfn_cfxdata_filepath(fpath,use_local=use_local)
+        return fxtransact_filepath
     
     
     def tojson(self, indent=2):
@@ -727,7 +793,7 @@ class FXTransactWrapper:
     @staticmethod
     def mkpath(ext="json",use_local=True,fn=None):
         fn=FXTransactWrapper.mkfilename(ext,fn)
-        fpath = _mkfn_cfxdata_filepath(fn,use_local=use_local,ext=ext)
+        fpath = jgtfxhelper.mkfn_cfxdata_filepath(fn,use_local=use_local,ext=ext)
         return fpath
     
     @staticmethod
@@ -740,7 +806,26 @@ class FXTransactWrapper:
         else:
             return None
         
+    # @staticmethod
+    # def from_path(filename:str):
+    #     try:
+    #         with open(filename,"r") as f:
+    #             json_string = f.read()
+    #             return FXTransactWrapper.fromjsonstring(json_string)
+    #     except Exception as e:
+    #         print(f"Error reading file: {e}")
+    #         return None
     
+    def to_path(self, fullpath:str=None,use_local=True):
+        if not fullpath:
+            filename = self._to_filename()
+            fullpath=FXTransactWrapper.mkpath("json",use_local,fn=filename)
+        try:
+            with open(fullpath, 'w') as f:
+                f.write(self.tojson())
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+      
     
     def tojsonfile(self, filename:str=None,use_local=True):
         if not filename:
@@ -783,15 +868,6 @@ class FXTransactWrapper:
             orders=FXOrders(orders)
         )
     
-    @staticmethod
-    def from_path(filename:str):
-        try:
-            with open(filename,"r") as f:
-                json_string = f.read()
-                return FXTransactWrapper.fromjsonstring(json_string)
-        except Exception as e:
-            print(f"Error reading file: {e}")
-            return None
     
     @staticmethod
     def fromyamlfile(filename:str):
@@ -828,19 +904,20 @@ class FXTransactDataHelper:
         if str_table == "trades":
             savefile = fn+"trades.json"
         
-        saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        saved_file_fix = sanitize_filename(savefile)
         
-        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
+        save_fullpath=jgtfxhelper.mkfn_cfxdata_filepath(saved_file_fix,use_local)
        
-        
-        fxtransactwrapper.tojsonfile(save_fullpath)
+        #@STCIssue HOW TO SAVE THE DATA WELL
+        #fxtransactwrapper.tojsonfile(save_fullpath)
+        fxtransactwrapper.to_path(save_fullpath,use_local)
         if not OUTPUT_YAML_DISABLED:
             fxtransactwrapper.toyamlfile(saved_file_fix.replace(".json",".yaml"))
         if not quiet:print("FXTransact saved to file: "+saved_file_fix)
         return saved_file_fix
     
     @staticmethod
-    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str= "fxorder_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
+    def save_fxorder_to_file(fxorder:FXOrder,str_connection:str="",save_prefix:str=ORDER_FILE_PREFIX,prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -851,9 +928,9 @@ class FXTransactDataHelper:
         if str_instrument:
             savefile = fn+str_instrument.replace("/","-")+".json"
 
-        saved_file_fix = savefile.replace("_.",".").replace("__","_")
+        saved_file_fix = sanitize_filename(savefile)
         
-        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
+        save_fullpath=jgtfxhelper.mkfn_cfxdata_filepath(saved_file_fix,use_local)
         
         fxorder.tojsonfile(save_fullpath)
         if not OUTPUT_YAML_DISABLED:
@@ -862,7 +939,7 @@ class FXTransactDataHelper:
         return saved_file_fix
     
     @staticmethod
-    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str= "fxtrade_",prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
+    def save_fxtrade_to_file(fxtrade:FXTrade,str_connection:str="",save_prefix:str=TRADE_FILE_PREFIX,prefix_to_connection:bool=True,str_order_id=None,str_instrument=None,quiet=True,use_local=True):
         connection_prefix = str_connection.lower()+"_" if prefix_to_connection else ""
         
         fn = connection_prefix+save_prefix
@@ -873,8 +950,8 @@ class FXTransactDataHelper:
         if str_instrument:
             savefile = fn+str_instrument.replace("/","-")+".json"
 
-        saved_file_fix = savefile.replace("_.",".").replace("__","_")
-        save_fullpath=_mkfn_cfxdata_filepath(saved_file_fix,use_local)
+        saved_file_fix = sanitize_filename(savefile)
+        save_fullpath=jgtfxhelper.mkfn_cfxdata_filepath(saved_file_fix,use_local)
         
         fxtrade.tojsonfile(save_fullpath)
         if not quiet:print("FXTrade saved to file: "+saved_file_fix)
@@ -894,7 +971,7 @@ class FXTransactDataHelper:
     def load_fxorder_from_id(id:str):
         try:
             prefix = ORDER_FILE_PREFIX
-            filename=_mkfn_cfxdata_filepath(prefix+id+".json")
+            filename=jgtfxhelper.mkfn_cfxdata_filepath(prefix+id+".json")
             if not os.path.exists(filename):
                 prefix=FXTRANSAC_FILE_PREFIX+"_"
             if not os.path.exists(filename):

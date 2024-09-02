@@ -44,6 +44,12 @@ def create_filestore_path(
         fpath = fpath.replace("/", "\\")
     return fpath
 
+def fix_timeframed_path(timeframe, original_path):
+    if timeframe=="m1":
+        updated_path = original_path.replace("m1","mi1")
+    else:
+        updated_path = original_path
+    return updated_path
 
 def mk_fn(instrument:str, 
           timeframe:str, 

@@ -102,7 +102,7 @@ def instruments_to_dict():
 
 
 from jgtos import ensure_directory_exists, fix_path_ext, mkfn_cdata_filepath
-from jgtcliconstants import JGT_FXDATA_NS
+from jgtcliconstants import JGT_FXDATA_NS,JGT_HOOK_NS
 from jgtos import get_data_path
 def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
     #.replace(f".{ext}.{ext}",f".{ext}")
@@ -118,3 +118,20 @@ def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
     #ensure_directory_exists(cleaned_filepath)
     return cleaned_filepath
 
+
+
+def is_entry_stop_valid(entry_rate,stop_rate,bs):
+    """
+    Entry Rate and Stop Rate validation
+    
+    """
+    if bs=="S":
+        if entry_rate<stop_rate:
+            return True
+        else:
+            return False
+    elif bs=="B":
+        if entry_rate>stop_rate:
+            return True
+        else:
+            return False
