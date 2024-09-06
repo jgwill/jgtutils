@@ -2122,7 +2122,7 @@ def read_fx_str_from_config(demo=False)->tuple[str,str,str,str,str]:
 
 
 
-def is_market_open(current_time=None):
+def is_market_open(current_time=None,exit_cli_if_closed=False,market_closed_callback=None):
     if current_time is None:
         current_time = datetime.utcnow()
 
@@ -2143,5 +2143,10 @@ def is_market_open(current_time=None):
             return True
     elif 0 <= current_day < 4:  # Monday to Thursday
         return True
-
+    if market_closed_callback is not None:
+        market_closed_callback()
+    if exit_cli_if_closed:
+        from jgterrorcodes import MARKET_CLOSED_EXIT_ERROR_CODE
+        print("Market is closed.")
+        sys.exit(MARKET_CLOSED_EXIT_ERROR_CODE)
     return False
