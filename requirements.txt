@@ -1,3 +1,5 @@
 python-dotenv
 tlid
+PyYAML
 ruamel.yaml
+numpy

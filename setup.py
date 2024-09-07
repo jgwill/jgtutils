@@ -11,14 +11,11 @@ def read_version():
 
 version = read_version()
 
-INSTALL_REQUIRES = [
-    'tlid>=0.1.15',
-]
 setup(
     name='jgtutils',
     version=version,
     packages=find_packages(),
-    install_requires=INSTALL_REQUIRES,
+    #install_requires=INSTALL_REQUIRES,
     description='A utility package common to other JGT projects.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
