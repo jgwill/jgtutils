@@ -40,6 +40,7 @@ import tlid
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from jgtenv import load_env
+from jgtpov import i2fn,t2fn,fn2i,fn2t
 
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
@@ -1578,6 +1579,10 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     
     args=__quiet__post_parse()
     
+    if args.instrument and isinstance(args.instrument, str):
+        setattr(args, 'instrument', fn2i(args.instrument) )
+    if args.timeframe and isinstance(args.timeframe, str):
+        setattr(args, 'timeframe', fn2t(args.timeframe) )
     
     # OTHER DEPENDENT RULES
 
@@ -1598,6 +1603,9 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__json_post_parse()   
     args=__jgtclirqdata_post_parse()
     args=_demo_flag()
+    
+    if args.instrument and isinstance(args.instrument, str):
+        setattr(args, 'instrument', fn2i(args.instrument) )
     return args
 
     
