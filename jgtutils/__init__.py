@@ -16,7 +16,7 @@ import jgtcommon as common
 import jgtos as jos
 import jgtpov as pov
 import jgtwslhelper as wsl
-from jgtcommon import readconfig,new_parser,parse_args,load_settings,get_settings
+from jgtcommon import readconfig,new_parser,parse_args,load_settings,get_settings,dt_from_last_week_as_string_fxformat as dt_from_last_week
 from jgtpov import calculate_tlid_range as get_tlid_range
 from FXTransact import (FXTransactDataHelper as ftdh,
                         FXTransactWrapper as ftw)

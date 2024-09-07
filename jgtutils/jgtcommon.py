@@ -25,7 +25,7 @@ import os
 import sys
 import traceback
 #import logging
-from datetime import datetime, time, timezone
+from datetime import datetime, time, timezone, timedelta
 from enum import Enum
 from typing import List
 
@@ -2150,3 +2150,13 @@ def is_market_open(current_time=None,exit_cli_if_closed=False,market_closed_call
         print("Market is closed.")
         sys.exit(MARKET_CLOSED_EXIT_ERROR_CODE)
     return False
+
+def dt_from_last_week_as_datetime():
+    today = datetime.now()
+    last_week = today - timedelta(days=7)
+    return last_week
+
+def dt_from_last_week_as_string_fxformat():
+    last_week = dt_from_last_week_as_datetime()
+    _str=last_week.strftime('%m.%d.%Y')
+    return _str + " 00:00:00"
