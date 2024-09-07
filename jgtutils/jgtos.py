@@ -6,7 +6,8 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 def ensure_directory_exists(filepath):
     #detect if the filepath is a directory or a file and if a file is supplied, create the directory where the file will be saved
-    if os.path.isfile(filepath):
+    is_probably_a_filepath = filepath[-4] == "."
+    if os.path.isfile(filepath) or is_probably_a_filepath:
         directory = os.path.dirname(filepath)
     else:
         directory = filepath
