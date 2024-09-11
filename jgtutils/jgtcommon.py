@@ -1580,12 +1580,12 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__quiet__post_parse()
     
     try:
-        if args.instrument and isinstance(args.instrument, str):
+        if hasattr(args,"instrument") and args.instrument and isinstance(args.instrument, str):
             setattr(args, 'instrument', fn2i(args.instrument) )
     except:
         pass
     try:
-        if args.timeframe and isinstance(args.timeframe, str):
+        if hasattr(args,"timeframe") and args.timeframe and isinstance(args.timeframe, str):
             setattr(args, 'timeframe', fn2t(args.timeframe) )
     except:
         pass
