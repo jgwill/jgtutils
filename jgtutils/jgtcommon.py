@@ -938,6 +938,31 @@ def add_output_argument(parser: argparse.ArgumentParser=None,load_from_settings=
     
     return parser
 
+def add_input_file_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,add_f_alias=False)->argparse.ArgumentParser:
+    """
+    Adds an input file argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the input file argument to.
+        
+    Returns:
+        parser (argparse.ArgumentParser): The argument parser with the input file argument added.
+    """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    input_file_value=load_arg_default_from_settings(INPUT_FILE_ARGNAME,None,INPUT_FILE_ARGNAME_ALIAS) if load_from_settings else None
+    if add_f_alias:parser.add_argument('-f','-'+INPUT_FILE_ARGNAME_ALIAS,'--'+INPUT_FILE_ARGNAME,
+                        help='Input file PATH. ',
+                        default=input_file_value)
+    else:
+        parser.add_argument('-'+INPUT_FILE_ARGNAME_ALIAS,'--'+INPUT_FILE_ARGNAME,
+                        help='Input file PATH. ',
+                        default=input_file_value)
+    
+    return parser
+
 def add_compressed_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     """
     Adds an compressed argument to the given argument parser.
