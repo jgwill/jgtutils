@@ -71,7 +71,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       FULL_FLAG_ARGNAME,
                                       FULL_FLAG_ARGNAME_ALIAS,
                                       GATOR_OSCILLATOR_FLAG_ARGNAME,
-                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS, INSTRUMENT_ARGNAME, INSTRUMENT_ARGNAME_ALIAS, JSON_FLAG_ARGNAME, JSON_FLAG_ARGNAME_ALIAS,
+                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS, INPUT_FILE_ARGNAME, INPUT_FILE_ARGNAME_ALIAS, INSTRUMENT_ARGNAME, INSTRUMENT_ARGNAME_ALIAS, JSON_FLAG_ARGNAME, JSON_FLAG_ARGNAME_ALIAS,
                                       KEEP_BID_ASK_FLAG_ARGNAME,
                                       KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS, MD_FLAG_ARGNAME, MD_FLAG_ARGNAME_ALIAS,
                                       MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
@@ -86,7 +86,7 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, SELECTED_COLUMNS_ARGNAME, SELECTED_COLUMNS_ARGNAME_ALIAS, SELECTED_COLUMNS_GROUP_NAME, SELECTED_COLUMNS_HELP, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
                                       TALLIGATOR_FLAG_ARGNAME,
-                                      TALLIGATOR_FLAG_ARGNAME_ALIAS, TIMEFRAME_ARGNAME, TIMEFRAME_ARGNAME_ALIAS,
+                                      TALLIGATOR_FLAG_ARGNAME_ALIAS, TIMEFRAME_ARGNAME, TIMEFRAME_ARGNAME_ALIAS, TLID_DATETO_ARGNAME, TLID_DATETO_ARGNAME_ALIAS,
                                       TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
                                       TLID_RANGE_ARGNAME_ALIAS,
                                       TLID_RANGE_HELP_STRING, TRADEID_ARGNAME, TRADEID_ARGNAME_ALIAS)
@@ -766,6 +766,16 @@ def valid_datetime(check_future: bool):
             raise argparse.ArgumentTypeError(msg)
     return _valid_datetime
 
+def add_tlid_date_to_argumments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    #--ttlid which transform into to_dt
+    tlid_dateto_value=load_arg_default_from_settings(TLID_DATETO_ARGNAME,None,TLID_DATETO_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+TLID_DATETO_ARGNAME_ALIAS,'--'+TLID_DATETO_ARGNAME, metavar="TLID",
+                        help='The last dateto in TLID format',
+                        default=tlid_dateto_value)
+    return parser
 
 def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
@@ -1486,7 +1496,21 @@ def __crop_last_dt__post_parse()->argparse.Namespace:
     else:
         setattr(args, 'crop_last_dt', None)
     return args
-
+#tlid_dateto
+def __tlid_dateto__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    if hasattr(args, TLID_DATETO_ARGNAME):
+        if getattr(args, TLID_DATETO_ARGNAME) is not None:
+            try:
+                
+                dt_object=tlid.to_date(getattr(args, TLID_DATETO_ARGNAME))
+                setattr(args, TLID_DATETO_ARGNAME,dt_object )
+            except:
+                raise Exception("Invalid TLID DateTo format.  Use YYMMDDHHMM")
+    else:
+        setattr(args, 'crop_last_dt', None)
+    return args
 #@STCIssue We want this to Default to True and would be flagged to false by rm_bid_ask
 def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_argname = 'rmbidask')->argparse.Namespace:
     global args
@@ -1625,6 +1649,7 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__instruments_post_parse()
     
     args=__crop_last_dt__post_parse()
+    args=__tlid_dateto__post_parse()
     args=__verbose__post_parse()
     args=__quotescount__post_parse()
     args=__balligator_flag__post_parse()
@@ -2141,6 +2166,18 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
         #         config = json.load(file)
         # except:
         #     pass
+        if config is None:
+            try:
+                with open("/home/jgi/.jgt/config.json", 'r') as file:
+                    config = json.load(file)
+            except:
+                pass
+        if config is None:
+            try:                                                                                  
+                with open("/etc/jgt/config.json", 'r') as file:                             
+                    config = json.load(file)
+            except:
+                pass
                 
         if config is None:    
             raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")

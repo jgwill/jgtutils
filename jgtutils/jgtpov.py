@@ -257,3 +257,48 @@ def get_higher_tf_array1(t):
   
   arr = list(set(arr))
   return arr
+
+
+def i2fn(i):
+  """
+  Converts an input instrument string to a filename compatible string.
+  """
+  return i.replace("/", "-")
+
+def fn2i(ifn):
+  """
+  Converts a filename string to an instrument compatible string.
+  """
+  return ifn.replace("-", "/")
+
+def fn2t(t):
+  """
+  Converts an input timeframe filename to a timeframe compatible string. 
+  """
+  t_fix=t if t != "mi1" else t.replace("mi1","m1")
+  t_fix=t_fix if t_fix != "min1" else t_fix.replace("min1","m1")
+  
+  return t_fix
+
+def t2fn(t):
+  """
+  Converts an input timeframe string to a filename compatible string.
+  """
+  t_fix=t if t != "m1" else t.replace("m1","mi1")
+  return t_fix
+
+def topovfn(i,t,separator="_"):
+  """
+  Returns the filename for the given instrument and timeframe.
+  """
+  return f"{i2fn(i)}{separator}{t2fn(t)}"
+
+def fn2pov(fn,separator="_")->tuple:
+  """
+  Converts a filename string to a pov compatible string.
+  """
+  arr=fn.split(separator)
+  i:str=fn2i(arr[0])
+  t:str=fn2t(arr[1])
+  return i,t
+  
