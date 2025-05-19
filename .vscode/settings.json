@@ -17,6 +17,7 @@
   ],
   "python.analysis.ignore": [
     "build/**",
-    "dist/**"
+    "dist/**",
+    "/home/jgi/.local/lib/python3.10/site-packages/jgtutils/**"
   ]
 }

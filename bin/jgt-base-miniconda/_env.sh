@@ -14,9 +14,9 @@ xmount2=$HOME/.jgt/settings.json:/root/.jgt/settings.json
 #xmount2=/var:/a/var
 
 
-dkcommand=bash #command to execute (default is the one in the dockerfile)
+dkcommand=/upbash.sh #command to execute (default is the one in the dockerfile)
 
-dkextra=" -v $(realpath $(pwd)/../../):/app "
+dkextra=" -v $(realpath $(pwd)/../../):/app -v $(pwd)/upjgt.sh:/upjgt.sh -v $(pwd)/upbash.sh:/upbash.sh "
 #dkextra=" -v \$dworoot/x:/x -p 2288:2288 "
 
 #dkmounthome=true

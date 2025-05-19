@@ -17,7 +17,7 @@ USER user
 ENV HOME=/home/user
 RUN mkdir $HOME/.cache $HOME/.config \
 && chmod -R 777 $HOME
-
+RUN echo "export PATH=$PATH:/home/user/miniconda/bin" >> $HOME/.bashrc
 
 
 
@@ -32,6 +32,15 @@ RUN curl -sLo ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-py31
 
 
 RUN pip install -U pip
+RUN pip install -U ruamel.yaml PyYAML
+RUN pip install -U tlid
 
+USER root
+COPY upjgt.sh /upjgt.sh
+RUN chmod +x /upjgt.sh
+COPY upjgt.sh /upbash.sh
+RUN chmod +x /upbash.sh
 #RUN pip install -U jgtfxcon
+USER user
+
 WORKDIR /work
