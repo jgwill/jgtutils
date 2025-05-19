@@ -4,7 +4,17 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-
+def ensure_directory_exists(filepath):
+    #detect if the filepath is a directory or a file and if a file is supplied, create the directory where the file will be saved
+    is_probably_a_filepath = filepath[-4] == "."
+    if os.path.isfile(filepath) or is_probably_a_filepath:
+        directory = os.path.dirname(filepath)
+    else:
+        directory = filepath
+    #directory = os.path.dirname(filepath)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+    return directory
 
 def create_filestore_path(
     instrument:str, 
@@ -35,6 +45,12 @@ def create_filestore_path(
         fpath = fpath.replace("/", "\\")
     return fpath
 
+def fix_timeframed_path(timeframe, original_path):
+    if timeframe=="m1":
+        updated_path = original_path.replace("m1","mi1")
+    else:
+        updated_path = original_path
+    return updated_path
 
 def mk_fn(instrument:str, 
           timeframe:str, 
@@ -267,3 +283,42 @@ def tlidmin_to_dt(tlid_str: str):
         pass
     
     return None
+
+from jgtcliconstants import JGT_DATA_DIR,JGT_DATA_SUBDIRDIR
+def mkfn_cdata_filepath(fn,*args):
+    cdata_jgt_dir = os.path.join(os.getcwd(),JGT_DATA_DIR,JGT_DATA_SUBDIRDIR,*args)
+    os.makedirs(cdata_jgt_dir, exist_ok=True)
+    cfilepath=os.path.join(cdata_jgt_dir,fn)
+    return cfilepath
+
+def fix_path_ext(ext, fpath,double_underscore=False):
+    """
+    Fixes the file path extension.
+
+    Parameters:
+    ext (str): The desired extension to replace the existing extension.
+    fpath (str): The file path to be fixed.
+
+    Returns:
+    str: The fixed file path with the desired extension.
+    """
+    if ext is None: # get the ext from the fn
+        ext = fpath.split(".")[-1]
+        if ext == fpath:
+            raise Exception(f"No extension found in the file path: {fpath}")
+        #print(ext)
+
+    #check if the ext is already in the fpath
+    if not fpath.endswith(f".{ext}"):
+        fpath = f"{fpath}.{ext}"
+        
+    return sanitize_filename(fn=fpath,ext=ext,double_underscore=double_underscore)#fpath.replace(f".{ext}.{ext}",f".{ext}")
+
+
+def sanitize_filename( fn,ext=None,double_underscore=True):
+    if ext is None: # get the ext from the fn
+        ext = fn.split(".")[-1]
+    _sanitized_filename = fn.replace("_.",".").replace(f".{ext}.{ext}",f".{ext}")
+    if double_underscore:
+        _sanitized_filename=_sanitized_filename.replace("__","_")
+    return _sanitized_filename

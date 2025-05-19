@@ -10,6 +10,238 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal"
-    }
+    },
+    {
+      "name": "jgtset_conf_update",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_jgtset_config_update_yaml.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "jgtsettingscli_03_Y",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-Y"
+    },
+    {
+      "name": "jgtsettingscli_04_NO_U",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "jgtsettingscli_04_U",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-U"
+    },
+    {
+      "name": "jgtsettingscli_04_E",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E"
+    },
+    {
+      "name": "jgtsettingscli_04_U_Reset",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-U -R"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O_CusPath2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -S -O myenv.output -ls _jgtset_included.json"
+    },
+    {
+      "name": "jgtsettingscli_E",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E"
+    },
+    {
+      "name": "jgtsettingscli_E_YML",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -O myenv.output"
+    },
+    {
+      "name": "jgtsettingscli_E_YML_O_CusPath",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -Y -O myenv.output -ls tests/_jgtset_included.json"
+    },
+    {
+      "name": "jgtsettingscli_E_JSON",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/jgtset.py",
+      "console": "integratedTerminal",
+      "args": "-E -J"
+    },
+    {
+      "name": "Setting_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings.py",
+      "console": "integratedTerminal",
+      "args": "-ls /b/Dropbox/jgt/src/samples/jgt_settings_01.json"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "--demo"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_Real",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "--real"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_demo.json"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS_RealOn",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_real_on.json"
+    },
+    {
+      "name": "DemoReal_Setting_cli_test_2408_LS_DemoOn",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_settings_demo_real.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_07_demo_on.json"
+    },
+    {
+      "name": "timeframes_from_settings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/jgt_settings_04_timeframes.json"
+    },
+    {
+      "name": "II_incli",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "II_incli2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "pov_not_req01",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": ""
+    },
+    {
+      "name": "pov_not_req02",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": "--instrument EUR/CAD,AUD/CAD"
+    },
+    {
+      "name": "pov_not_req02b",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_pov_not_required.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD,AUD/CAD,SPX500 -t H1,m15"
+    },
+    {
+      "name": "patterns_from_settings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_patterns.py",
+      "console": "integratedTerminal",
+      "args": "-pls -json"
+    },
+    {
+      "name": "tf_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD -t D1,W1,H4"
+    },
+    {
+      "name": "tf1_cli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_timeframes.py",
+      "console": "integratedTerminal",
+      "args": "-i EUR/CAD -t D1"
+    },
+    {
+      "name": "Setting_jgtfxcli_test_2408",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_jgtfxcli_helper.py",
+      "console": "integratedTerminal",
+      "args": "-ls tests/test_settings_01_spec_instrument_timeframe.json"
+    },
+    {
+      "name": "cli_test_cronrun_helper01",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "jgtutils/cli_test_cronrun_helper.py",
+      "console": "integratedTerminal",
+      "args": "-t m5"
+    },
   ]
 }

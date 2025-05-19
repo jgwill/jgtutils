@@ -19,11 +19,13 @@
 
 import argparse
 import json
+import ruamel.yaml;yaml = ruamel.yaml.YAML()
+
 import os
 import sys
 import traceback
 #import logging
-from datetime import datetime, time
+from datetime import datetime, time, timezone, timedelta
 from enum import Enum
 from typing import List
 
@@ -37,15 +39,17 @@ import tlid
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtenv import load_env
+from jgtpov import i2fn,t2fn,fn2i,fn2t
+
 from jgtos import (tlid_dt_to_string, tlid_range_to_jgtfxcon_start_end_str,
                    tlid_range_to_start_end_datetime, tlidmin_to_dt)
 
-from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
+from jgtclihelper import add_exiting_quietly
+from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_BARS_TITLE,
                                       ARG_GROUP_CLEANUP_DESCRIPTION,
-                                      ARG_GROUP_CLEANUP_TITLE,
-                                      ARG_GROUP_INDICATOR_DESCRIPTION,
-                                      ARG_GROUP_INDICATOR_TITLE,
+                                      ARG_GROUP_CLEANUP_TITLE, ARG_GROUP_INDICATOR_DESCRIPTION, ARG_GROUP_INDICATOR_TITLE,
                                       ARG_GROUP_INTERACTION_DESCRIPTION,
                                       ARG_GROUP_INTERACTION_TITLE,
                                       ARG_GROUP_OUTPUT_DESCRIPTION,
@@ -57,7 +61,7 @@ from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_DESCRIPTION,
                                       ARG_GROUP_VERBOSITY_TITLE,
                                       BALLIGATOR_FLAG_ARGNAME,
-                                      BALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      BALLIGATOR_FLAG_ARGNAME_ALIAS, BUYSELL_ARGNAME, BUYSELL_ARGNAME_ALIAS, DATEFROM_ARGNAME, DATEFROM_ARGNAME_ALIAS, DATETO_ARGNAME, DATETO_ARGNAME_ALIAS,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME,
                                       DONT_DROPNA_VOLUME_FLAG_ARGNAME_ALIAS,
                                       DROPNA_VOLUME_FLAG_ARGNAME,
@@ -67,25 +71,25 @@ from jgtutils.jgtcliconstants import (ARG_GROUP_BARS_DESCRIPTION,
                                       FULL_FLAG_ARGNAME,
                                       FULL_FLAG_ARGNAME_ALIAS,
                                       GATOR_OSCILLATOR_FLAG_ARGNAME,
-                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
+                                      GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS, INPUT_FILE_ARGNAME, INPUT_FILE_ARGNAME_ALIAS, INSTRUMENT_ARGNAME, INSTRUMENT_ARGNAME_ALIAS, JSON_FLAG_ARGNAME, JSON_FLAG_ARGNAME_ALIAS,
                                       KEEP_BID_ASK_FLAG_ARGNAME,
-                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS, MD_FLAG_ARGNAME, MD_FLAG_ARGNAME_ALIAS,
                                       MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
                                       NO_MFI_FLAG_ARGNAME,
                                       NO_MFI_FLAG_ARGNAME_ALIAS,
                                       NOT_FRESH_FLAG_ARGNAME,
                                       NOT_FRESH_FLAG_ARGNAME_ALIAS,
                                       NOT_FULL_FLAG_ARGNAME,
-                                      NOT_FULL_FLAG_ARGNAME_ALIAS,
+                                      NOT_FULL_FLAG_ARGNAME_ALIAS, ORDERID_ARGNAME, ORDERID_ARGNAME_ALIAS, OUTPUT_ARGNAME, OUTPUT_ARGNAME_ALIAS, PIPS_ARGNAME, PN_ARGNAME, PN_ARGNAME_ALIAS, PN_COLUMN_LIST_ARGNAME, PN_COLUMN_LIST_ARGNAME_ALIAS, PN_GROUP_NAME, PN_LIST_FLAG_ARGNAME, PN_LIST_FLAG_ARGNAME_ALIAS,
                                       QUOTES_COUNT_ARGNAME,
-                                      QUOTES_COUNT_ARGNAME_ALIAS,
+                                      QUOTES_COUNT_ARGNAME_ALIAS, RATE_ARGNAME, RATE_ARGNAME_ALIAS, REAL_FLAG_ARGNAME,
                                       REMOVE_BID_ASK_FLAG_ARGNAME,
-                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,
+                                      REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS, SELECTED_COLUMNS_ARGNAME, SELECTED_COLUMNS_ARGNAME_ALIAS, SELECTED_COLUMNS_GROUP_NAME, SELECTED_COLUMNS_HELP, STOP_ARGNAME, STOP_ARGNAME_ALIAS,
                                       TALLIGATOR_FLAG_ARGNAME,
-                                      TALLIGATOR_FLAG_ARGNAME_ALIAS,
+                                      TALLIGATOR_FLAG_ARGNAME_ALIAS, TIMEFRAME_ARGNAME, TIMEFRAME_ARGNAME_ALIAS, TLID_DATETO_ARGNAME, TLID_DATETO_ARGNAME_ALIAS,
                                       TLID_RANGE_ARG_DEST, TLID_RANGE_ARGNAME,
                                       TLID_RANGE_ARGNAME_ALIAS,
-                                      TLID_RANGE_HELP_STRING)
+                                      TLID_RANGE_HELP_STRING, TRADEID_ARGNAME, TRADEID_ARGNAME_ALIAS)
 
 args:argparse.Namespace=None # Default args when we are done parsing
 try :
@@ -118,6 +122,10 @@ except:
     default_parser = argparse.ArgumentParser(description='JGWill Trading Utilities')
     pass
 
+
+
+settings: dict = None
+
 # try:
 #     #indicator's group
 #     indicator_group = default_parser.add_argument_group(INDICATOR_GROUP_TITLE, 'Indicators to use in the processing.')
@@ -125,10 +133,205 @@ except:
 # except:
 #     pass
 
+def _load_settings_from_path(path):
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            loaded_data = json.load(f)
+            return loaded_data
+    return {}
 
-def new_parser(description: str,epilog: str=None,prog: str=None)->argparse.ArgumentParser:
+def _load_settings_from_path_yaml(path,key=None):
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            if key is not None:
+                try:
+                    yaml_value = yaml.load(f)
+                except yaml.YAMLError as exc:
+                    print(exc)
+                if yaml_value is not None and key in yaml_value:
+                    return yaml_value[key]
+                else:
+                    return {}
+            yaml_data = yaml.load(f)
+            if yaml_data is None:
+                return {}
+            return yaml_data
+    return {}
+def load_settings(custom_path=None,old=None):
+    global args
+    if custom_path is None and args is not None and hasattr(args,SETTING_ARGNAME):
+        custom_path = getattr(args,SETTING_ARGNAME,None)
+    
+    system_settings_path = os.path.join('/etc', 'jgt', 'settings.json')
+    home_settings_path = os.path.join(os.path.expanduser('~'), '.jgt', 'settings.json')
+    current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.json')
+    yaml_current_settings_path = os.path.join(os.getcwd(), '.jgt', 'settings.yml')
+    jgt_yaml_current_settings_path = os.path.join(os.getcwd(), 'jgt.yml')
+    jubook_jgt_yaml_current_settings_path = os.path.join(os.getcwd(), '_config.yml')
+    
+    _settings={}
+    if old is not None:
+        _settings=old
+    
+    
+    system_settings=_load_settings_from_path(system_settings_path)
+     # Merge settings
+    update_settings(_settings, system_settings)
+
+    #load json from env JGT_SETTINGS if exist
+    if 'JGT_SETTINGS_SYSTEM' in os.environ:
+        env_settings_system=json.loads(os.environ['JGT_SETTINGS_SYSTEM'])
+        update_settings(_settings, env_settings_system)
+        
+    
+    user_settings = _load_settings_from_path(home_settings_path)
+     # Merge settings, with user directory settings taking precedence
+    update_settings(_settings, user_settings)
+    
+    if 'JGT_SETTINGS' in os.environ:
+        env_settings_user=json.loads(os.environ['JGT_SETTINGS'])
+        update_settings(_settings, env_settings_user)
+    
+    if 'JGT_SETTINGS_USER' in os.environ:
+        env_settings_user=json.loads(os.environ['JGT_SETTINGS_USER'])
+        update_settings(_settings, env_settings_user)
+    
+    
+    current_settings = _load_settings_from_path(current_settings_path)    
+    # Merge settings, with current directory settings taking precedence
+    update_settings(_settings, current_settings)
+    
+    current_settings_yaml = _load_settings_from_path_yaml(yaml_current_settings_path)
+    update_settings(_settings, current_settings_yaml)
+    
+    
+    jubook_jgt_current_settings_yaml = _load_settings_from_path_yaml(jubook_jgt_yaml_current_settings_path,key='jgt')
+    update_settings(_settings, jubook_jgt_current_settings_yaml)
+    
+    jgt_current_settings_yaml = _load_settings_from_path_yaml(jgt_yaml_current_settings_path)
+    update_settings(_settings, jgt_current_settings_yaml)
+    
+    if custom_path is not None and custom_path != '':
+        custom_settings={}
+        if '.json' in custom_path:
+            custom_settings = _load_settings_from_path(custom_path)
+        else:
+            if '.yml' in custom_path:
+                custom_settings = _load_settings_from_path_yaml(custom_path)
+        update_settings(_settings, custom_settings)
+    
+    if 'JGT_SETTINGS_PROCESS' in os.environ:
+        env_settings_process=json.loads(os.environ['JGT_SETTINGS_PROCESS'])
+        update_settings(_settings,env_settings_process )
+    
+    _settings_loaded(_settings)
+    
+    return _settings
+
+def update_settings(old_settings, new_settings,keys=['patterns']):
+    #if our old settings has a key in our keys list, then we will update it on their own (meaning we will not merge it directly but update it independently)
+    for key in keys:
+        if key in old_settings:
+            tst_key_value_old=old_settings[key]
+            if new_settings is not None and key in new_settings:
+                test_if_key_not_none = new_settings[key]
+                if test_if_key_not_none is not None:
+                    old_settings[key].update(new_settings[key])
+                #new_settings.pop(key)
+                tst_key_value_new=old_settings[key]
+                #remove the key from the new settings
+                new_settings.pop(key)
+                #print("Updated key: "+key)
+    if new_settings is not None:
+        old_settings.update(new_settings)
+    #print("Updated settings")
+
+def _settings_loaded(_settings):
+    return
+
+def get_settings(custom_path=None)->dict:
+    global settings
+    if settings is None or len(settings)==0:
+        settings = load_settings(custom_path=custom_path)
+    return settings
+
+def load_arg_default_from_settings(argname:str,default_value,alias:str=None,from_jgt_env=False,exclude_env_alias=False):
+    global settings
+    if settings is None or len(settings)==0:
+        settings=load_settings()
+    
+    _value = settings.get(argname,default_value)
+    if alias is not None and _value==default_value:
+        _value = settings.get(alias,default_value) #try alias might be used
+    
+    if from_jgt_env:
+        _alias=None if exclude_env_alias else alias
+        _value = load_arg_from_jgt_env(argname, _alias)
+    
+    return _value
+
+def load_arg_from_jgt_env(argname, alias=None):
+    _value=None
+    loaded=load_env()
+        #if loaded:
+    if argname in os.environ :
+        #or alias in os.environ:
+        _value = os.getenv(argname,None)
+    if alias is not None and _value is None:
+        _value = os.getenv(alias,None)
+    return _value
+
+def load_arg_default_from_settings_if_exist(argname:str,alias:str=None):
+    global settings
+    if settings is None or len(settings)==0:
+        settings=load_settings()
+    
+    _value = settings.get(argname,None)
+    if alias is not None and _value==None:
+        _value = settings.get(alias,None) #try alias might be used
+    return _value
+
+def add_settings_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
+    if parser is None:
+        parser=default_parser
+    try:
+        parser.add_argument('-'+SETTING_ARGNAME_ALIAS,'--'+SETTING_ARGNAME,
+                        type=str,
+                            help='Load settings from a specific settings file (overrides default settings (/etc/jgt/settings.json and HOME/.jgt/settings.json and .jgt/settings.json)).',
+                            required=False)
+    #argparse.ArgumentError: argument -ls/--settings: conflicting option strings: -ls, --settings
+    except argparse.ArgumentError as e:
+        if not 'argument -ls/--settings: conflicting option strings: -ls, --settings' in str(e):
+            raise e
+        pass
+
+    return parser
+
+def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
+    global default_parser,settings
+    if parser is None:
+        parser=default_parser
+    
+    args, unknown = parser.parse_known_args()
+    custom_path = getattr(args,SETTING_ARGNAME,None)
+    settings = load_settings(custom_path)
+    
+    return parser
+
+def new_parser(description: str,epilog: str=None,prog: str=None,enable_specified_settings=True,add_exiting_quietly_flag=False,exiting_quietly_message:str=None,exiting_quietly_handler=None)->argparse.ArgumentParser:
+    global default_parser
+    if add_exiting_quietly_flag or exiting_quietly_handler is not None:
+        #print("We are adding exiting quietly")
+        add_exiting_quietly(exiting_quietly_message,exiting_quietly_handler)
+        
     default_parser = argparse.ArgumentParser(description=description,epilog=epilog,prog=prog)
+    
+    if enable_specified_settings:
+        default_parser=add_settings_argument(default_parser)
+        if not '--help' in sys.argv:
+            default_parser=_preload_settings_from_args(default_parser)
+    
     return default_parser
 
 # Get a group by its title
@@ -148,11 +351,13 @@ def init_default_parser(description: str):
 
 
 
-def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true",group_title="",group_description=""):
+def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str, parser: argparse.ArgumentParser,_action_value="store_true",group_title="",group_description="",load_default_from_settings=True,flag_default_value=False):
 
 
     __alias_cmd_prefix = "-"
     __full_arg_prefix = "--"
+    
+    __flag_setting_value=load_arg_default_from_settings(_argname_full,flag_default_value)
     
     _argname_alias = __alias_cmd_prefix+_argname_alias
     _argname_full = __full_arg_prefix+_argname_full
@@ -162,6 +367,7 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
         _argname_full,
         action=_action_value,
         help=_description,
+        default=__flag_setting_value
         )
     else:
         #try get group name or create it.
@@ -171,6 +377,7 @@ def _add_a_flag_helper(_description:str,  _argname_alias:str, _argname_full:str,
             _argname_full,
             action=_action_value,
             help=_description,
+            default=__flag_setting_value
         )
     
     return parser
@@ -230,100 +437,305 @@ def add_candle_open_price_mode_argument(parser: argparse.ArgumentParser=None)->a
                         of O2GCandleOpenPriceMode enumeration. Optional parameter.')
     return parser
 
-def add_demo_flag_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtcliconstants import (DEMO_FLAG_ARGNAME)
+
+def add_demo_flag_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False,from_jgt_env=False)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('--demo',
+    
+    type_of_account_group=_get_group_by_title(parser,"Type of Account","Real or Demo")
+    
+    demo_value = load_arg_default_from_settings_if_exist(DEMO_FLAG_ARGNAME,"demo_arg") 
+    if from_jgt_env:
+        demo_value = load_arg_from_jgt_env(DEMO_FLAG_ARGNAME,"demo_arg")
+    #if load_default_from_settings else flag_default_value
+    real_value = load_arg_default_from_settings_if_exist(REAL_FLAG_ARGNAME) 
+    if from_jgt_env:
+        real_value = load_arg_from_jgt_env(REAL_FLAG_ARGNAME)
+    
+    #turn "--demo" into True
+    if demo_value is not None and isinstance(demo_value,str) :
+        _value:str=demo_value
+        if _value.lower() == "true" or _value.lower() == "1" or _value.lower() == "--demo" or _value.lower() == "-demo" or _value.lower() == "demo":
+            demo_value=True
+        elif _value.lower() == "false" or _value.lower() == "0" or _value.lower() == "--real" or _value.lower() == "-real" or _value.lower() == "real":
+            demo_value=False
+    #support real=1 or real=0
+    if real_value is not None and isinstance(real_value,str) :
+        if real_value.lower() == "true" or real_value.lower() == "1" or real_value.lower() == "--real" or real_value.lower() == "-real" or real_value.lower() == "real":
+            real_value=True
+        elif real_value.lower() == "false" or real_value.lower() == "0" or real_value.lower() == "--demo" or real_value.lower() == "-demo" or real_value.lower() == "demo":
+            real_value=False
+            
+    if real_value is not None and real_value:
+        demo_value=False
+    elif real_value is not None and not real_value:
+        demo_value=True
+    
+    
+    
+    type_of_excl=type_of_account_group.add_mutually_exclusive_group()
+    type_of_excl.add_argument('-'+DEMO_FLAG_ARGNAME,'--'+DEMO_FLAG_ARGNAME,
                         action='store_true',
-                        help='Use the demo server. Optional parameter.')
+                        help='Use the demo server. Optional parameter.',
+                        default=demo_value)
+    type_of_excl.add_argument('-'+REAL_FLAG_ARGNAME,'--'+REAL_FLAG_ARGNAME,
+                        action='store_true',
+                        help='Use the real server. Optional parameter.',
+                        default=real_value)
     return parser
 
-def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,add_IndicatorPattern=False):
+def add_instrument_timeframe_arguments(parser: argparse.ArgumentParser=None, timeframe: bool = True,load_instrument_from_settings=True,load_timeframe_from_settings=True, from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     
     global default_parser
+    instrument_required=True
+    
     if parser is None:
         parser=default_parser
     pov_group=_get_group_by_title(parser,ARG_GROUP_POV_TITLE,ARG_GROUP_POV_DESCRIPTION)
-    pov_group.add_argument('-i','--instrument',
+    instrument_setting_value=None 
+    if load_instrument_from_settings :
+        instrument_setting_value=load_arg_default_from_settings(INSTRUMENT_ARGNAME,None,alias=INSTRUMENT_ARGNAME_ALIAS)
+    if from_jgt_env: #Cascade to env with no alias by default
+        instrument_alias = INSTRUMENT_ARGNAME_ALIAS if not exclude_env_alias else None # we wont load from env var "i" by default
+        instrument_setting_value= load_arg_from_jgt_env(INSTRUMENT_ARGNAME,instrument_alias)
+    
+    if instrument_setting_value is not None:
+        instrument_required=False
+    
+    pov_group.add_argument('-'+INSTRUMENT_ARGNAME_ALIAS,'--'+INSTRUMENT_ARGNAME,
                         metavar="INSTRUMENT",
                         help='An instrument which you want to use in sample. \
-                                  For example, "EUR/USD".')
+                                  For example, "EUR/USD".',
+                                  default=instrument_setting_value,
+                                  required=instrument_required)
 
     if timeframe:
-        pov_group.add_argument('-t','--timeframe',
+        timeframe_required=True
+        timeframe_setting_value=None 
+        if load_timeframe_from_settings :
+            timeframe_setting_value=load_arg_default_from_settings(TIMEFRAME_ARGNAME,None,alias=TIMEFRAME_ARGNAME_ALIAS)
+        if from_jgt_env:
+            timeframe_alias = TIMEFRAME_ARGNAME_ALIAS if not exclude_env_alias else None
+            timeframe_setting_value= load_arg_from_jgt_env(TIMEFRAME_ARGNAME,timeframe_alias)
+        if timeframe_setting_value is not None:
+            timeframe_required=False
+            
+        pov_group.add_argument('-'+TIMEFRAME_ARGNAME_ALIAS,'--'+TIMEFRAME_ARGNAME,
                             metavar="TIMEFRAME",
                             help='Time period which forms a single candle. \
-                                      For example, m1 - for 1 minute, H1 - for 1 hour.')
-    if add_IndicatorPattern:
-        parser.add_argument('-ip',
-                        metavar="IndicatorPattern",
-                        required=False,
-                        help='The indicator Pattern. For example, \
-                                 "AOAC","JTL,"JTLAOAC","JTLAOAC","AOACMFI".')
+                                      For example, m1 - for 1 minute, H1 - for 1 hour.',
+                                      default=timeframe_setting_value,
+                                      required=timeframe_required)
+
     return parser
+
+def add_instrument_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    instrument_value=None
+    if load_from_settings :   
+        instrument_value=load_arg_default_from_settings(INSTRUMENT_ARGNAME,None,INSTRUMENT_ARGNAME_ALIAS,from_jgt_env=False)
+    if from_jgt_env: #Cascade to env with no alias by default
+        instrument_value= load_arg_from_jgt_env(INSTRUMENT_ARGNAME,INSTRUMENT_ARGNAME_ALIAS if not exclude_env_alias else None) 
     
+    if instrument_value is not None:
+        required=False #We might read it from env
+    parser.add_argument('-'+INSTRUMENT_ARGNAME_ALIAS,'--'+INSTRUMENT_ARGNAME,
+                        metavar="INSTRUMENT",
+                        help='An instrument which you want to use in sample. \
+                                  For example, "EUR/USD".',
+                                  default=instrument_value,
+                                  required=required)
+    return parser
 
-def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+TIMEFRAME_DEFAULT_STANDALONE = "D1"
+def add_timeframe_standalone_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False,load_default_timeframe=False,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-d','--bs', metavar="TYPE", required=True,
-                        help='The order direction. Possible values are: B - buy, S - sell.')
+    
+    timeframe_value=None
+    if load_from_settings :
+        timeframe_value=load_arg_default_from_settings(TIMEFRAME_ARGNAME,TIMEFRAME_DEFAULT_STANDALONE if load_default_timeframe else None,TIMEFRAME_ARGNAME_ALIAS,from_jgt_env=False) 
+    
+    if from_jgt_env: #Cascade to env with no alias by default
+        timeframe_value= load_arg_from_jgt_env(TIMEFRAME_ARGNAME,TIMEFRAME_ARGNAME_ALIAS if not exclude_env_alias else None)
+    
+    if timeframe_value is not None:
+        required=False #We might read it from env
+    parser.add_argument("-"+TIMEFRAME_ARGNAME_ALIAS,"--"+TIMEFRAME_ARGNAME, help="Timeframe", default=timeframe_value, required=required)
     return parser
 
-def add_rate_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+
+def add_direction_buysell_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True, required=True,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-r','--rate', metavar="RATE", required=True, type=float,
-                            help='Desired price of an entry order.')
+    
+    bs_value=None
+    if load_from_settings :
+        bs_value=load_arg_default_from_settings(BUYSELL_ARGNAME,None,BUYSELL_ARGNAME_ALIAS,from_jgt_env=False) 
+    if from_jgt_env: #Cascade to env with no alias by default
+        bs_value= load_arg_from_jgt_env(BUYSELL_ARGNAME,BUYSELL_ARGNAME_ALIAS if not exclude_env_alias else None)
+        #support env var direction
+        # if bs_value is None:
+        #     bs_value=load_arg_from_jgt_env("direction")
+        
+    if bs_value is not None:
+        required=False
+        if isinstance(bs_value,str) and  bs_value.lower() =="sell":
+            bs_value="S"
+        elif isinstance(bs_value,str) and  bs_value.lower() =="buy":
+            bs_value="B"
+    
+    
+    parser.add_argument('-'+BUYSELL_ARGNAME_ALIAS,'--'+BUYSELL_ARGNAME, metavar="TYPE", required=required,
+                        help='The order direction. Possible values are: B - buy, S - sell.',default=bs_value)
     return parser
 
-def add_stop_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_rate_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True, required=True,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-stop','--stop', metavar="STOP", required=True, type=float,
-                            help='Desired price of the stop order.')
+    
+    rate_value=None
+    if load_from_settings :
+        rate_value=load_arg_default_from_settings(RATE_ARGNAME,None,RATE_ARGNAME_ALIAS,from_jgt_env=False) 
+    if from_jgt_env: #Cascade to env with no alias by default
+        rate_value= load_arg_from_jgt_env(RATE_ARGNAME,RATE_ARGNAME_ALIAS if not exclude_env_alias else None)
+        
+    
+    if rate_value is not None:
+        required=False
+        if isinstance(rate_value,str):
+            rate_value=float(rate_value)
+    
+    parser.add_argument('-'+RATE_ARGNAME_ALIAS,'--'+RATE_ARGNAME, metavar="RATE", required=required, type=float,
+                            help='Desired price of an entry order.',
+                            default=rate_value)
     return parser
 
-def add_lots_arguments(parser):
-    parser.add_argument('-lots', metavar="LOTS", default=1, type=int,
+def add_stop_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,pips_flag=False,required=True,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    stop_value=None
+    if load_from_settings :
+        stop_value=load_arg_default_from_settings(STOP_ARGNAME,None,STOP_ARGNAME_ALIAS) 
+    if from_jgt_env: #Cascade to env with no alias by default
+        stop_value= load_arg_from_jgt_env(STOP_ARGNAME,STOP_ARGNAME_ALIAS if not exclude_env_alias else None)
+    
+    if stop_value is not None:
+        required=False
+        if isinstance(stop_value,str):
+            stop_value=float(stop_value)
+                          
+    parser.add_argument('-'+STOP_ARGNAME_ALIAS,'-'+STOP_ARGNAME,'--'+STOP_ARGNAME, metavar="STOP", required=required, type=float,
+                            help='Desired price of the stop order.',
+                            default=stop_value)
+    if pips_flag:
+        pips_value=load_arg_default_from_settings(PIPS_ARGNAME,False,from_jgt_env=from_jgt_env) if load_from_settings else False
+        parser.add_argument('-'+PIPS_ARGNAME,'--'+PIPS_ARGNAME,
+                        action='store_true',
+                        help='The value is in pips. Optional parameter.',default=pips_value)
+    return parser
+
+def add_lots_arguments(parser,load_from_settings=True,default_value = 1,from_jgt_env=False,exclude_env_alias=True):
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    lots_value=default_value
+    if load_from_settings :
+        lots_value=load_arg_default_from_settings(LOTS_ARGNAME,default_value,LOTS_ARGNAME_ALIAS) 
+    if from_jgt_env: #Cascade to env with no alias by default
+        _lots_value= load_arg_from_jgt_env(LOTS_ARGNAME,LOTS_ARGNAME_ALIAS if not exclude_env_alias else None)
+        lots_value=_lots_value if _lots_value is not None else lots_value
+    
+    if isinstance(lots_value,str):
+        lots_value=int(lots_value)
+        
+    parser.add_argument('-'+LOTS_ARGNAME_ALIAS,'-'+LOTS_ARGNAME,'--'+LOTS_ARGNAME, metavar="LOTS", default=lots_value, type=int,
                             help='Trade amount in lots.')
 
 def add_direction_rate_lots_arguments(parser: argparse.ArgumentParser=None, direction: bool = True, rate: bool = True,
-                                      lots: bool = True, stop: bool = True)->argparse.ArgumentParser:
+                                      lots: bool = True, stop: bool = True,load_from_settings=True,lots_default_value=1,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
 
     if direction:
-        add_direction_buysell_arguments(parser)
+        add_direction_buysell_arguments(parser,load_from_settings,from_jgt_env=from_jgt_env,exclude_env_alias=exclude_env_alias)
     if rate:
-        add_rate_arguments(parser)
+        add_rate_arguments(parser,load_from_settings,from_jgt_env=from_jgt_env,exclude_env_alias=exclude_env_alias)
     if lots:
-        add_lots_arguments(parser)
+        add_lots_arguments(parser,load_from_settings,lots_default_value,from_jgt_env=from_jgt_env,exclude_env_alias=exclude_env_alias)
     if stop:
-        add_stop_arguments(parser)
+        add_stop_arguments(parser,load_from_settings,from_jgt_env=from_jgt_env,exclude_env_alias=exclude_env_alias)
     
     return parser
 
 
-def add_orderid_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_orderid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=True,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-id','--orderid', metavar="OrderID", required=True,
-                        help='The order identifier.')
+    
+    orderid_value=None
+    if load_from_settings :
+        orderid_value=load_arg_default_from_settings(ORDERID_ARGNAME,None,ORDERID_ARGNAME_ALIAS) 
+    
+    if from_jgt_env: #Cascade to env with no alias by default
+        orderid_value= load_arg_from_jgt_env(ORDERID_ARGNAME,ORDERID_ARGNAME_ALIAS if not exclude_env_alias else None)
+        #support order_id
+        if orderid_value is None:
+            orderid_value=load_arg_from_jgt_env("order_id")
+        #OrderID
+        if orderid_value is None:
+            orderid_value=load_arg_from_jgt_env("OrderID")
+    
+    if orderid_value is not None:
+        required=False
+    
+    parser.add_argument('-'+ORDERID_ARGNAME_ALIAS,'--'+ORDERID_ARGNAME, metavar="OrderID", required=required,
+                        help='The order identifier.',
+                        default=orderid_value)
     return parser
 
-def add_account_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_tradeid_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False,from_jgt_env=False,exclude_env_alias=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
-    parser.add_argument('-account', metavar="ACCOUNT",
-                        help='An account which you want to use in sample.')
+    tradeid_value=None
+    if load_from_settings :
+        tradeid_value=load_arg_default_from_settings(TRADEID_ARGNAME,None,TRADEID_ARGNAME_ALIAS) 
+    if from_jgt_env: #Cascade to env with no alias by default
+        tradeid_value= load_arg_from_jgt_env(TRADEID_ARGNAME,TRADEID_ARGNAME_ALIAS if not exclude_env_alias else None)
+        if tradeid_value is None:
+            tradeid_value=load_arg_from_jgt_env("trade_id")
+        if tradeid_value is None:
+            tradeid_value=load_arg_from_jgt_env("TradeID")
+    
+    if tradeid_value is not None:
+        required=False
+        
+    parser.add_argument('-'+TRADEID_ARGNAME_ALIAS,'--'+TRADEID_ARGNAME, metavar="TradeID", required=required,
+                        help='The trade identifier.',
+                        default=tradeid_value)
+    return parser
+
+
+def add_account_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True,required=False)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    account_value=load_arg_default_from_settings(ACCOUNT_ARGNAME,None) if load_from_settings else None
+    parser.add_argument('-'+ACCOUNT_ARGNAME, metavar="ACCOUNT",
+                        help='An account which you want to use in sample.',default=account_value,required=required)
     return parser
 
 
@@ -332,7 +744,7 @@ def str_to_datetime(date_str):
     
     for fmt in formats:
         try:
-            return datetime.datetime.strptime(date_str, fmt)
+            return datetime.strptime(date_str, fmt)
         except ValueError:
             continue
     return None
@@ -341,19 +753,29 @@ def valid_datetime(check_future: bool):
     def _valid_datetime(str_datetime: str):
         date_format = '%m.%d.%Y %H:%M:%S'
         try:
-            result = datetime.datetime.strptime(str_datetime, date_format).replace(
-                tzinfo=datetime.timezone.utc)
-            if check_future and result > datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc):
+            result = datetime.strptime(str_datetime, date_format).replace(
+                tzinfo=timezone.utc)
+            if check_future and result > datetime.utcnow().replace(tzinfo=timezone.utc):
                 msg = "'{0}' is in the future".format(str_datetime)
                 raise argparse.ArgumentTypeError(msg)
             return result
         except ValueError:
-            now = datetime.datetime.now()
+            now = datetime.now()
             msg = "The date '{0}' is invalid. The valid data format is '{1}'. Example: '{2}'".format(
                 str_datetime, date_format, now.strftime(date_format))
             raise argparse.ArgumentTypeError(msg)
     return _valid_datetime
 
+def add_tlid_date_to_argumments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    #--ttlid which transform into to_dt
+    tlid_dateto_value=load_arg_default_from_settings(TLID_DATETO_ARGNAME,None,TLID_DATETO_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+TLID_DATETO_ARGNAME_ALIAS,'--'+TLID_DATETO_ARGNAME, metavar="TLID",
+                        help='The last dateto in TLID format',
+                        default=tlid_dateto_value)
+    return parser
 
 def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
     global default_parser
@@ -362,7 +784,7 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.A
     
     group1 = parser.add_argument_group('Group 1 (TLID Range)')
     g1x=group1.add_mutually_exclusive_group()
-    g1x.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+    g1x.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS,'--'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     g2x=g1x.add_mutually_exclusive_group()
     
@@ -393,39 +815,45 @@ def add_tlid_date_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.A
     return parser
 
 
-def add_tlid_range_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_tlid_range_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     #print("Tlid range active")
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
-    group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
+    tlid_value=load_arg_default_from_settings(TLID_RANGE_ARGNAME,None,TLID_RANGE_ARGNAME_ALIAS) if load_from_settings else None
+    group_range.add_argument('-'+TLID_RANGE_ARGNAME_ALIAS, '--'+TLID_RANGE_ARGNAME_ALIAS,'--'+TLID_RANGE_ARGNAME, type=str, required=False, dest=TLID_RANGE_ARG_DEST,
                         help=TLID_RANGE_HELP_STRING)
     return parser
 
-def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True):
+def add_date_arguments(parser: argparse.ArgumentParser=None, date_from: bool = True, date_to: bool = True,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
     
     group_range=_get_group_by_title(parser,ARG_GROUP_RANGE_TITLE,ARG_GROUP_RANGE_DESCRIPTION)
+    
     if date_from:
-        group_range.add_argument('-s','--datefrom',
+        date_from_value=load_arg_default_from_settings(DATEFROM_ARGNAME,None,DATEFROM_ARGNAME_ALIAS) if load_from_settings else None
+        group_range.add_argument('-'+DATEFROM_ARGNAME_ALIAS,'--'+DATEFROM_ARGNAME,
                             metavar="\"m.d.Y H:M:S\"",
                             help='Date/time from which you want to receive\
                                       historical prices. If you leave this argument as it \
                                       is, it will mean from last trading day. Format is \
                                       "m.d.Y H:M:S". Optional parameter.',
-                            type=valid_datetime(True)
+                            type=valid_datetime(True),
+                            default=date_from_value
                             )
     if date_to:
-        group_range.add_argument('-e','--dateto',
+        date_to_value=load_arg_default_from_settings(DATETO_ARGNAME,None,DATETO_ARGNAME_ALIAS) if load_from_settings else None
+        group_range.add_argument('-'+DATETO_ARGNAME_ALIAS,'--'+DATETO_ARGNAME,
                             metavar="\"m.d.Y H:M:S\"",
                             help='Datetime until which you want to receive \
                                       historical prices. If you leave this argument as it is, \
                                       it will mean to now. Format is "m.d.Y H:M:S". \
                                       Optional parameter.',
-                            type=valid_datetime(False)
+                            type=valid_datetime(False),
+                            default=date_to_value
         )
     return parser
 
@@ -471,7 +899,7 @@ def add_max_bars_arguments(parser: argparse.ArgumentParser=None)->argparse.Argum
     
     return parser
 
-def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     global default_parser
     if parser is None:
         parser=default_parser
@@ -480,23 +908,26 @@ def add_bars_amount_V2_arguments(parser: argparse.ArgumentParser=None)->argparse
     #g=parser.add_argument_group('Bars Amount', 'Specify the number of bars to download or use the full number of bars available from the store.')
     bars_exclusive_subgroup=bars_group.add_mutually_exclusive_group()
     
-    
+    quotescount_value=load_arg_default_from_settings(QUOTES_COUNT_ARGNAME,-1,QUOTES_COUNT_ARGNAME_ALIAS) if load_from_settings else -1
     bars_exclusive_subgroup.add_argument('-'+QUOTES_COUNT_ARGNAME_ALIAS,'--'+QUOTES_COUNT_ARGNAME,
                         metavar="MAX",
-                        default=-1,
+                        default=quotescount_value,
                         type=int,
                         help='Max number of bars. 0 - Not limited')
     g_full_notfull=bars_exclusive_subgroup.add_mutually_exclusive_group()
+    use_full_value=load_arg_default_from_settings(FULL_FLAG_ARGNAME,False,FULL_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     g_full_notfull.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses the full store. ')
+                        help='Output/Input uses the full store. ',
+                        default=use_full_value)
     g_full_notfull.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses NOT the full store. ')
+                        help='Output/Input uses NOT the full store. ',
+                        default=not use_full_value)
     return parser
 
 
-def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_output_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds an output argument to the given argument parser.
 
@@ -509,10 +940,36 @@ def add_output_argument(parser: argparse.ArgumentParser=None)->argparse.Argument
     global default_parser
     if parser is None:
         parser=default_parser
+
+    output_value=load_arg_default_from_settings(OUTPUT_ARGNAME,None,OUTPUT_ARGNAME_ALIAS) if load_from_settings else None
+    parser.add_argument('-'+OUTPUT_ARGNAME_ALIAS,'--'+OUTPUT_ARGNAME,
+                        help='Output PATH. ',
+                        default=output_value)
+    
+    return parser
+
+def add_input_file_argument(parser: argparse.ArgumentParser=None,load_from_settings=True,add_f_alias=False)->argparse.ArgumentParser:
+    """
+    Adds an input file argument to the given argument parser.
+    
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to add the input file argument to.
         
-    parser.add_argument('-o','--output',
-                        action='store_true',
-                        help='Output PATH. If specified, output will be written in the filestore.')
+    Returns:
+        parser (argparse.ArgumentParser): The argument parser with the input file argument added.
+    """
+    global default_parser
+    if parser is None:
+        parser=default_parser
+    
+    input_file_value=load_arg_default_from_settings(INPUT_FILE_ARGNAME,None,INPUT_FILE_ARGNAME_ALIAS) if load_from_settings else None
+    if add_f_alias:parser.add_argument('-f','-'+INPUT_FILE_ARGNAME_ALIAS,'--'+INPUT_FILE_ARGNAME,
+                        help='Input file PATH. ',
+                        default=input_file_value)
+    else:
+        parser.add_argument('-'+INPUT_FILE_ARGNAME_ALIAS,'--'+INPUT_FILE_ARGNAME,
+                        help='Input file PATH. ',
+                        default=input_file_value)
     
     return parser
 
@@ -536,7 +993,7 @@ def add_compressed_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     return parser
 
 
-def add_use_full_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_use_full_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds a use full argument to the given argument parser.
     
@@ -552,16 +1009,19 @@ def add_use_full_argument(parser: argparse.ArgumentParser=None)->argparse.Argume
     
     #print("DEPRECATION: Use: add_bars_amount_V2_arguments")
     full_notfull_group = parser.add_mutually_exclusive_group()
+    use_full_value=load_arg_default_from_settings(FULL_FLAG_ARGNAME,False,FULL_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     full_notfull_group.add_argument('-'+FULL_FLAG_ARGNAME_ALIAS,'--'+FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses the full store. ')
+                        help='Output/Input uses the full store. ',
+                        default=use_full_value)
     full_notfull_group.add_argument('-'+NOT_FULL_FLAG_ARGNAME_ALIAS,'--'+NOT_FULL_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input uses NOT the full store. ')
+                        help='Output/Input uses NOT the full store. ',
+                        default=not use_full_value)
  
     return parser
 
-def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_use_fresh_argument(parser: argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
     """
     Adds a use fresh argument to the given argument parser.
     
@@ -577,17 +1037,20 @@ def add_use_fresh_argument(parser: argparse.ArgumentParser=None)->argparse.Argum
     bars_group=_get_group_by_title(parser,ARG_GROUP_BARS_TITLE,ARG_GROUP_BARS_DESCRIPTION)
     
     fresh_old_group=bars_group.add_mutually_exclusive_group()
+    use_fresh_value=load_arg_default_from_settings(FRESH_FLAG_ARGNAME,False,FRESH_FLAG_ARGNAME_ALIAS) if load_from_settings else False
     fresh_old_group.add_argument('-'+FRESH_FLAG_ARGNAME_ALIAS,'--'+FRESH_FLAG_ARGNAME,
                         action='store_true',
-                        help='Freshening the storage with latest market. ')
+                        help='Freshening the storage with latest market. ',
+                        default=use_fresh_value)
     fresh_old_group.add_argument('-'+NOT_FRESH_FLAG_ARGNAME_ALIAS,'--'+NOT_FRESH_FLAG_ARGNAME,
                         action='store_true',
-                        help='Output/Input wont be freshed from storage (weekend or tests). ')
+                        help='Output/Input wont be freshed from storage (weekend or tests). ',
+                        default=not use_fresh_value)
  
     return parser
 
 
-def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_keepbidask_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=True)->argparse.ArgumentParser:
     """
     Adds a keep Bid/Ask argument to the given argument parser.
     
@@ -604,13 +1067,82 @@ def add_keepbidask_argument(parser: argparse.ArgumentParser=None)->argparse.Argu
     cleanupGroup=_get_group_by_title(parser,ARG_GROUP_CLEANUP_TITLE,ARG_GROUP_CLEANUP_DESCRIPTION)
     group_kba=cleanupGroup.add_mutually_exclusive_group()
     
+    default_value = load_arg_default_from_settings(KEEP_BID_ASK_FLAG_ARGNAME,flag_default_value,alias=KEEP_BID_ASK_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    #print("keepbidask  value:"+str(default_value))
     group_kba.add_argument('-'+KEEP_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+KEEP_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
-                        help='Keep Bid/Ask in storage. ')
+                        help='Keep Bid/Ask in storage. ',
+                        default=default_value)
     group_kba.add_argument('-'+REMOVE_BID_ASK_FLAG_ARGNAME_ALIAS,'--'+REMOVE_BID_ASK_FLAG_ARGNAME,
                         action='store_true',
-                        help='Remove Bid/Ask in storage. ')
+                        help='Remove Bid/Ask in storage. ',
+                        default=not default_value)
     return parser
+
+def add_format_outputs_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  out_group=_get_group_by_title(parser,"Outputs")
+  json_flag_default_value=load_arg_default_from_settings(JSON_FLAG_ARGNAME,False,JSON_FLAG_ARGNAME_ALIAS) if load_from_settings else False
+  f_exclusive=out_group.add_mutually_exclusive_group()
+  f_exclusive.add_argument("-"+JSON_FLAG_ARGNAME_ALIAS, "--"+JSON_FLAG_ARGNAME_ALIAS, "--"+JSON_FLAG_ARGNAME, help="Output in JSON format", action="store_true",default=json_flag_default_value,dest=JSON_FLAG_ARGNAME)
+  #Markdown
+  
+  markdown_flag_default_value=load_arg_default_from_settings(MD_FLAG_ARGNAME,False,MD_FLAG_ARGNAME_ALIAS) if load_from_settings else False
+  f_exclusive.add_argument("-"+MD_FLAG_ARGNAME_ALIAS, "--"+MD_FLAG_ARGNAME, help="Output in Markdown format", action="store_true",default=markdown_flag_default_value)
+  return parser
+
+def add_patterns_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True,required=True,from_jgt_env=False)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  
+  pn_group=_get_group_by_title(parser,PN_GROUP_NAME)
+
+  clh_default_value=load_arg_default_from_settings(PN_COLUMN_LIST_ARGNAME,None,PN_COLUMN_LIST_ARGNAME_ALIAS) if load_from_settings else None
+  pn_group.add_argument("-"+PN_COLUMN_LIST_ARGNAME_ALIAS, "--"+PN_COLUMN_LIST_ARGNAME, nargs='+', help="List of columns to get from higher TF.  Default is mfi_sig,zone_sig,ao", default=clh_default_value)
+  
+
+  
+  pn_default_value=load_arg_default_from_settings(PN_ARGNAME,None,PN_ARGNAME_ALIAS,from_jgt_env=from_jgt_env) if load_from_settings or from_jgt_env else None
+  if pn_default_value is not None:
+      required=False
+      
+  pn_group.add_argument("-"+PN_ARGNAME_ALIAS, "--"+PN_ARGNAME, help="Pattern Name",default=pn_default_value,required=required)
+  
+  pn_group.add_argument("-"+PN_LIST_FLAG_ARGNAME_ALIAS, "--"+PN_LIST_FLAG_ARGNAME, help="List Patterns", action="store_true")
+  
+  #Add the format outputs
+  parser=add_format_outputs_arguments(parser,load_from_settings)
+  return parser
+
+
+
+def add_selected_columns_arguments(parser:argparse.ArgumentParser=None,load_from_settings=True)->argparse.ArgumentParser:
+  global default_parser
+  if parser is None:
+    parser=default_parser
+  
+  
+  sc_group=_get_group_by_title(parser,SELECTED_COLUMNS_GROUP_NAME)
+
+  sc_default_value=load_arg_default_from_settings(SELECTED_COLUMNS_ARGNAME,None,SELECTED_COLUMNS_ARGNAME_ALIAS) if load_from_settings else None
+  
+  sc_group.add_argument("-"+SELECTED_COLUMNS_ARGNAME_ALIAS, "--"+SELECTED_COLUMNS_ARGNAME, nargs='+', help=SELECTED_COLUMNS_HELP, default=sc_default_value)
+
+  return parser
+
+
+
+
+
+
+
+
+
 
 import jgtclirqdata
 
@@ -793,34 +1325,103 @@ def __quiet__post_parse():
     return args
 
 
-
-def __timeframes_post_parse(timeframes=None)->argparse.Namespace:
+def _get_iterable_timeframes_from_args()->List[str]:
     global args
     __check_if_parsed()
-    if hasattr(args, 'timeframes'):
-        _timeframes=args.timeframes 
-    else :
-        setattr(args, 'timeframes',None)
-        return args
+    if hasattr(args, 'timeframe') and \
+        hasattr(args, 'tflag')   and \
+            getattr(args, "tflag"):
+        return getattr(args, 'timeframes')
+    else: #Return just one timeframe
+        return [getattr(args, 'timeframe')]
+
+
+def _get_iterable_instruments_from_args()->List[str]:
+    global args
+    __check_if_parsed()
+    if hasattr(args, 'instrument') and \
+        hasattr(args, 'iflag')   and \
+            getattr(args, "iflag"):
+        return getattr(args, 'instruments')
+    else: #Return just one instrument
+        return [getattr(args, 'instrument')]
+
+from jgtconstants import TIMEFRAMES_DEFAULT_STRING,INSTRUMENT_ALL_STRING
+from jgtconstants import TIMEFRAMES_ALL, TIMEFRAMES_DEFAULT
+
+
+def get_timeframes(default_timeframes: List[str] = None, envvar="T") -> List[str]:
+    global args
+    if args.timeframe and not args.tflag:
+        return [args.timeframe]
+    elif args.tflag:
+        return args.timeframes
+    else:
+        return os.getenv(envvar, TIMEFRAMES_DEFAULT_STRING).split(",") if default_timeframes is None else default_timeframes if isinstance(default_timeframes, list) else default_timeframes.split(",")
+
+def get_instruments(default_instruments: List[str] = None, envvar="I") -> List[str]:
+    global args
+    if args.instrument and not args.iflag:
+        return [args.instrument]
+    elif args.iflag:
+        return args.instruments
+    else:
+        return os.getenv(envvar, INSTRUMENT_ALL_STRING).split(",") if default_instruments is None else default_instruments if isinstance(default_instruments, list) else default_instruments.split(",")
+    
+
+
+
+def __timeframes_post_parse()->argparse.Namespace:
+    global args,settings
+    __check_if_parsed()
     
     _timeframes=None
     
-    if isinstance(timeframes, list):
-        _timeframes = timeframes
+    setattr(args, 'tflag',False)
+    if hasattr(args, 'timeframe') and getattr(args, "timeframe") is not None  and ","  in getattr(args, "timeframe"):
+        setattr(args, 'tflag',True)
+        _timeframes=getattr(args, "timeframe").split(",")
+    
+    elif hasattr(args, "timeframes"):
+        _timeframes=getattr(args, "timeframes")
     else:
-        _timeframes = parse_timeframes_helper(timeframes)
+        try:
+            if settings["timeframes"]:
+                _timeframes =settings["timeframes"]
+        except:
+            pass
+            
+            
+    if _timeframes is not None and not isinstance(_timeframes, list) :
+        _timeframes=parse_timeframes_helper(_timeframes)
+
+
+    #if we have coma in the string
+    if _timeframes is None:
+        _timeframes = os.getenv("T",TIMEFRAMES_DEFAULT_STRING)
+    
+    if  "," in _timeframes:
+        _timeframes=parse_timeframes_helper(_timeframes)
+    
+    
     setattr(args, 'timeframes',_timeframes)
+
     return args
 
-from jgtconstants import TIMEFRAMES_ALL
 
 
 def parse_timeframes_helper(timeframes):
     if timeframes in TIMEFRAMES_ALL:
         return [timeframes]
+    
+    if timeframes == "default":
+        __timeframes = TIMEFRAMES_DEFAULT
+    if  timeframes == "all" :
+        __timeframes = TIMEFRAMES_ALL
+    
     if timeframes == "default" or timeframes == "all" :
         try:
-            _timeframes = os.getenv("T").split(",")
+            _timeframes = os.getenv("T",__timeframes).split(",")
         except:
             _timeframes = None
     else:
@@ -829,6 +1430,62 @@ def parse_timeframes_helper(timeframes):
         except:
             _timeframes = None
     return _timeframes
+
+
+
+from jgtconstants import INSTRUMENTS_DEFAULT,INSTRUMENT_ALL
+
+def __instruments_post_parse()->argparse.Namespace:
+    global args,settings
+    __check_if_parsed()
+    
+    _instruments=None
+    # if not hasattr(args, 'instrument') or args.instrument is None:
+    #     return args
+    
+    setattr(args, 'iflag',False)
+    if hasattr(args, 'instrument') and getattr(args, "instrument") is not None and "," in getattr(args, "instrument"):
+        setattr(args, 'iflag',True)
+        _instruments=getattr(args, "instrument")
+    else:
+        try:
+            if settings["instruments"]:
+                _instruments =settings["instruments"]
+        except:
+            pass
+            
+            
+    if _instruments is not None and not isinstance(_instruments, list) :
+        _instruments=parse_instruments_helper(_instruments)
+
+
+    if _instruments is None :
+        _instruments = os.getenv("I",None)
+            
+    setattr(args, 'instruments',_instruments)
+
+    return args
+
+
+def parse_instruments_helper(instruments):
+
+   
+    if instruments == "default":
+        __instruments = INSTRUMENTS_DEFAULT
+    if instruments == "all" :
+        __instruments=INSTRUMENT_ALL
+    
+    if instruments == "default" or instruments == "all" :
+        try:
+            _instruments = os.getenv("I",None).split(",")
+        except:
+            _instruments = None
+    else:
+        try:
+            _instruments = instruments.split(",")
+        except:
+            _instruments = None
+    return _instruments
 
 def __crop_last_dt__post_parse()->argparse.Namespace:
     global args
@@ -839,7 +1496,21 @@ def __crop_last_dt__post_parse()->argparse.Namespace:
     else:
         setattr(args, 'crop_last_dt', None)
     return args
-
+#tlid_dateto
+def __tlid_dateto__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    if hasattr(args, TLID_DATETO_ARGNAME):
+        if getattr(args, TLID_DATETO_ARGNAME) is not None:
+            try:
+                
+                dt_object=tlid.to_date(getattr(args, TLID_DATETO_ARGNAME))
+                setattr(args, TLID_DATETO_ARGNAME,dt_object )
+            except:
+                raise Exception("Invalid TLID DateTo format.  Use YYMMDDHHMM")
+    else:
+        setattr(args, 'crop_last_dt', None)
+    return args
 #@STCIssue We want this to Default to True and would be flagged to false by rm_bid_ask
 def __keep_bid_ask__post_parse(keep_bid_ask_argname = 'keepbidask',rm_bid_ask_argname = 'rmbidask')->argparse.Namespace:
     global args
@@ -953,8 +1624,20 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     global args
     __check_if_parsed()
     
+    #args=_load_settings_from_args() #@STCIssue - THis has to load before we do any other argparsing, like preloading the settings.
+    
     args=__quiet__post_parse()
     
+    try:
+        if hasattr(args,"instrument") and args.instrument and isinstance(args.instrument, str):
+            setattr(args, 'instrument', fn2i(args.instrument) )
+    except:
+        pass
+    try:
+        if hasattr(args,"timeframe") and args.timeframe and isinstance(args.timeframe, str):
+            setattr(args, 'timeframe', fn2t(args.timeframe) )
+    except:
+        pass
     
     # OTHER DEPENDENT RULES
 
@@ -963,7 +1646,10 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__keep_bid_ask__post_parse()
     
     args=__timeframes_post_parse()
+    args=__instruments_post_parse()
+    
     args=__crop_last_dt__post_parse()
+    args=__tlid_dateto__post_parse()
     args=__verbose__post_parse()
     args=__quotescount__post_parse()
     args=__balligator_flag__post_parse()
@@ -973,23 +1659,44 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__json_post_parse()   
     args=__jgtclirqdata_post_parse()
     args=_demo_flag()
+    
+    try:
+        if hasattr(args,"instrument") and args.instrument and isinstance(args.instrument, str):
+            setattr(args, 'instrument', fn2i(args.instrument) )
+    except:
+        pass
+    
+    try:
+        if hasattr(args,"timeframe") and args.timeframe and isinstance(args.timeframe, str):
+            setattr(args, 'timeframe', fn2t(args.timeframe) )
+    except:
+        pass
+
     return args
 
+    
 def _demo_flag():
     global args
     if hasattr(args, 'demo') and args.demo:
         setattr(args, 'connection', 'Demo')
         setattr(args, 'demo', True)
+        setattr(args, 'real', False)
     else:
         setattr(args, 'connection', 'Real')
+        setattr(args, 'real', True)
         setattr(args, 'demo', False)
     return args
 
 def parse_args(parser: argparse.ArgumentParser=None)->argparse.Namespace:
-    global default_parser,args
+    global default_parser,args,settings
     if parser is None:
         parser=default_parser
     args= parser.parse_args()
+    try:
+        #set a key jgtcommon_settings in the args to store settings
+        setattr(args, 'jgtcommon_settings', get_settings())
+    except:
+        pass
     
     
     args=_post_parse_dependent_arguments_rules()
@@ -1001,7 +1708,7 @@ def _do_we_dropna_volume(_args=None):
         _args=args
     dropna_volume_value = _args.dropna_volume or not _args.dont_dropna_volume
     if args.timeframe == "M1" and dropna_volume_value:
-        print("We dont dropna volume for M1")
+        #print("We dont dropna volume for M1")
         return False # We dont drop for Monthly
     return dropna_volume_value
 
@@ -1070,103 +1777,179 @@ def add_ids_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentPar
                         help='Action the creation of IDS')
     return parser
 
-
-def add_ids_mfi_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_ids_mfi_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=True)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
+    default_value = load_arg_default_from_settings(MFI_FLAG_ARGNAME,flag_default_value,alias=MFI_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    #settings.get(MFI_FLAG_ARGNAME,flag_default_value) if settings else flag_default_value
+    
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     mfi_exclusive_subgroup=group_indicators.add_mutually_exclusive_group()
     mfi_exclusive_subgroup.add_argument(
         "-"+MFI_FLAG_ARGNAME_ALIAS,
         "--"+MFI_FLAG_ARGNAME,
         action="store_true",
+        default=default_value,
         help="Enable the Market Facilitation Index indicator.",
     )
     mfi_exclusive_subgroup.add_argument(
         "-"+NO_MFI_FLAG_ARGNAME_ALIAS,
         "--"+NO_MFI_FLAG_ARGNAME,  
         action="store_true",
+        default=not default_value,
         help="Disable the Market Facilitation Index indicator.",
     )  
     return parser
 
-def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+def add_ids_gator_oscillator_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
 
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
+    
+    default_value = load_arg_default_from_settings(GATOR_OSCILLATOR_FLAG_ARGNAME,flag_default_value,alias=GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    
     group_indicators.add_argument(
         "-"+GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS,
         "--"+GATOR_OSCILLATOR_FLAG_ARGNAME,
         action="store_true",
         help="Enable the Gator Oscillator indicator.",
+        default=default_value
     )
     return parser
 
-def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtcliconstants import  (LARGEST_FRACTAL_PERIOD_ARGNAME,
+                                LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS, SETTING_ARGNAME, SETTING_ARGNAME_ALIAS,)
+def add_ids_fractal_largest_period_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,default_value=89)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
+    
+    default_value = load_arg_default_from_settings(LARGEST_FRACTAL_PERIOD_ARGNAME,default_value,alias=LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS) if load_default_from_settings else default_value
+    
     group_indicators.add_argument(
-        "-lfp",
-        "--largest_fractal_period",
+        "-"+LARGEST_FRACTAL_PERIOD_ARGNAME_ALIAS,
+        "--"+LARGEST_FRACTAL_PERIOD_ARGNAME,
         type=int,
-        default=89,
-        help="The largest fractal period.",
+        default=default_value,
+        help=f"The largest fractal period. ({default_value})",
     )
     return parser
 
-def add_ids_balligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+
+
+from jgtconstants import BJAW_PERIODS,BTEETH_PERIODS,BLIPS_PERIODS
+from jgtcliconstants import  (BALLIGATOR_PERIOD_JAWS_ARGNAME,
+                              BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+                              BALLIGATOR_PERIOD_TEETH_ARGNAME,
+                              BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+                              BALLIGATOR_PERIOD_LIPS_ARGNAME,
+                              BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,)
+def add_ids_balligator_argument(parser: argparse.ArgumentParser=None,add_periods_arg=True,load_default_from_settings=True,flag_default_value=False,period_jaws_default = BJAW_PERIODS,period_teeth_default=BTEETH_PERIODS,period_lips_default=BLIPS_PERIODS)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
     
-    _description = "Enable the Big Alligator indicator."
-    _argname_alias=BALLIGATOR_FLAG_ARGNAME_ALIAS
-    _argname_full=BALLIGATOR_FLAG_ARGNAME
-    
-    
-    _add_a_flag_helper( _description, _argname_alias, _argname_full,parser,group_title=ARG_GROUP_INDICATOR_TITLE,group_description=ARG_GROUP_INDICATOR_DESCRIPTION)
+    flag_default_value=load_arg_default_from_settings(BALLIGATOR_FLAG_ARGNAME,flag_default_value,alias=BALLIGATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
     
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
-        "-bjaw",
-        "--balligator_period_jaws",
-        type=int,
-        default=89,
-        help="The period of the Big Alligator jaws.",
+        "-"+BALLIGATOR_FLAG_ARGNAME_ALIAS,
+        "--"+BALLIGATOR_FLAG_ARGNAME,
+        action="store_true",
+        help="Enable the Big Alligator indicator.",
+        default=flag_default_value
     )
+    
+    if add_periods_arg:
+        balligator_period_jaws_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_JAWS_ARGNAME,period_jaws_default,alias=BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_JAWS_ARGNAME,
+            type=int,
+            default=balligator_period_jaws_default,
+            help="The period of the Big Alligator jaws.",
+        )
+        balligator_period_teeth_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_TEETH_ARGNAME,period_teeth_default,alias=BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_TEETH_ARGNAME,
+            type=int,
+            default=balligator_period_teeth_default,
+            help="The period of the Big Alligator teeth.",
+        )
+        balligator_period_lips_default=load_arg_default_from_settings(BALLIGATOR_PERIOD_LIPS_ARGNAME,period_lips_default,alias=BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+BALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,
+            "--"+BALLIGATOR_PERIOD_LIPS_ARGNAME,
+            type=int,
+            default=balligator_period_lips_default,
+            help="The period of the Big Alligator lips.",
+        )
     return parser
 
-  
-def add_ids_talligator_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
+from jgtconstants import TJAW_PERIODS,TTEETH_PERIODS,TLIPS_PERIODS
+from jgtcliconstants import  (TALLIGATOR_PERIOD_JAWS_ARGNAME,
+                              TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+                              TALLIGATOR_PERIOD_TEETH_ARGNAME,
+                              TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+                              TALLIGATOR_PERIOD_LIPS_ARGNAME,
+                              TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,)
+def add_ids_talligator_argument(parser: argparse.ArgumentParser=None,add_periods_arg=True,load_default_from_settings=True,flag_default_value=False,period_jaws_default = TJAW_PERIODS,period_teeth_default=TTEETH_PERIODS,period_lips_default=TLIPS_PERIODS)->argparse.ArgumentParser:
 
     global default_parser
     if parser is None:
         parser=default_parser
+    
+    flag_default_value=load_arg_default_from_settings(TALLIGATOR_FLAG_ARGNAME,flag_default_value,alias=TALLIGATOR_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
     
     group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
     group_indicators.add_argument(
         "-"+TALLIGATOR_FLAG_ARGNAME_ALIAS,
         "--"+TALLIGATOR_FLAG_ARGNAME,
         action="store_true",
-        help="Enable the Tide Alligator indicator."
+        help="Enable the Tide Alligator indicator.",
+        default=flag_default_value
     )
     
-    group_indicators.add_argument(
-        "-tjaw",
-        "--talligator_period_jaws",
-        type=int,
-        default=377,
-        help="The period of the Tide Alligator jaws.",
-    )
+    if add_periods_arg:
+        talligator_period_jaws_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_JAWS_ARGNAME,period_jaws_default,alias=TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_JAWS_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_JAWS_ARGNAME,
+            type=int,
+            default=talligator_period_jaws_default,
+            help="The period of the Tide Alligator jaws.",
+        )
+        talligator_period_teeth_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_TEETH_ARGNAME,period_teeth_default,alias=TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_TEETH_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_TEETH_ARGNAME,
+            type=int,
+            default=talligator_period_teeth_default,
+            help="The period of the Tide Alligator teeth.",
+        )
+        talligator_period_lips_default=load_arg_default_from_settings(TALLIGATOR_PERIOD_LIPS_ARGNAME,period_lips_default,alias=TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS)
+        
+        group_indicators.add_argument(
+            "-"+TALLIGATOR_PERIOD_LIPS_ARGNAME_ALIAS,
+            "--"+TALLIGATOR_PERIOD_LIPS_ARGNAME,
+            type=int,
+            default=talligator_period_lips_default,
+            help="The period of the Tide Alligator lips.",
+        )
     return parser
 
 def add_ads_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
@@ -1364,11 +2147,38 @@ def readconfig(json_config_str=None,config_file = 'config.json',export_env=False
         
     if config is None:
         #Last attempt to read
-        another_config = "config.json"
-        if not os.path.exists(another_config):
-            another_config = "/etc/jgt/config.json"
-        with open(another_config, 'r') as file:
-            config = json.load(file)
+        try:
+            another_config = "config.json"
+            if not os.path.exists(another_config):
+                another_config = os.path.join(os.path.expanduser('~'), '.jgt', 'config.json')
+                
+            if not os.path.exists(another_config):
+                another_config = "/etc/jgt/config.json"
+            with open(another_config, 'r') as file:
+                config = json.load(file)
+        except:
+            pass
+        # try:
+        #     home_config_path_try2 = os.path.join(os.path.expanduser('~'), '.jgt', 'config.json')
+        #     if not os.path.exists(another_config):
+        #         another_config = "/etc/jgt/config.json"
+        #     with open(another_config, 'r') as file:
+        #         config = json.load(file)
+        # except:
+        #     pass
+        if config is None:
+            try:
+                with open("/home/jgi/.jgt/config.json", 'r') as file:
+                    config = json.load(file)
+            except:
+                pass
+        if config is None:
+            try:                                                                                  
+                with open("/etc/jgt/config.json", 'r') as file:                             
+                    config = json.load(file)
+            except:
+                pass
+                
         if config is None:    
             raise Exception(f"Configuration not found. Please provide a config file or set the JGT_CONFIG environment variable to the JSON config string. (config_file={config_file})")
     
@@ -1398,7 +2208,7 @@ def read_fx_str_from_config(demo=False)->tuple[str,str,str,str,str]:
 
 
 
-def is_market_open(current_time=None):
+def is_market_open(current_time=None,exit_cli_if_closed=False,market_closed_callback=None):
     if current_time is None:
         current_time = datetime.utcnow()
 
@@ -1419,5 +2229,20 @@ def is_market_open(current_time=None):
             return True
     elif 0 <= current_day < 4:  # Monday to Thursday
         return True
-
+    if market_closed_callback is not None:
+        market_closed_callback()
+    if exit_cli_if_closed:
+        from jgterrorcodes import MARKET_CLOSED_EXIT_ERROR_CODE
+        print("Market is closed.")
+        sys.exit(MARKET_CLOSED_EXIT_ERROR_CODE)
     return False
+
+def dt_from_last_week_as_datetime():
+    today = datetime.now()
+    last_week = today - timedelta(days=7)
+    return last_week
+
+def dt_from_last_week_as_string_fxformat():
+    last_week = dt_from_last_week_as_datetime()
+    _str=last_week.strftime('%m.%d.%Y')
+    return _str + " 00:00:00"

@@ -1,0 +1,3 @@
+{
+	"jgtset_included": "tlid_id,instrument,timeframe,entry_rate,stop_rate,bs,lots,demo_arg,demo,OrderID,action,strategy,trade_id,patterns,timeframes,patterns"
+}

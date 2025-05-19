@@ -191,6 +191,9 @@ signalBuy_saucer_column_name = 'sb'
 AOF = indicator_ao_fractalPeakOfMomentum_column_name
 AOFVALUE = indicator_ao_fractalPeakValue_column_name
 FDB = signalCode_fractalDivergentBar_column_name
+"""
+Fractal Divergent Bar Code (contains the signal value either buy, sell or nothing)
+"""
 FDBB = signalBuy_fractalDivergentBar_column_name
 FDBS = signalSell_fractalDivergentBar_column_name
 ACS = signalSell_AC_deceleration_column_name
@@ -241,6 +244,9 @@ VECTOR_AO_FDBB = 'vaob'
 
 
 VECTOR_AO_FDB_COUNT = 'vaoc'
+"""
+Count of the number AO Bars in the Fractal Divergent Bar Analysis.
+"""
 VECTOR_AO_FDB_COUNT_TYPE = int
 VECTOR_AO_FDBS_COUNT = 'vaosc'
 VECTOR_AO_FDBS_COUNT_TYPE = int
@@ -252,7 +258,7 @@ ML_DEFAULT_INSTRUMENTS = "SPX500,EUR/USD,GBP/USD"
 ML_DEFAULT_TIMEFRAMES = "D1,H8,H4"
 
 
-ML_DEFAULT_COLUMNS_TO_KEEP=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaos','vaob']
+ML_DEFAULT_COLUMNS_TO_KEEP=['High','Low','ao','ac','jaw','teeth','lips','fh','fl','fdbb','fdbs','zlcb','zlcs','target','vaosc','vaobc','vaoc']
 
 ML_DEFAULT_COLUMNS_TO_DROP = ['Median', 'fh3', 'fl3', 'fh5', 'fl5', 'fh8', 'fl8','fh13', 'fl13', 'fh21', 'fl21', 'fh34', 'fl34', 'fh55', 'fl55', 'fh89','fl89','fdb', 'aof', 'aofvalue', 'aoaz', 'aobz', 'aocolor', 'accolor', 'zcol', 'sz', 'bz', 'acs', 'acb','ss', 'sb', 'price_peak_above', 'price_peak_bellow', 'ao_peak_bellow','ao_peak_above','zlc']
 
@@ -265,3 +271,18 @@ IDS_COLUMNS_TO_NORMALIZE = ["ao", "ac"] #@a Migrate to jgtutils.jgtconstants
 
 
 TIMEFRAMES_ALL=["M1","W1","D1","H8","H6","H4","H3","H2","H1","m30","m15","m5","m1"]
+TIMEFRAMES_DEFAULT=["M1","W1","D1","H4","H1","m15","m5"]
+TIMEFRAMES_DEFAULT_STRING="M1,W1,D1,H4,H1,m15,m5"
+
+NB_BARS_BY_DEFAULT_IN_CDS=330
+
+
+INSTRUMENTS_DEFAULT=["SPX500","EUR/USD","GBP/USD","AUD/USD","USD/CAD"]
+INSTRUMENTS_DEFAULT_STRING="SPX500,EUR/USD,GBP/USD,AUD/USD,USD/CAD"
+
+INSTRUMENT_ALL=["SPX500","EUR/USD","GBP/USD","AUD/USD","XAU/USD","USD/CAD","AUS200","USD/JPY","EUR/CAD","AUD/CAD","AUD/NZD","NZD/CAD"]
+
+INSTRUMENT_ALL_STRING=["SPX500,EUR/USD,GBP/USD,AUD/USD,XAU/USD,USD/CAD,AUS200,USD/JPY,EUR/CAD,AUD/CAD,AUD/NZD,NZD/CAD"]
+
+
+local_fn_compression='gzip'

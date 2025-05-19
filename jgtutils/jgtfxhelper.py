@@ -1,4 +1,7 @@
 
+
+import os
+
 OFFERS_CSV_DATA="""18,CAD/JPY
 1010,SPX500
 2020,WHEATF
@@ -84,3 +87,51 @@ def instrument_to_offer_id(symbol):
         if line.split(",")[1] == symbol:
             return int(line.split(",")[0])
     return None
+
+def offers_to_dict():
+    dict = {}
+    for line in OFFERS_CSV_DATA.split("\n"):
+        dict[int(line.split(",")[0])] = line.split(",")[1]
+    return dict
+
+def instruments_to_dict():
+    dict={}
+    for line in OFFERS_CSV_DATA.split("\n"):
+        dict[line.split(",")[1]] = int(line.split(",")[0])
+    return dict
+
+
+from jgtos import ensure_directory_exists, fix_path_ext, mkfn_cdata_filepath
+from jgtcliconstants import JGT_FXDATA_NS,JGT_HOOK_NS
+from jgtos import get_data_path
+def mkfn_cfxdata_filepath(fn,use_local=True,ext=None):
+    #.replace(f".{ext}.{ext}",f".{ext}")
+    if use_local:
+        fpath = mkfn_cdata_filepath( fn)
+
+    else :
+        fx_dir_path=get_data_path(JGT_FXDATA_NS)
+        fpath = os.path.join(fx_dir_path,fn)
+    if ext is not None:
+        fpath = fix_path_ext(ext, fpath)
+    cleaned_filepath = fpath.replace("_.",".")
+    #ensure_directory_exists(cleaned_filepath)
+    return cleaned_filepath
+
+
+
+def is_entry_stop_valid(entry_rate,stop_rate,bs):
+    """
+    Entry Rate and Stop Rate validation
+    
+    """
+    if bs=="S":
+        if entry_rate<stop_rate:
+            return True
+        else:
+            return False
+    elif bs=="B":
+        if entry_rate>stop_rate:
+            return True
+        else:
+            return False

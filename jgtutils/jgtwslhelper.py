@@ -4,6 +4,8 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+from jgtutils.jgtcliconstants import (PDSCLI_PROG_NAME,TLID_RANGE_ARGNAME_ALIAS,FULL_FLAG_ARGNAME,QUOTES_COUNT_ARGNAME_ALIAS,KEEP_BID_ASK_FLAG_ARGNAME_ALIAS)
+
 import platform
 
 import jgtos
@@ -34,7 +36,7 @@ def run_bash_command_by_platform(bash_cmd):
             # The system is Linux
             return subprocess.run(bash_cmd, shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8")
     except Exception as e:
-        print(f"An error occurred running jgtfxcli: {str(e)}")
+        print(f"An error occurred running {PDSCLI_PROG_NAME}: {str(e)}")
         print(f"   bash_cmd: {bash_cmd}")
         raise e
         #return None
@@ -53,63 +55,54 @@ def run(bash_command):
     return run_bash_command_by_platform(bash_command)
 
 
-    
+
 
 def resolve_cli_path(cli_path=""):
     if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
-        cli_path = os.path.join(os.getenv('HOME'), '.local', 'bin', 'jgtfxcli')
+        cli_path = os.path.join(os.getenv('HOME'), '.local', 'bin', PDSCLI_PROG_NAME)
     if not os.path.exists(cli_path):
-        cli_path = 'jgtfxcli'    
+        cli_path = PDSCLI_PROG_NAME    
     
     return cli_path #@STCIssue Should install : pip install --user jgtfxcon    (if not found)
 
-def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False):
-    cli_path=resolve_cli_path(cli_path)
-    if cli_path == "" or cli_path is None or cli_path == 0 or cli_path == '0':
-        cli_path = '$HOME/.local/bin/jgtfxcli'
-        #cli_path = "/home/jgi/.local/bin/jgtfxcli"
-    if use_full:
-        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" --full  -v {verbose_level} "
-    else :
-        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c {quote_count} -v {verbose_level}"
-    if verbose_level > 0:
-        print(f"bash_command_to_run: {bash_command_to_run}")
+def jgtfxcli_wsl(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
+
+    
+    bash_command_to_run=_mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,cli_path=cli_path, verbose_level=verbose_level,quote_count=quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
     
     return run_bash_command_by_platform(bash_command_to_run)
 
 
 def _mkbash_cmd_string_jgtfxcli_range(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0,quote_count=420,use_full=False,keep_bid_ask=False):
-    cli_path=resolve_cli_path(cli_path)
+
+    base_args = mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask)
     
-    
-    #env variable bypass if env exist JGT_KEEP_BID_ASK=1, keep_bid_ask = True
-    bidask_arg = " "
-    if os.getenv("JGT_KEEP_BID_ASK","0") == "1":
-        keep_bid_ask = True
-    if keep_bid_ask:
-        bidask_arg = " -kba "
-    if tlid_range is not None:
-        bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -r \"{tlid_range}\" -v {verbose_level} {bidask_arg}"
+    if tlid_range is not None and tlid_range != "":
+        bash_command_to_run = f"{base_args} -{TLID_RANGE_ARGNAME_ALIAS} \"{tlid_range}\""
     else:
         if use_full:
-            bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" --full  -v {verbose_level}  {bidask_arg}"
+            bash_command_to_run = f"{base_args} --{FULL_FLAG_ARGNAME}"
         else:
-            bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -c \"{quote_count}\" -v {verbose_level}  {bidask_arg}"
+            quote_args = ""
+            if quote_count > 0:
+                quote_args = f" -{QUOTES_COUNT_ARGNAME_ALIAS} {quote_count}"
+            bash_command_to_run = f"{base_args}{quote_args}"
         
     
     return bash_command_to_run
 
-def _mkbash_cmd_string_jgtfxcli_range1(instrument:str, timeframe:str,tlid_range=None,cli_path="", verbose_level=0):
+def mk_base_args(instrument, timeframe, cli_path, verbose_level, keep_bid_ask):
     cli_path=resolve_cli_path(cli_path)
+    bidask_arg = ""
     
-    date_from,date_to=jgtos.tlid_range_to_jgtfxcon_start_end_str(tlid_range)
+    if keep_bid_ask:
+        bidask_arg = f" -{KEEP_BID_ASK_FLAG_ARGNAME_ALIAS}"
     
-    bash_command_to_run = f"pwd;{cli_path} -i \"{instrument}\" -t \"{timeframe}\" -s \"{date_from}\" -e \"{date_to}\" -v {verbose_level}"
-    return bash_command_to_run
+    base_args=f"{cli_path} -i \"{instrument}\" -t \"{timeframe}\"{bidask_arg} -v {verbose_level}"
+    return base_args
 
 def jgtfxcli_wsl_range(instrument:str, timeframe:str, quote_count:int,tlid_range=None,cli_path="", verbose_level=0,use_full=False,keep_bid_ask=False):
-    bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count,use_full=use_full)
-        
+    bash_command_to_run = _mkbash_cmd_string_jgtfxcli_range(instrument, timeframe,tlid_range,cli_path, verbose_level,quote_count,use_full=use_full,keep_bid_ask=keep_bid_ask)
     return run_bash_command_by_platform(bash_command_to_run)
 
 def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose_level=0,use_full=False):
@@ -117,7 +110,6 @@ def jgtfxcli(instrument:str, timeframe:str, quote_count:int,cli_path="", verbose
 
 def getPH(instrument:str, timeframe:str, quote_count:int,tlid_range=None, verbose_level=0,use_full=False,keep_bid_ask=False):
     return jgtfxcli_wsl_range(instrument, timeframe, quote_count,tlid_range,"", verbose_level,use_full=use_full,keep_bid_ask=keep_bid_ask)
-
 
 def wsl_cd(directory):
     # Define the command to be executed

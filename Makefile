@@ -64,9 +64,14 @@ dist:
 pypi-release:
 	twine upload -s dist/*
 
+.PHONY: pre-release
+pre-release:
+	make dist
+	make bump_version
+	#git commit pyproject.toml jgtutils/__init__.py package.json -m bump:release &>/dev/null
+
 .PHONY: release
 release:
-	make dist
 	git tag -s $(version)
 	git push 
 	git push --tags
@@ -77,12 +82,29 @@ dev-pypi-release:
 	twine --version
 	twine upload --repository pypi-dev dist/*
 
+.PHONY: test
+test:
+	pytest
+
 .PHONY: dev-release
 dev-release:
-	python bump_version.py
+	make bump_version
 	make dist
 	make dev-pypi-release
+
+.PHONY: dev-release-plus
+dev-release-plus:
+	make dev-release
+	twine upload dist/*
 
 .PHONY: bump_version
 bump_version:
 	python bump_version.py
+	#git commit pyproject.toml jgtutils/__init__.py package.json -m bump:dev &>/dev/null
+
+.PHONY: quick-release
+quick-release:
+	make test
+	make bump_version
+	make dist
+	make pypi-release
