@@ -62,7 +62,7 @@ dist:
 
 .PHONY: pypi-release
 pypi-release:
-	twine upload -s dist/*
+	twine upload dist/*
 
 .PHONY: pre-release
 pre-release:
@@ -72,7 +72,7 @@ pre-release:
 
 .PHONY: release
 release:
-	git tag -s $(version)
+	git tag $(version)
 	git push 
 	git push --tags
 	make pypi-release
