@@ -172,3 +172,8 @@ _config.yml.bak
 _config.yml
 .env.jgtset
 _config.yml
+ref-dotcache*
+ref-dot*
+_jgt/
+jgtutils/Interactive-1.ipynb
+.hch/
