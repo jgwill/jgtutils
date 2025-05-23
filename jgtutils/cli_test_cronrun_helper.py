@@ -1,3 +1,17 @@
+"""
+Timeframe Scheduler Module
+
+This module provides functionality for scheduling and executing tasks based on trading timeframes.
+It handles:
+- Timeframe-based task scheduling
+- Execution of scripts/commands at specific timeframe intervals
+- Graceful handling of interruptions and errors
+- Logging and monitoring of scheduled tasks
+
+The module is designed to work with various trading timeframes (m1, m5, m15, H1, H4, etc.)
+and can execute custom scripts or commands when specific timeframe conditions are met.
+"""
+
 import datetime
 import time
 import os
