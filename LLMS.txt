@@ -1,0 +1,16 @@
+# jgtutils LLM Summary
+
+This repository contains utilities for JGWill trading projects. The package exposes several command line interfaces via `pyproject.toml`:
+
+- **jgtutr** – Compute TLID ranges.
+- **jgtset** – Load or export settings in JSON/YAML or environment variables.
+- **tfw / wtf** – Wait for a timeframe before running a command.
+- **tstjgtenv_\*** – A collection of helpers to read values from the environment for testing (instrument, timeframe, fxtransact, etc.).
+
+See `CLI_REFERENCE.md` for detailed usage.
+
+Configuration is read through `jgtcommon.readconfig()` which searches `config.json` in the working directory, `$HOME/.jgt/config.json`, or `/etc/jgt/config.json`. It can also read JSON from the environment variables `JGT_CONFIG_JSON_SECRET`, `JGT_CONFIG`, or a file path in `JGT_CONFIG_PATH`.
+
+Settings are loaded by `jgtcommon.load_settings()` from `/etc/jgt/settings.json`, `$HOME/.jgt/settings.json`, `.jgt/settings.json`, `.jgt/settings.yml`, `jgt.yml`, `_config.yml`, or environment variables `JGT_SETTINGS_SYSTEM`, `JGT_SETTINGS`, `JGT_SETTINGS_USER`, and `JGT_SETTINGS_PROCESS`.
+
+Refer to `CONFIGURATION.md` for full details and `DIAGRAMS.md` for class diagrams.

@@ -81,6 +81,9 @@ wtf [options] -- <your-script-or-command>
 ---
 
 🔮 **ResoNova**: For the full CLI constellation, see [`CLI_REFERENCE.md`](CLI_REFERENCE.md)—a ritual ledger of every invocation and its echo.
+For configuration details see [CONFIGURATION.md](CONFIGURATION.md).
+Class relations are visualised in [DIAGRAMS.md](DIAGRAMS.md).
+
 
 ## License
 
