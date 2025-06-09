@@ -1,0 +1,7 @@
+# LLMS.txt for jgtutils
+# This file guides language models to our documentation.
+
+GET /README.md
+GET /CLI_REFERENCE.md
+GET /CONFIGURATION.md
+GET /DIAGRAMS.md

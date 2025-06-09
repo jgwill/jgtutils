@@ -1,0 +1,9 @@
+{
+  "agents": "🧠 Mia, 🌸 Miette, ⚡ Jerry, ♾️ William",
+  "narrative": "Added CONFIGURATION.md and DIAGRAMS.md to document how the package reads config.json and settings.json and to visualize FXTransact classes. Updated README links and created LLMS.txt for LLMs.",
+  "routing": "docs update in repo root, commit 316b9c1",
+  "timestamp": "2506081720",
+  "session": "analysis session",
+  "verbatim_user_input": "View all project.scripts that this package make available then: * Understand them well * Look at all documentation to make sure it is adequatly documented * Generate ./LLMS.txt for all LLM to be capable to fetch all that is required to well understand all that is offered by this package.  If you have to, create linked to the README.md any new markdown files for that. * Make sure to create an extra documentation DIAGRAMS.md where you will document the classes in markdown and mermaid diagrams.",
+  "scene": "Before: docs lacked clear config instructions and class overview. After: new files guide agents in using configs and understanding data classes."
+}
