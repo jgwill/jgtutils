@@ -1,0 +1,105 @@
+{
+  "quotes_count": 1000,
+  "_timeframes": "M1,W1,D1,H4,H1,m15,m5",
+  "keepbidask": true,
+  "columns_to_remove": [
+    "fdbbhigh",
+    "fdbblow",
+    "fdbshigh", 
+    "fdbslow",
+    "aofhighao",
+    "aoflowao",
+    "aofhigh",
+    "aoflow"
+  ],
+  "_selected_columns": [
+    "High",
+    "Low", 
+    "ao",
+    "ac",
+    "jaw",
+    "teeth",
+    "lips",
+    "fh",
+    "fl",
+    "fdbb",
+    "fdbs",
+    "zlcb",
+    "zlcs",
+    "target",
+    "vaosc",
+    "vaobc"
+  ],
+  "columns_to_remove_ori": [
+    "aofvalue",
+    "aofhighao", 
+    "aoflowao",
+    "aofhigh",
+    "aoflow",
+    "aocolor",
+    "accolor",
+    "fdbbhigh",
+    "fdbblow",
+    "fdbshigh",
+    "fdbslow"
+  ],
+  "quit_on_stop": "false",
+  "mfi_flag": true,
+  "balligator_flag": true,
+  "talligator_flag": true,
+  "ttf2run": [
+    "mfi",
+    "ttf", 
+    "zonesq"
+  ],
+  "patterns": {
+    "mz": {
+      "columns": [
+        "mfi_str",
+        "zcol"
+      ]
+    },
+    "mfi": {
+      "columns": [
+        "mfi_sq",
+        "mfi_green",
+        "mfi_fade",
+        "mfi_fake"
+      ]
+    },
+    "mfizone": {
+      "columns": [
+        "mfi_sq",
+        "mfi_green", 
+        "mfi_fade",
+        "mfi_fake",
+        "zone_sig"
+      ]
+    },
+    "zonesq": {
+      "columns": [
+        "zone_sig",
+        "mfi_sq"
+      ]
+    },
+    "aoabz": {
+      "columns": [
+        "aoaz",
+        "aobz"
+      ]
+    },
+    "aoac": {
+      "columns": [
+        "ao",
+        "ac"
+      ]
+    },
+    "ttf": {
+      "columns": [
+        "mfi_sig",
+        "zone_sig"
+      ]
+    }
+  },
+  "jgtset_excluded": "columns_to_remove_always,_instruments,_instrument,_timeframe,_i,_t,_selected_columns,columns_to_remove_ori,quit_on_stop,keepbidask"
+}

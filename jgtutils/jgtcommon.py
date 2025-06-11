@@ -2246,3 +2246,81 @@ def dt_from_last_week_as_string_fxformat():
     last_week = dt_from_last_week_as_datetime()
     _str=last_week.strftime('%m.%d.%Y')
     return _str + " 00:00:00"
+
+
+# Simple API wrappers for external packages
+def get_config(demo=False, export_env=False):
+    """
+    Simple configuration loader for external packages.
+    
+    Args:
+        demo (bool): Whether to use demo credentials
+        export_env (bool): Whether to export config to environment variables
+    
+    Returns:
+        dict: Configuration dictionary
+    """
+    return readconfig(demo=demo, export_env=export_env)
+
+
+def get_setting(key, default=None, custom_path=None):
+    """
+    Get a single setting value.
+    
+    Args:
+        key (str): Setting key to retrieve
+        default: Default value if key not found
+        custom_path (str): Optional custom path to settings file
+    
+    Returns:
+        Setting value or default
+    """
+    settings = get_settings(custom_path=custom_path)
+    return settings.get(key, default)
+
+
+def setup_environment(demo=False, custom_settings_path=None):
+    """
+    One-call setup for external packages.
+    Sets up configuration and settings, exports environment variables.
+    
+    Args:
+        demo (bool): Whether to use demo credentials
+        custom_settings_path (str): Optional custom path to settings file
+    
+    Returns:
+        tuple: (config_dict, settings_dict)
+    """
+    config = readconfig(demo=demo, export_env=True)
+    settings = get_settings(custom_path=custom_settings_path)
+    return config, settings
+
+
+def get_config_value(key, default=None, demo=False):
+    """
+    Get a single configuration value.
+    
+    Args:
+        key (str): Configuration key to retrieve
+        default: Default value if key not found
+        demo (bool): Whether to use demo credentials
+    
+    Returns:
+        Configuration value or default
+    """
+    config = readconfig(demo=demo)
+    return config.get(key, default)
+
+
+def is_demo_mode():
+    """
+    Check if running in demo mode based on current configuration.
+    
+    Returns:
+        bool: True if demo mode is active
+    """
+    try:
+        config = readconfig()
+        return config.get('connection', '').lower() == 'demo'
+    except:
+        return False
