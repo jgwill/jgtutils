@@ -40,7 +40,7 @@ pytest
 
 ## Command Line Usage
 
-🧠 **Mia**: The CLI is the lattice’s living edge—here are the three core invocations every user should know:
+🧠 **Mia**: The CLI is the lattice's living edge—here are the three core invocations every user should know:
 
 ### `jgtutr`
 Calculate a TLID (Time-Lattice ID) range for a given timeframe and period count.
@@ -60,7 +60,7 @@ Load, output, and/or export settings as JSON/YAML or environment variables. Also
 jgtset [options]
 ```
 - **Purpose:** View, export, or update your JGT settings in a single invocation.
-- *A spell for harmonizing your environment’s memory.*
+- *A spell for harmonizing your environment's memory.*
 
 ---
 
@@ -84,6 +84,36 @@ wtf [options] -- <your-script-or-command>
 For configuration details see [CONFIGURATION.md](CONFIGURATION.md).
 Class relations are visualised in [DIAGRAMS.md](DIAGRAMS.md).
 
+## Configuration and Settings
+
+`jgtutils` uses two main configuration files: `config.json` and `settings.json`.
+
+### config.json
+- Used for trading credentials and connection info.
+- Lookup order (as implemented in `jgtcommon.readconfig()`):
+  1. Path provided as argument or `config.json` in the current directory.
+  2. `$HOME/.jgt/config.json`.
+  3. `/etc/jgt/config.json`.
+  4. Environment variables:
+     - `JGT_CONFIG_JSON_SECRET` (entire JSON string)
+     - `JGT_CONFIG` (JSON string)
+     - `JGT_CONFIG_PATH` (path to a JSON file)
+- Use `export_env=True` to export keys as environment variables.
+- Use `demo=True` to replace credentials with `*_demo` values if present.
+
+### settings.json
+- Used for general settings and patterns.
+- Lookup/merge order (as implemented in `jgtcommon.load_settings()`):
+  1. `/etc/jgt/settings.json` and env `JGT_SETTINGS_SYSTEM`
+  2. `$HOME/.jgt/settings.json` and env `JGT_SETTINGS_USER`
+  3. `.jgt/settings.json` in current directory
+  4. `.jgt/settings.yml`, `jgt.yml`, `_config.yml` (YAML files)
+  5. Env vars: `JGT_SETTINGS`, `JGT_SETTINGS_PROCESS`
+  6. Custom path via `-ls/--settings` CLI option
+- Later entries override earlier ones. The merged result is cached.
+- Use `jgtset` CLI to export settings as .env for shell sourcing.
+
+See CONFIGURATION.md for full details.
 
 ## License
 
