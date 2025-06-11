@@ -31,13 +31,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-    ],    
-    entry_points={
-        'console_scripts': [
-            'jgtutr=jgtutils.cli_tlid_range:main',
-            'jgt-add-pattern=jgtutils.add_pattern_to_home_settings:main',
-        ],
-    },
+    ],  
     keywords='utilities',
     project_urls={
         'Bug Reports': 'https://github.com/jgwill/jgtutils/issues',

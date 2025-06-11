@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jgtutils"
-version = "1.0.0"
+version = "1.0.2"
 description = "A utility package common to other JGT projects."
 readme = "README.md"
 authors = [{ name = "Guillaume Isabelle", email = "jgi@jgwill.com" }]
@@ -48,3 +48,4 @@ tstjgtenv_timeframe="jgtutils.cli_test_from_jgtenv_timeframe:main"
 tstjgtenv_timeframe_with_alias="jgtutils.cli_test_from_jgtenv_timeframe:main_alias"
 tstjgtenv_fxtransact="jgtutils.cli_test_from_jgtenv_fxtransact:main"
 tstjgtenv_fxtransact_with_alias="jgtutils.cli_test_from_jgtenv_fxtransact:main_alias"
+jgt-add-pattern="jgtutils.add_pattern_to_home_settings:main"
