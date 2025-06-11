@@ -3,3 +3,4 @@ tlid>=0.1.16
 PyYAML
 ruamel.yaml
 numpy
+jgtcore
