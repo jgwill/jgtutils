@@ -2,8 +2,12 @@
 # This file guides language models to our documentation.
 
 GET /README.md
-GET /CONFIGURATION.md
 GET /DIAGRAMS.md
 GET /CLI_REFERENCE.md
 GET /examples/README.md
+
+# Configurations and Settings
+GET /CONFIGURATION.md
+GET https://jgtcore.jgwill.com
+
 

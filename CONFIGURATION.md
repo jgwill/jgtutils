@@ -1,5 +1,21 @@
 # Configuration and Settings
 
+* NOTE : You can use the package "jgtcore" (pip install jgtcore) which contains what is needed for configurations and settings 
+
+```python
+from jgtcore import readconfig, load_settings
+
+# Load with specific options
+config = readconfig(demo=True, export_env=True)
+settings = load_settings(custom_path="/path/to/settings.json")
+```
+
+* for more see: https://jgtcore.jgwill.com
+
+
+-----
+BELLOW IS STILL Supported on config/settings that will keep migrating to jgtcore (will only by a library for that and jgtutils will become just utilities but that is not completed yet.)
+
 ## config.json
 `jgtcommon.readconfig()` loads trading credentials and connection info from a JSON file. Lookup order:
 
