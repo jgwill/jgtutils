@@ -12,13 +12,45 @@ pip install jgtutils
 
 ## Usage
 
-Here's a simple example of how to use `jgtutils`:
+### Library Usage (For External Packages)
 
 ```python
-from jgtutils import module
+import jgtutils
 
-# Your usage example here
+# Simple configuration access
+config = jgtutils.get_config()
+demo_config = jgtutils.get_config(demo=True)
+
+# Single setting access
+instrument = jgtutils.get_setting('instrument', 'EUR/USD')
+quotes_count = jgtutils.get_setting('quotes_count', 1000)
+
+# One-call environment setup
+config, settings = jgtutils.setup_environment(demo=True)
+
+# Check if running in demo mode
+if jgtutils.is_demo_mode():
+    print("Running in demo mode")
 ```
+
+### Advanced Library Usage
+
+```python
+from jgtutils import readconfig, get_settings, load_settings
+
+# Load configuration with options
+config = readconfig(demo=True, export_env=True)
+
+# Load settings from custom path
+settings = load_settings(custom_path="/path/to/custom/settings.json")
+
+# Get all settings (cached)
+all_settings = get_settings()
+```
+
+### Configuration Files
+
+See `examples/config.json` and `examples/settings.json` for complete file structures.
 
 ## Development
 
