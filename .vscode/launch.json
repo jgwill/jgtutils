@@ -236,10 +236,10 @@
       "args": "-ls tests/test_settings_01_spec_instrument_timeframe.json"
     },
     {
-      "name": "cli_test_cronrun_helper01",
+      "name": "timeframe_scheduler01",
       "type": "debugpy",
       "request": "launch",
-      "program": "jgtutils/cli_test_cronrun_helper.py",
+      "program": "jgtutils/timeframe_scheduler.py",
       "console": "integratedTerminal",
       "args": "-t m5"
     },

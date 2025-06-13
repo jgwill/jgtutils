@@ -40,8 +40,8 @@ dependencies = [
 [project.scripts]
 jgtutr = "jgtutils.cli_tlid_range:main"
 jgtset = "jgtutils.jgtset:main"
-tfw="jgtutils.cli_test_cronrun_helper:main"
-wtf="jgtutils.cli_test_cronrun_helper:main"
+    tfw="jgtutils.timeframe_scheduler:main"
+    wtf="jgtutils.timeframe_scheduler:main"
 tstjgtenv_instrument_timeframe="jgtutils.cli_test_from_jgtenv_it:main"
 tstjgtenv_instrument_timeframe_with_alias="jgtutils.cli_test_from_jgtenv_it:main_alias"
 tstjgtenv_timeframe="jgtutils.cli_test_from_jgtenv_timeframe:main"
