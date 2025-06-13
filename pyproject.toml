@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jgtutils"
-version = "1.0.2"
+version = "1.0.7"
 description = "A utility package common to other JGT projects."
 readme = "README.md"
 authors = [{ name = "Guillaume Isabelle", email = "jgi@jgwill.com" }]
@@ -23,7 +23,7 @@ classifiers = [
 keywords = ["utilities"]
 
 dependencies = [
-	'jgtcore>=0.1.0',
+	'jgtcore>=0.1.4',
 	'tlid>=0.1.16',
   'python-dotenv',
   'ruamel.yaml>=0.18.6',

@@ -1,7 +1,13 @@
 #%%
 from io import StringIO
-import ruamel.yaml
-yaml = ruamel.yaml.YAML()
+# Optional YAML support - graceful fallback to JSON-only if not available
+try:
+    import ruamel.yaml
+    yaml = ruamel.yaml.YAML()
+    HAS_YAML = True
+except ImportError:
+    yaml = None
+    HAS_YAML = False
 
 book_config_file="_config.yml"
 

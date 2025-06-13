@@ -19,7 +19,15 @@
 
 import argparse
 import json
-import ruamel.yaml;yaml = ruamel.yaml.YAML()
+
+# Optional YAML support - graceful fallback to JSON-only if not available
+try:
+    import ruamel.yaml
+    yaml = ruamel.yaml.YAML()
+    HAS_YAML = True
+except ImportError:
+    yaml = None
+    HAS_YAML = False
 
 import os
 import sys
@@ -141,6 +149,10 @@ def _load_settings_from_path(path):
     return {}
 
 def _load_settings_from_path_yaml(path,key=None):
+    if not HAS_YAML:
+        # YAML not available, skip YAML file loading
+        return {}
+    
     if os.path.exists(path):
         with open(path, 'r') as f:
             if key is not None:

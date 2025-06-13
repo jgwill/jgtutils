@@ -3,9 +3,14 @@ import sys
 
 from dotenv import load_dotenv
 
-from ruamel.yaml import YAML
-
-yaml = YAML()
+# Optional YAML support - graceful fallback to JSON-only if not available
+try:
+    from ruamel.yaml import YAML
+    yaml = YAML()
+    HAS_YAML = True
+except ImportError:
+    yaml = None
+    HAS_YAML = False
 
 from jgtcliconstants import JGT_ENV_EXPORT_NAME, JGT_SUBDIR_NAME,JGT_FXTRADE_ENV_FILENAME
 
@@ -55,6 +60,9 @@ def load_env():
   return False
 
 def load_jgtyaml_env(config_file="_config.yaml",jgt_key="jgt"):
+  if not HAS_YAML:
+    return False
+    
   try:
     with open(config_file) as f:
       config = yaml.load(f)
