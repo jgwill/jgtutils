@@ -1,19 +1,243 @@
 # LLMS.txt for jgtutils
-# This file guides language models to our documentation.
+# Platform Utilities and Configuration Management
 
 GET /README.md
 GET /DIAGRAMS.md
 GET /CLI_REFERENCE.md
+GET /CONFIGURATION.md
+GET /REFACTORING_PLAN.md
 GET /examples/README.md
 
-# Configurations and Settings
-GET /CONFIGURATION.md
-GET https://jgtcore.jgwill.com
+## Package Purpose
+jgtutils provides essential utilities and configuration management for the JGT platform. This package is currently undergoing refactoring to properly separate utilities from libraries (see REFACTORING_PLAN.md).
 
-# Key Modules and Tools
-# timeframe_scheduler.py - Production timeframe scheduler for automated trading workflows
-# - CLI commands: tfw/wtf - Wait for trading timeframes then execute scripts/functions
-# - Supports all timeframes: m1, m5, m15, H1, H4, D1, W1, M1
-# - Essential for cron-like orchestration in trading automation
+⚠️ **Note**: This package is in active refactoring to migrate library functions to jgtcore and maintain only utilities here.
+
+## Current State & Refactoring Context
+
+### What jgtutils Should Be (Target State)
+- **Platform Utilities**: CLI helpers, environment management, file system utilities
+- **Configuration Management**: Settings loading, environment setup
+- **OS Integration**: WSL helpers, path utilities, system integration
+- **Development Tools**: Testing utilities, debugging helpers
+
+### What's Being Migrated to jgtcore
+- **Trading Domain Logic**: FXTransact classes and trading data structures
+- **Core Library Functions**: Data processing, business logic
+- **Market Utilities**: Trading-specific calculations and utilities
+
+### Current Mixed State (Being Resolved)
+The package currently contains both utilities and libraries, which creates confusion. See REFACTORING_PLAN.md for detailed migration strategy.
+
+## Key Utility Components (Staying in jgtutils)
+
+### Configuration and Settings
+- **jgtcommon.py** - Configuration management and CLI argument parsing (being split)
+- **jgtenv.py** - Environment variable loading and management
+- **jgtset.py** - Settings management utilities
+
+```python
+from jgtutils import jgtcommon
+
+# Load configuration
+config = jgtcommon.readconfig()
+settings = jgtcommon.get_settings()
+
+# CLI argument parsing
+parser = jgtcommon.new_parser("App Description", "app-name")
+args = jgtcommon.parse_args(parser)
+```
+
+### File System and OS Utilities
+- **jgtos.py** - File path utilities and data directory management
+- **jgtfxhelper.py** - FX-specific file path helpers
+- **jgtwslhelper.py** - Windows Subsystem for Linux utilities
+
+```python
+from jgtutils import jgtos
+
+# Data path management
+data_path = jgtos.get_data_path("ids", use_full=False)
+filepath = jgtos.get_pov_local_data_filename(instrument, timeframe)
+```
+
+### CLI Tools and Helpers
+- **jgtclihelper.py** - JSON message formatting and signal handling
+- **jgtcliconstants.py** - CLI argument constants and command groups
+
+```python
+from jgtutils.jgtclihelper import print_jsonl_message
+from jgtutils.jgtcliconstants import CLI_FXADDORDER_PROG_NAME
+
+# Structured logging
+print_jsonl_message("Operation completed", extra_dict={"status": "success"})
+```
+
+### Point of View (POV) Utilities
+- **jgtpov.py** - Timeframe calculations and date handling utilities
+
+```python
+from jgtutils import jgtpov
+
+# Timeframe and date calculations
+timeframe_data = jgtpov.calculate_timeframe_metrics(timeframe)
+```
+
+## Library Components (Being Migrated to jgtcore)
+
+### ⚠️ FXTransact Classes (Migration Target)
+- **FXTransact.py** - Trading data structures and business logic
+- **Status**: Will be moved to jgtcore.trading module
+
+```python
+# Current usage (will change after migration)
+from jgtutils.FXTransact import FXTransactWrapper, FXTrade, FXTrades
+```
+
+### ⚠️ Constants and Type Definitions (Partially Migrating)
+- **jgtconstants.py** - Platform constants (trading-specific parts migrating)
+- **coltypehelper.py** - Data type definitions and helpers
+- **colconverthelper.py** - Data conversion utilities
+
+## Essential CLI Tools & Constants
+
+### Timeframe Scheduler (Production Ready)
+- **CLI Commands**: `tfw`/`wtf` - Wait for trading timeframes then execute scripts
+- **Purpose**: Cron-like orchestration for trading automation
+- **Timeframes**: Supports all timeframes (m1, m5, m15, H1, H4, D1, W1, M1)
+
+```bash
+# Wait for H4 timeframe then execute script
+tfw -t H4 -S ./trading_script.sh
+
+# Wait for timeframe then exit (for automation)
+tfw -t D1 -X
+```
+
+### CLI Program Constants
+Essential for inter-package CLI communication:
+
+```python
+from jgtutils.jgtcliconstants import (
+    CLI_FXADDORDER_PROG_NAME,     # Order management
+    CLI_FXTR_PROG_NAME,           # Trade reporting  
+    PDSCLI_PROG_NAME,             # Price data service
+    IDSCLI_PROG_NAME,             # Indicator data service
+)
+```
+
+## Integration with Other Packages
+
+### Used by jgtapp.py (Primary Integration)
+```python
+# jgtapp uses jgtutils for configuration and CLI tools
+from jgtutils import jgtcommon
+from jgtutils.jgtcliconstants import CLI_FXADDORDER_PROG_NAME
+from jgtutils.jgtconstants import LIPS, TEETH, JAW
+from jgtutils.FXTransact import FXTransactWrapper  # Will migrate to jgtcore
+```
+
+### Used by jgtpy for Configuration
+```python
+# jgtpy uses jgtutils for settings and file paths
+from jgtutils import jgtcommon, jgtos
+
+config = jgtcommon.readconfig()
+data_path = jgtos.get_data_path("ids")
+```
+
+### Used by jgtml for Utilities
+```python
+# jgtml uses jgtutils for CLI constants and file helpers
+from jgtutils.jgtcliconstants import TFW_PROG_NAME
+from jgtutils.jgtfxhelper import mkfn_cfxdata_filepath
+```
+
+## Configuration Management
+
+### Settings Files
+- **Global**: `/etc/jgt/settings.json`
+- **User**: `$HOME/.jgt/settings.json`  
+- **Local**: `.jgt/settings.json`
+
+### Environment Variables
+- **JGTPY_DATA** - Standard data storage path
+- **JGTPY_DATA_FULL** - Full historical data storage path
+- **JGT_KEEP_BID_ASK** - Bid/ask data retention flag
+
+### Configuration API
+```python
+from jgtutils import jgtcommon
+
+# Load hierarchical configuration
+config = jgtcommon.readconfig()
+settings = jgtcommon.get_settings()
+
+# Environment setup
+jgtcommon.setup_environment()
+```
+
+## Critical Refactoring Notes
+
+### Phase 1: Split jgtcommon.py (High Priority)
+The 2,327-line jgtcommon.py file needs immediate splitting:
+- **CLI parsing** → Stay in jgtutils  
+- **Settings management** → Remove duplicates (already in jgtcore)
+- **Market timing** → Move to jgtcore
+- **Date/time utilities** → Move to jgtcore
+
+### Phase 2: Migrate Trading Libraries
+- **FXTransact.py** → Move to jgtcore.trading
+- **Trading constants** → Move to jgtcore.constants
+- **Market utilities** → Move to jgtcore.market
+
+### Current Dependencies
+jgtutils currently depends on `jgtcore>=0.1.0` and re-exports some functions:
+```python
+# Current pattern (transitional)
+from jgtcore import get_config, get_setting
+# Re-exported for backward compatibility
+```
+
+## Development State
+
+### Production Components
+- **CLI Tools**: tfw/wtf timeframe scheduler
+- **Configuration Management**: Settings loading and environment setup
+- **File Utilities**: Path management and file operations
+
+### Active Refactoring
+- **jgtcommon.py splitting** - High priority (2,327 lines → multiple modules)
+- **Library migration** - Moving trading logic to jgtcore
+- **Import cleanup** - Removing duplicates and updating dependencies
+
+### Post-Refactoring Target
+After refactoring completion, jgtutils will be a clean utilities package:
+```
+jgtutils/
+├── cli/           # CLI tools and helpers
+├── os/            # OS and file system utilities  
+├── env/           # Environment and configuration
+├── pov/           # POV calculations
+└── scripts/       # Utility scripts
+```
+
+## Getting Started
+
+### For LLM Understanding
+1. **Current State**: Mixed utilities and libraries
+2. **Refactoring Goal**: Pure utilities package with libraries in jgtcore
+3. **Integration**: Essential for CLI orchestration and configuration
+4. **Migration Impact**: Import paths will change as refactoring progresses
+
+### Key Integration Points
+- **jgtapp**: Primary consumer for CLI orchestration
+- **jgtpy**: Uses configuration and file utilities
+- **jgtml**: Uses CLI constants and file helpers
+- **jgtcore**: Target for migrated library functions
+
+---
+
+*jgtutils is the platform's utility backbone, currently undergoing strategic refactoring to achieve proper separation between utilities and libraries. See REFACTORING_PLAN.md for detailed migration roadmap.*
 
 
