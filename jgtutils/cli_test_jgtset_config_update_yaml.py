@@ -9,7 +9,7 @@ except ImportError:
     yaml = None
     HAS_YAML = False
 
-book_config_file="_config.yml"
+book_config_file="_config.yml" #Probably related to that experimentation that when launching a trading campaign, jupyter book is created therefore, we store configuration into the jupyter book config file
 
 import jgtset as jset
 jgtset_included_keys = "_jgtset_included.json"
