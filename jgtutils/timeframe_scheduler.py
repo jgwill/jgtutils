@@ -1,15 +1,28 @@
 """
-Timeframe Scheduler Module
+Timeframe Scheduler - Production Trading Automation Tool
 
-This module provides functionality for scheduling and executing tasks based on trading timeframes.
-It handles:
-- Timeframe-based task scheduling
-- Execution of scripts/commands at specific timeframe intervals
-- Graceful handling of interruptions and errors
-- Logging and monitoring of scheduled tasks
+This module provides production-ready timeframe-based task scheduling for automated trading workflows.
+CLI Commands: `tfw` and `wtf` (both aliases for the same functionality)
 
-The module is designed to work with various trading timeframes (m1, m5, m15, H1, H4, etc.)
-and can execute custom scripts or commands when specific timeframe conditions are met.
+Core Features:
+- **Timeframe-based scheduling**: Wait for specific trading timeframes (m1, m5, m15, H1, H4, D1, W1, M1)
+- **Script execution**: Run bash scripts when timeframes are reached
+- **CLI command execution**: Execute any CLI command at timeframe intervals  
+- **Function execution**: Run bash functions with environment loading
+- **Graceful error handling**: Robust error management and logging
+- **JSONL logging**: Structured logging for monitoring and debugging
+
+Usage Examples:
+    # Wait for H1 timeframe then exit
+    tfw -t H1 -X
+    
+    # Run script every m15
+    tfw -t m15 -S /path/to/script.sh
+    
+    # Execute CLI command on H4
+    wtf -t H4 -C python my_trading_script.py
+
+This is a critical component for automated trading systems requiring precise timing.
 """
 
 import datetime
@@ -67,7 +80,7 @@ def parse_args():
     #--script-to-run
     step_group.add_argument("-S","-B", "--script-to-run", help="Script to run when the timeframe is reached. (.jgt/tfw.sh). ",nargs="*")
     #--cli-to-run
-    step_group.add_argument("-C", "--cli-to-run", help="CLI to run when the timeframe is reached. (python -m jgtutils.cli_test_cronrun_helper)",nargs="*")
+    step_group.add_argument("-C", "--cli-to-run", help="CLI to run when the timeframe is reached. (python -m jgtutils.timeframe_scheduler)",nargs="*")
     #--function
     step_group.add_argument("-F", "--function", help="Function to run when the timeframe is reached.")
     

@@ -248,6 +248,15 @@ jgtutils/
 4. **Usability**: Simplified import structure
 5. **Maintainability**: Easier to add new features and fix bugs
 
+## Recent Improvements ✅
+
+### Timeframe Scheduler Refactor (2025-01-22)
+- **Renamed**: `cli_test_cronrun_helper.py` → `timeframe_scheduler.py`
+- **Issue**: Misleading filename suggested test utility, but it's a production timeframe scheduler
+- **CLI Commands**: `tfw`/`wtf` now properly documented as timeframe scheduler
+- **Documentation**: Updated CLI_REFERENCE.md and llms.txt with clear purpose
+- **Impact**: Better discoverability and understanding of this critical trading automation tool
+
 ## Next Actions
 
 1. **Immediate**: Begin Phase 1 - Split jgtcommon.py

@@ -10,4 +10,10 @@ GET /examples/README.md
 GET /CONFIGURATION.md
 GET https://jgtcore.jgwill.com
 
+# Key Modules and Tools
+# timeframe_scheduler.py - Production timeframe scheduler for automated trading workflows
+# - CLI commands: tfw/wtf - Wait for trading timeframes then execute scripts/functions
+# - Supports all timeframes: m1, m5, m15, H1, H4, D1, W1, M1
+# - Essential for cron-like orchestration in trading automation
+
 
