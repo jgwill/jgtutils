@@ -1,8 +1,17 @@
 
 import datetime
 import json
-import ruamel.yaml;yaml = ruamel.yaml.YAML()
-OUTPUT_YAML_DISABLED=True
+
+# Optional YAML support - graceful fallback to JSON-only if not available
+try:
+    import ruamel.yaml
+    yaml = ruamel.yaml.YAML()
+    HAS_YAML = True
+    OUTPUT_YAML_DISABLED = False
+except ImportError:
+    yaml = None
+    HAS_YAML = False
+    OUTPUT_YAML_DISABLED = True
 
 import os
 import sys
