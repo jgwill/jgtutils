@@ -60,6 +60,10 @@ NO_MFI_FLAG_ARGNAME_ALIAS = 'nomfi'
 GATOR_OSCILLATOR_FLAG_ARGNAME = 'gator_oscillator_flag'
 GATOR_OSCILLATOR_FLAG_ARGNAME_ALIAS = 'go'
 
+#mouth_water_flag,mw
+MOUTH_WATER_FLAG_ARGNAME = 'mouth_water_flag'
+MOUTH_WATER_FLAG_ARGNAME_ALIAS = 'mw'
+
 #keepbidask_flag,kba
 KEEP_BID_ASK_FLAG_ARGNAME = 'keepbidask'
 KEEP_BID_ASK_FLAG_ARGNAME_ALIAS = 'kba'
