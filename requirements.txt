@@ -4,3 +4,4 @@ PyYAML
 ruamel.yaml
 numpy
 jgtcore
+dateutils
