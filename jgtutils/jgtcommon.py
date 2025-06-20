@@ -1,6 +1,3 @@
-
-
-
 # Copyright 2019 Gehtsoft USA LLC
 # Copyright 2023 JGWill (extended/variations)
 
@@ -83,6 +80,8 @@ from jgtcliconstants import (ACCOUNT_ARGNAME, ARG_GROUP_BARS_DESCRIPTION,
                                       KEEP_BID_ASK_FLAG_ARGNAME,
                                       KEEP_BID_ASK_FLAG_ARGNAME_ALIAS, LOTS_ARGNAME, LOTS_ARGNAME_ALIAS, MD_FLAG_ARGNAME, MD_FLAG_ARGNAME_ALIAS,
                                       MFI_FLAG_ARGNAME, MFI_FLAG_ARGNAME_ALIAS,
+                                      MOUTH_WATER_FLAG_ARGNAME,
+                                      MOUTH_WATER_FLAG_ARGNAME_ALIAS,
                                       NO_MFI_FLAG_ARGNAME,
                                       NO_MFI_FLAG_ARGNAME_ALIAS,
                                       NOT_FRESH_FLAG_ARGNAME,
@@ -1667,6 +1666,7 @@ def _post_parse_dependent_arguments_rules()->argparse.Namespace:
     args=__balligator_flag__post_parse()
     args=__talligator_flag__post_parse()
     args=__mfi_flag__post_parse()
+    args=__mouth_water_flag__post_parse()
     args=__use_fresh__post_parse()
     args=__json_post_parse()   
     args=__jgtclirqdata_post_parse()
@@ -1962,6 +1962,25 @@ def add_ids_talligator_argument(parser: argparse.ArgumentParser=None,add_periods
             default=talligator_period_lips_default,
             help="The period of the Tide Alligator lips.",
         )
+    return parser
+
+def add_ids_mouth_water_argument(parser: argparse.ArgumentParser=None,load_default_from_settings=True,flag_default_value=False)->argparse.ArgumentParser:
+
+    global default_parser
+    if parser is None:
+        parser=default_parser
+
+    group_indicators=_get_group_by_title(parser,ARG_GROUP_INDICATOR_TITLE,ARG_GROUP_INDICATOR_DESCRIPTION)
+    
+    default_value = load_arg_default_from_settings(MOUTH_WATER_FLAG_ARGNAME,flag_default_value,alias=MOUTH_WATER_FLAG_ARGNAME_ALIAS) if load_default_from_settings else flag_default_value
+    
+    group_indicators.add_argument(
+        "-"+MOUTH_WATER_FLAG_ARGNAME_ALIAS,
+        "--"+MOUTH_WATER_FLAG_ARGNAME,
+        action="store_true",
+        help="Enable the Alligator Mouth and Water State analysis.",
+        default=default_value
+    )
     return parser
 
 def add_ads_argument(parser: argparse.ArgumentParser=None)->argparse.ArgumentParser:
@@ -2336,3 +2355,13 @@ def is_demo_mode():
         return config.get('connection', '').lower() == 'demo'
     except:
         return False
+
+def __mouth_water_flag__post_parse()->argparse.Namespace:
+    global args
+    __check_if_parsed()
+    try:
+        if not hasattr(args, MOUTH_WATER_FLAG_ARGNAME):
+            setattr(args, MOUTH_WATER_FLAG_ARGNAME,False)
+    except:
+        pass
+    return args
