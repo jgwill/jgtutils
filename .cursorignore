@@ -1,2 +1,22 @@
 # Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
 weekly_report.txt
+codex
+CNAME
+CS_jgtutils_250613.code-workspace
+debug-jos.py
+dist
+_jgtset_included.json
+upjgtutils_version.sh
+WSL__jgtutils.code-workspace
+jgtutils.egg-info
+arch
+build
+*log
+
+.claude/
+.hch
+
+jgtutils/cli_test_*
+jgtutils/test_*
+jgtutils/tst_*
+
