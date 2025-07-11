@@ -79,11 +79,12 @@ AC=indicator_AC_accelerationDeceleration_column_name
 
 indicator_AO_aboveZero_column_name = 'aoaz'
 indicator_AO_bellowZero_column_name = 'aobz'
-indicator_zeroLineCross_column_name = 'zlc'
 AOAZ=indicator_AO_aboveZero_column_name
 AOAZ_TYPE=int
 AOBZ=indicator_AO_bellowZero_column_name
 AOBZ_TYPE=int
+
+indicator_zeroLineCross_column_name = 'zlc'
 ZLC=indicator_zeroLineCross_column_name
 ZLC_TYPE=int
 

@@ -23,7 +23,7 @@ classifiers = [
 keywords = ["utilities"]
 
 dependencies = [
-	'jgtcore>=0.1.5',
+	'jgtcore>=0.2.5',
 	'tlid>=0.1.16',
   'python-dotenv',
   'ruamel.yaml>=0.18.6',
