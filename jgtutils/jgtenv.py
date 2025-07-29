@@ -50,12 +50,23 @@ def load_dotjgtset_exported_env():
   else:
     return False
 
+def load_current_dir_dotenv():
+    """Load .env file from current working directory with override=True for highest precedence"""
+    dotenv_path = os.path.join(os.getcwd(), '.env')
+    if os.path.exists(dotenv_path):
+        load_dotenv(dotenv_path=dotenv_path, override=True)  # Force override existing env vars
+        return True
+    return False
+
 def load_env():
-  _load_dotjgt_env_sh=load_dotjgt_env_sh()
-  _load_dotjgtset_exported_env=load_dotjgtset_exported_env()
-  _load_dotfxtrade_env=load_dotfxtrade_env()
+  # Load in order of precedence (lowest to highest priority)
+  # Current directory .env should override everything else
   _load_jgtyaml_env=load_jgtyaml_env()
-  if _load_dotjgt_env_sh or _load_dotjgtset_exported_env or _load_dotfxtrade_env or _load_jgtyaml_env:
+  _load_dotfxtrade_env=load_dotfxtrade_env()
+  _load_dotjgtset_exported_env=load_dotjgtset_exported_env()
+  _load_dotjgt_env_sh=load_dotjgt_env_sh()
+  _load_current_dir_dotenv=load_current_dir_dotenv()  # Highest priority - current directory
+  if _load_current_dir_dotenv or _load_dotjgt_env_sh or _load_dotjgtset_exported_env or _load_dotfxtrade_env or _load_jgtyaml_env:
     return True
   return False
 
