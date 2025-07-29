@@ -332,6 +332,10 @@ def _preload_settings_from_args(parser: argparse.ArgumentParser=None):
 
 def new_parser(description: str,epilog: str=None,prog: str=None,enable_specified_settings=True,add_exiting_quietly_flag=False,exiting_quietly_message:str=None,exiting_quietly_handler=None)->argparse.ArgumentParser:
     global default_parser
+    
+    # Load environment variables from .env files FIRST (including $(pwd)/.env)
+    load_env()
+    
     if add_exiting_quietly_flag or exiting_quietly_handler is not None:
         #print("We are adding exiting quietly")
         add_exiting_quietly(exiting_quietly_message,exiting_quietly_handler)
