@@ -70,8 +70,9 @@ def parse_args():
     parser = jgtcommon.new_parser("JGT WTF CLI helper ",epilog=APP_EPILOG,enable_specified_settings=True,exiting_quietly_handler=_exit_quietly_handler)#add_exiting_quietly_flag=True,exiting_quietly_message=f"")
     #parser=jgtcommon.add_settings_argument(parser)
     #parser=jgtcommon._preload_settings_from_args(parser)
-    
-    parser= jgtcommon.add_timeframe_standalone_argument(parser,required=True,from_jgt_env=True)
+
+    is_help_requested = '--help' in sys.argv or '-h' in sys.argv
+    parser= jgtcommon.add_timeframe_standalone_argument(parser,required=not is_help_requested,from_jgt_env=True)
     
     step_group=parser.add_mutually_exclusive_group()
     #exit the program when the timeframe is reached
