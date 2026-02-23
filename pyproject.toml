@@ -50,3 +50,4 @@ tstjgtenv_timeframe_with_alias="jgtutils.cli_test_from_jgtenv_timeframe:main_ali
 tstjgtenv_fxtransact="jgtutils.cli_test_from_jgtenv_fxtransact:main"
 tstjgtenv_fxtransact_with_alias="jgtutils.cli_test_from_jgtenv_fxtransact:main_alias"
 jgt-add-pattern="jgtutils.add_pattern_to_home_settings:main"
+smcg="jgtutils.statemachine.cli:main"
