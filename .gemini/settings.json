@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+	   "iaip-mcp": {
+      "command": "node",
+      "args": [
+        "/src/mcp-iaip-gemini/dist/index.js"
+      ],
+      "env": { }
+    },
+	  "coaiapy_caishen": {
+      "command": "/opt/anaconda3/envs/src/bin/coaiapy-mcp",
+      "args": [ ],
+      "env": { 
+	      "COAIAPY_ENV_PATH":"/src/.env.caishen",
+	      "COAIAPY_MCP_FEATURES":"MINIMAL"
+        }
+    }
+,
+    "trading-chart-coaia-narrative": {
+         "command": "npx",
+         "args": ["-y", "${CNCV}", "--memory-path", "${memories}/trading-chart.coaia-narrative.jsonl" ]
+    }
+  }
+}
