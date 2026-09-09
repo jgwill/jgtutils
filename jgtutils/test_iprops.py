@@ -63,8 +63,8 @@ class TestTwoBrokers:
     def test_silver_differs_by_broker_and_both_survive(self):
         # FXCM quotes silver to 2 decimals, OANDA to 5. Collapsing these into
         # one entry misprices a silver stop by 100x on whichever broker loses.
-        assert iprops.get_pips("XAG-USD") == 0.01
-        assert iprops.get_pips("XAG_USD") == 0.0001
+        assert iprops.get_pips("XAG-USD", "fxcm") == 0.01
+        assert iprops.get_pips("XAG-USD", "oanda") == 0.0001
 
     @pytest.mark.parametrize("fxcm,oanda", [
         ("SPX500", "SPX500_USD"),
@@ -76,7 +76,7 @@ class TestTwoBrokers:
         ("WHEATF", "WHEAT_USD"),
     ])
     def test_the_instruments_the_brokers_quote_differently(self, fxcm, oanda):
-        assert iprops.get_pips(fxcm) != iprops.get_pips(oanda)
+        assert iprops.get_pips(fxcm, "fxcm") != iprops.get_pips(oanda, "oanda")
 
     @pytest.mark.parametrize("instrument,pips", [
         ("XAU_USD", 0.01),
@@ -90,10 +90,67 @@ class TestTwoBrokers:
         ("USD_MXN", 0.0001),
     ])
     def test_oanda_instruments_resolve(self, instrument, pips):
-        assert iprops.get_pips(instrument) == pips
+        assert iprops.get_pips(instrument, "oanda") == pips
 
     def test_the_fxcm_half_kept_its_values(self):
         # Adding a broker must not have moved anything that was already right.
         assert iprops.get_pips("XAU/USD") == 0.01
         assert iprops.get_pips("EUR/USD") == 0.0001
         assert iprops.get_iprop("EUR-USD")["bu"] == 1000
+
+
+class TestPunctuationIsNotABroker:
+    """EUR/USD, EUR-USD and EUR_USD are one instrument.
+
+    Which of them a caller types says nothing about which broker they trade on.
+    1.0.28 let the underscore select OANDA and the dash select FXCM, so silver
+    resolved to two different pip sizes depending on how it was spelled. The
+    contract is now named, not spelled.
+    """
+
+    FORMS = ["XAG/USD", "XAG-USD", "XAG_USD"]
+
+    @pytest.mark.parametrize("broker,pips", [("fxcm", 0.01), ("oanda", 0.0001)])
+    def test_every_spelling_gives_one_answer_per_broker(self, broker, pips):
+        for form in self.FORMS:
+            assert iprops.get_pips(form, broker) == pips, form
+
+    @pytest.mark.parametrize("name,identity", [
+        ("EUR/USD", "EUR-USD"), ("EUR_USD", "EUR-USD"), ("EUR-USD", "EUR-USD"),
+        ("XCU_USD", "Copper"), ("Copper", "Copper"),
+        ("SPX500_USD", "SPX500"), ("SPX500", "SPX500"),
+        ("WTICO_USD", "USOil"), ("NATGAS_USD", "NGAS"),
+    ])
+    def test_one_identity_under_every_name(self, name, identity):
+        assert iprops.canonical(name) == identity
+
+    def test_the_broker_can_come_from_the_environment(self, monkeypatch):
+        monkeypatch.setenv("BROKER_PROVIDER", "oanda")
+        assert iprops.get_pips("XAG-USD") == 0.0001
+        monkeypatch.setenv("JGT_BROKER", "fxcm")   # more specific wins
+        assert iprops.get_pips("XAG-USD") == 0.01
+
+    def test_an_unqualified_lookup_still_means_what_it_always_meant(self, monkeypatch):
+        monkeypatch.delenv("JGT_BROKER", raising=False)
+        monkeypatch.delenv("BROKER_PROVIDER", raising=False)
+        assert iprops.get_pips("XAG-USD") == 0.01
+
+    def test_which_brokers_carry_an_instrument(self):
+        assert iprops.get_brokers_for("EUR/USD") == ("fxcm", "oanda")
+        assert iprops.get_brokers_for("XPT-USD") == ("oanda",)   # platinum, OANDA only
+        assert iprops.get_brokers_for("NOT-REAL") == ()
+
+    def test_every_fxcm_instrument_is_also_on_oanda(self):
+        # Measured 2026-09-09: all 48 have an OANDA counterpart, so a stack
+        # switching brokers loses no instrument — only, for eight of them, the
+        # pip size changes.
+        fxcm = [k for k, v in iprops.data.items() if v["broker"] == "fxcm"]
+        assert [k for k in fxcm if "oanda" not in iprops.get_brokers_for(k)] == []
+
+    def test_an_instrument_a_broker_lacks_says_so(self):
+        with pytest.raises(KeyError, match="fxcm does not carry"):
+            iprops.get_pips("XPT_USD", "fxcm")
+
+    def test_an_unknown_broker_is_refused(self):
+        with pytest.raises(ValueError, match="unknown broker"):
+            iprops.get_pips("EUR-USD", "ig")

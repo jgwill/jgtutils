@@ -3213,10 +3213,88 @@ def read_iprops():
   #return data
 read_iprops()
 
-def get_iprop(instrument:str):
+#: The instruments the two brokers name differently for the same thing. Every
+#: other instrument differs only in punctuation, which `canonical` handles.
+#: Keyed by the JGT/FXCM name, valued by OANDA's.
+_OANDA_ALIASES = {
+  "SPX500": "SPX500_USD", "NAS100": "NAS100_USD", "US2000": "US2000_USD",
+  "GER30": "DE30_EUR", "GER40": "DE30_EUR", "UK100": "UK100_GBP",
+  "FRA40": "FR40_EUR", "ESP35": "ESPIX_EUR", "EUSTX50": "EU50_EUR",
+  "JPN225": "JP225_USD", "AUS200": "AU200_AUD", "HKG33": "HK33_HKD",
+  "CHN50": "CN50_USD", "USOil": "WTICO_USD", "UKOil": "BCO_USD",
+  "NGAS": "NATGAS_USD", "Copper": "XCU_USD", "CORNF": "CORN_USD",
+  "SOYF": "SOYBN_USD", "WHEATF": "WHEAT_USD",
+}
+
+_FXCM_ALIASES = {oanda: jgt for jgt, oanda in _OANDA_ALIASES.items()}
+
+BROKERS = ("fxcm", "oanda")
+
+DEFAULT_BROKER = "fxcm"
+"""Which contract an unqualified lookup means.
+
+Overridden by JGT_BROKER, then BROKER_PROVIDER, so a stack executing on OANDA
+gets OANDA's contracts without every call site having to say so. It stays fxcm
+by default because that is what every existing caller has been getting.
+"""
+
+
+def default_broker() -> str:
+  import os
+  for key in ("JGT_BROKER", "BROKER_PROVIDER"):
+    value = (os.environ.get(key) or "").strip().lower()
+    if value in BROKERS:
+      return value
+  return DEFAULT_BROKER
+
+
+def canonical(instrument: str) -> str:
+  """The instrument's identity, with punctuation and broker naming removed.
+
+  EUR/USD, EUR-USD and EUR_USD are one instrument. So are Copper and XCU_USD.
+  Which of them a caller happens to type says nothing about which broker they
+  trade on, so it must not select one.
+  """
+  name = instrument.strip()
+  if name in _FXCM_ALIASES:      # an OANDA name for something JGT calls else
+    return _FXCM_ALIASES[name]
+  if name in _OANDA_ALIASES:     # already the JGT name
+    return name
+  return name.replace("/", "-").replace("_", "-")
+
+
+def _key_for(instrument: str, broker: str) -> str:
+  """The table key holding `instrument` as `broker` quotes it."""
+  jgt_name = canonical(instrument)
+  if broker == "oanda":
+    return _OANDA_ALIASES.get(jgt_name, jgt_name.replace("-", "_"))
+  return jgt_name
+
+
+def get_iprop(instrument: str, broker: str = None):
+  """Properties for `instrument` on `broker`, whatever punctuation was used.
+
+  A pip size is a property of a contract, so the contract has to be named. When
+  it is not, `default_broker()` names it from the environment.
+  """
   global data
-  i=instrument.replace("/","-")
-  return data[i]
-  
-def get_pips(instrument:str):
-  return get_iprop(instrument)["pips"]	
+  broker = (broker or default_broker()).lower()
+  if broker not in BROKERS:
+    raise ValueError(f"unknown broker {broker!r}, expected one of {BROKERS}")
+
+  key = _key_for(instrument, broker)
+  try:
+    return data[key]
+  except KeyError:
+    raise KeyError(
+      f"{instrument!r} resolves to {key!r}, which {broker} does not carry"
+    ) from None
+
+
+def get_pips(instrument: str, broker: str = None):
+  return get_iprop(instrument, broker)["pips"]
+
+
+def get_brokers_for(instrument: str):
+  """Which brokers carry `instrument`, by any of its names."""
+  return tuple(b for b in BROKERS if _key_for(instrument, b) in data)	
