@@ -77,6 +77,10 @@ def as_iprop(instrument: dict) -> dict:
         # like a measurement, so the key is absent instead.
         "qtmi": float(instrument.get("minimumTradeSize") or 0),
         "qtmx": int(float(instrument.get("maximumOrderUnits") or 0)),
+        # Decimals allowed in an order's unit count. Gold trades to 0.1 of a
+        # unit, an index to 0.01, a currency pair only in whole units — so a
+        # size has to be rounded to the instrument's own step, not a shared one.
+        "qtpre": int(instrument.get("tradeUnitsPrecision") or 0),
         "cc": name.split("_")[-1],
         "i": instrument.get("displayName", name.replace("_", "/")),
         "broker": "oanda",

@@ -154,3 +154,36 @@ class TestPunctuationIsNotABroker:
     def test_an_unknown_broker_is_refused(self):
         with pytest.raises(ValueError, match="unknown broker"):
             iprops.get_pips("EUR-USD", "ig")
+
+
+class TestOrderSizing:
+    """A size has to land on the instrument's own step, not a shared one.
+
+    `1` meaning "one minimum position" only works if both the minimum and the
+    step it moves in come from the broker. Gold trades from 0.1 of a unit in
+    tenths, an index from 0.01 in hundredths, a currency pair from 1 in whole
+    units — one shared lot size cannot express any two of those.
+    """
+
+    @pytest.mark.parametrize("instrument,minimum,precision", [
+        ("EUR_USD", 1.0, 0),
+        ("XAU_USD", 0.1, 1),
+        ("XAG_USD", 1.0, 0),
+        ("SPX500_USD", 0.01, 2),
+        ("DE30_EUR", 0.01, 2),
+    ])
+    def test_the_minimum_and_its_step(self, instrument, minimum, precision):
+        prop = iprops.get_iprop(instrument, "oanda")
+        assert prop["qtmi"] == pytest.approx(minimum)
+        assert prop["qtpre"] == precision
+
+    def test_every_oanda_entry_carries_both(self):
+        for name, prop in iprops.data.items():
+            if prop["broker"] == "oanda":
+                assert "qtmi" in prop and "qtpre" in prop, name
+
+    def test_the_minimum_is_expressible_at_its_own_precision(self):
+        for name, prop in iprops.data.items():
+            if prop["broker"] != "oanda" or not prop["qtmi"]:
+                continue
+            assert round(prop["qtmi"], prop["qtpre"]) == pytest.approx(prop["qtmi"]), name
