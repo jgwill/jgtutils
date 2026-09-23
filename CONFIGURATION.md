@@ -10,7 +10,7 @@ config = readconfig(demo=True, export_env=True)
 settings = load_settings(custom_path="/path/to/settings.json")
 ```
 
-* for more see: https://jgtcore.jgwill.com
+* for more see: https://docs.jgtcore.jgwill.com
 
 
 -----
