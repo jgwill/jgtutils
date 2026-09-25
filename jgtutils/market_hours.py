@@ -5,12 +5,15 @@ Classifies instruments into categories (FOREX, INDEX, COMMODITY, METAL, BOND)
 and provides per-category market open/close/daily-break schedules so that
 schedulers can skip refreshes when instruments are not tradable.
 
-FXCM Trading Hours (all times UTC):
-  Forex:       Sunday 22:00 → Friday 21:55  (no daily break)
-  Indices:     Sunday 23:00 → Friday 21:45  (daily break 22:00-23:00)
-  Commodities: Sunday 23:00 → Friday 21:45  (daily break 22:00-23:00)
-  Metals:      Sunday 23:00 → Friday 21:45  (daily break 22:00-23:00)
-  Bonds:       Sunday 23:00 → Friday 21:45  (daily break 22:00-23:00)
+FXCM Trading Hours, in New York time (the broker's day rolls at 17:00 ET):
+  Forex:       Sunday 17:00 → Friday 16:55  (no daily break)
+  Indices:     Sunday 18:00 → Friday 16:45  (daily break 17:00-18:00)
+  Commodities: Sunday 18:00 → Friday 16:45  (daily break 17:00-18:00)
+  Metals:      Sunday 18:00 → Friday 16:45  (daily break 17:00-18:00)
+  Bonds:       Sunday 18:00 → Friday 16:45  (daily break 17:00-18:00)
+In UTC that is one hour earlier while New York is on daylight time (EDT):
+forex closes Friday 20:55 UTC in summer and 21:55 UTC in winter. Callers
+still pass UTC datetimes, naive or aware, and get UTC back.
 
 Usage:
     from jgtutils.market_hours import is_instrument_market_open, get_instrument_category
@@ -21,7 +24,7 @@ Usage:
     status = get_all_market_status(["EUR/USD", "SPX500", "XAU/USD"])
 """
 
-from datetime import datetime, time, timezone
+from datetime import datetime, time, timedelta, timezone
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
@@ -125,17 +128,53 @@ _INSTRUMENT_CATEGORIES: Dict[str, InstrumentCategory] = {
 #                 daily_break_start, daily_break_end)
 # Days: 0=Monday ... 6=Sunday
 
+def _us_daylight_bounds(year: int) -> Tuple[datetime, datetime]:
+    """UTC instants New York daylight time starts and ends (US rule since 2007).
+
+    Starts the second Sunday of March at 02:00 EST (07:00 UTC), ends the first
+    Sunday of November at 02:00 EDT (06:00 UTC). Computed directly rather than
+    through zoneinfo, which needs a tz database that slim images may lack.
+    """
+    march1 = datetime(year, 3, 1)
+    second_sunday = march1 + timedelta(days=(6 - march1.weekday()) % 7 + 7)
+    nov1 = datetime(year, 11, 1)
+    first_sunday = nov1 + timedelta(days=(6 - nov1.weekday()) % 7)
+    return second_sunday + timedelta(hours=7), first_sunday + timedelta(hours=6)
+
+
+def _as_utc_naive(dt: datetime) -> datetime:
+    if dt.tzinfo is not None:
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt
+
+
+def _utc_to_new_york(utc: datetime) -> datetime:
+    start, end = _us_daylight_bounds(utc.year)
+    return utc + timedelta(hours=-4 if start <= utc < end else -5)
+
+
+def _new_york_to_utc(local: datetime) -> datetime:
+    guess = local + timedelta(hours=5)
+    start, end = _us_daylight_bounds(guess.year)
+    return local + timedelta(hours=4 if start <= guess - timedelta(hours=1) < end else 5)
+
+
+def _like_input(original: datetime, utc: datetime) -> datetime:
+    """Return a UTC result in the same form the caller passed: naive or aware."""
+    return utc.replace(tzinfo=timezone.utc) if original.tzinfo is not None else utc
+
+
 class MarketSchedule:
-    """Trading schedule for an instrument category."""
+    """Trading schedule for an instrument category, in New York time."""
 
     def __init__(
         self,
         week_open_day: int,   # weekday when market opens (6=Sunday)
-        week_open_time: time,  # UTC time of weekly open
+        week_open_time: time,  # New York time of weekly open
         week_close_day: int,  # weekday when market closes (4=Friday)
-        week_close_time: time,  # UTC time of weekly close
-        daily_break_start: Optional[time] = None,  # daily break start (UTC)
-        daily_break_end: Optional[time] = None,     # daily break end (UTC)
+        week_close_time: time,  # New York time of weekly close
+        daily_break_start: Optional[time] = None,  # daily break start (New York)
+        daily_break_end: Optional[time] = None,     # daily break end (New York)
     ):
         self.week_open_day = week_open_day
         self.week_open_time = week_open_time
@@ -145,12 +184,13 @@ class MarketSchedule:
         self.daily_break_end = daily_break_end
 
     def is_open(self, dt: Optional[datetime] = None) -> bool:
-        """Check if market is open at the given UTC datetime."""
+        """Check if market is open at the given UTC datetime (naive or aware)."""
         if dt is None:
             dt = datetime.utcnow()
+        local = _utc_to_new_york(_as_utc_naive(dt))
 
-        day = dt.weekday()  # 0=Mon ... 6=Sun
-        t = dt.time()
+        day = local.weekday()  # 0=Mon ... 6=Sun, in New York
+        t = local.time()
 
         # Saturday: always closed for all FXCM instruments
         if day == 5:
@@ -173,7 +213,7 @@ class MarketSchedule:
         return True
 
     def next_open(self, dt: Optional[datetime] = None) -> datetime:
-        """Calculate next market open time from given UTC datetime."""
+        """Calculate next market open time from given UTC datetime, returned in UTC."""
         if dt is None:
             dt = datetime.utcnow()
 
@@ -181,38 +221,39 @@ class MarketSchedule:
         if self.is_open(dt):
             return dt
 
-        day = dt.weekday()
-        t = dt.time()
+        local = _utc_to_new_york(_as_utc_naive(dt))
+        day = local.weekday()
+        t = local.time()
 
         # If in daily break, next open is break end today
         if self.daily_break_start and self.daily_break_end:
             if self.daily_break_start <= t < self.daily_break_end:
-                return dt.replace(
+                opens = local.replace(
                     hour=self.daily_break_end.hour,
                     minute=self.daily_break_end.minute,
                     second=0, microsecond=0
                 )
+                return _like_input(dt, _new_york_to_utc(opens))
 
         # Otherwise, next open is the weekly open
         days_until_open = (self.week_open_day - day) % 7
         if days_until_open == 0 and t >= self.week_open_time:
             days_until_open = 7
-        from datetime import timedelta
-        next_day = dt + timedelta(days=days_until_open)
-        return next_day.replace(
+        opens = (local + timedelta(days=days_until_open)).replace(
             hour=self.week_open_time.hour,
             minute=self.week_open_time.minute,
             second=0, microsecond=0
         )
+        return _like_input(dt, _new_york_to_utc(opens))
 
 
 # ── Schedule definitions ─────────────────────────────────────────────
 
 FOREX_SCHEDULE = MarketSchedule(
     week_open_day=6,        # Sunday
-    week_open_time=time(22, 0),   # 22:00 UTC (5:00 PM ET)
+    week_open_time=time(17, 0),   # 5:00 PM ET (22:00 UTC winter, 21:00 UTC summer)
     week_close_day=4,       # Friday
-    week_close_time=time(21, 55),  # 21:55 UTC (4:55 PM ET)
+    week_close_time=time(16, 55),  # 4:55 PM ET (21:55 UTC winter, 20:55 UTC summer)
     daily_break_start=None,
     daily_break_end=None,
 )
@@ -220,11 +261,11 @@ FOREX_SCHEDULE = MarketSchedule(
 # Indices, Commodities, Metals, Bonds all share the same FXCM schedule
 CFD_SCHEDULE = MarketSchedule(
     week_open_day=6,        # Sunday
-    week_open_time=time(23, 0),   # 23:00 UTC
+    week_open_time=time(18, 0),   # 6:00 PM ET (23:00 UTC winter)
     week_close_day=4,       # Friday
-    week_close_time=time(21, 45),  # 21:45 UTC
-    daily_break_start=time(22, 0),  # 22:00 UTC
-    daily_break_end=time(23, 0),    # 23:00 UTC
+    week_close_time=time(16, 45),  # 4:45 PM ET (21:45 UTC winter)
+    daily_break_start=time(17, 0),  # 5:00 PM ET (22:00 UTC winter)
+    daily_break_end=time(18, 0),    # 6:00 PM ET (23:00 UTC winter)
 )
 
 _CATEGORY_SCHEDULES: Dict[InstrumentCategory, MarketSchedule] = {

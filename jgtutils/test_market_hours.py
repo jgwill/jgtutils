@@ -123,7 +123,7 @@ class TestCFDSchedule(unittest.TestCase):
         self.assertFalse(is_instrument_market_open("SPX500", dt))
 
     def test_sunday_before_open_closed(self):
-        dt = datetime(2026, 3, 8, 22, 0)  # Sunday 22:00
+        dt = datetime(2026, 3, 1, 22, 0)  # Sunday 22:00, winter (New York on EST)
         self.assertFalse(is_instrument_market_open("SPX500", dt))
 
     def test_sunday_at_open(self):
@@ -165,8 +165,8 @@ class TestFilterOpenInstruments(unittest.TestCase):
 
     def test_sunday_evening_forex_only(self):
         instruments = ["EUR/USD", "SPX500", "XAU/USD"]
-        dt = datetime(2026, 3, 8, 22, 30)  # Sunday 22:30
-        # Forex opens 22:00, CFDs open 23:00
+        dt = datetime(2026, 3, 1, 22, 30)  # Sunday 22:30, winter
+        # Forex opens 22:00 UTC, CFDs 23:00 UTC while New York is on EST
         result = filter_open_instruments(instruments, dt)
         self.assertEqual(result, ["EUR/USD"])
 
@@ -188,6 +188,56 @@ class TestMarketStatus(unittest.TestCase):
         status = get_all_market_status(instruments, dt)
         self.assertFalse(status["instruments"]["EUR/USD"]["is_open"])
         self.assertIsNotNone(status["instruments"]["EUR/USD"]["next_open"])
+
+
+class TestNewYorkDaylightTime(unittest.TestCase):
+    """FXCM's week follows New York time: one hour earlier in UTC under EDT.
+
+    2026-09-18 is a Friday and 2026-09-20 a Sunday, both on EDT (UTC-4).
+    Until 1.0.31 the schedule was fixed in UTC, so forex counted as open for
+    55 minutes after the summer Friday close, when FXCM sends placeholder
+    candles (jgwill/jgtsrc#159).
+    """
+
+    def test_summer_friday_forex_closes_at_20_55_utc(self):
+        self.assertTrue(is_instrument_market_open("EUR/USD", datetime(2026, 9, 18, 20, 54)))
+        self.assertFalse(is_instrument_market_open("EUR/USD", datetime(2026, 9, 18, 20, 55)))
+        self.assertFalse(is_instrument_market_open("EUR/USD", datetime(2026, 9, 18, 21, 30)))
+
+    def test_summer_sunday_forex_opens_at_21_00_utc(self):
+        self.assertFalse(is_instrument_market_open("EUR/USD", datetime(2026, 9, 20, 20, 59)))
+        self.assertTrue(is_instrument_market_open("EUR/USD", datetime(2026, 9, 20, 21, 0)))
+
+    def test_summer_cfd_break_is_21_to_22_utc(self):
+        self.assertTrue(is_instrument_market_open("SPX500", datetime(2026, 9, 15, 20, 59)))
+        self.assertFalse(is_instrument_market_open("SPX500", datetime(2026, 9, 15, 21, 30)))
+        self.assertTrue(is_instrument_market_open("SPX500", datetime(2026, 9, 15, 22, 0)))
+
+    def test_dst_start_sunday_cfd_opens_at_22_00_utc(self):
+        # 2026-03-08: New York moved to EDT at 02:00 local, so CFDs open 18:00 EDT
+        self.assertFalse(is_instrument_market_open("SPX500", datetime(2026, 3, 8, 21, 59)))
+        self.assertTrue(is_instrument_market_open("SPX500", datetime(2026, 3, 8, 22, 0)))
+
+    def test_winter_friday_close_is_unchanged(self):
+        self.assertTrue(is_instrument_market_open("EUR/USD", datetime(2026, 12, 4, 21, 54)))
+        self.assertFalse(is_instrument_market_open("EUR/USD", datetime(2026, 12, 4, 21, 55)))
+
+    def test_next_open_is_returned_in_utc(self):
+        from jgtutils.market_hours import get_schedule
+        self.assertEqual(get_schedule("EUR/USD").next_open(datetime(2026, 9, 19, 12, 0)),
+                         datetime(2026, 9, 20, 21, 0))
+        self.assertEqual(get_schedule("SPX500").next_open(datetime(2026, 9, 15, 21, 30)),
+                         datetime(2026, 9, 15, 22, 0))
+        self.assertEqual(get_schedule("EUR/USD").next_open(datetime(2026, 12, 5, 12, 0)),
+                         datetime(2026, 12, 6, 22, 0))
+
+    def test_aware_datetimes_are_accepted(self):
+        from datetime import timezone
+        from jgtutils.market_hours import get_schedule
+        aware = datetime(2026, 9, 18, 20, 55, tzinfo=timezone.utc)
+        self.assertFalse(is_instrument_market_open("EUR/USD", aware))
+        self.assertEqual(get_schedule("EUR/USD").next_open(aware),
+                         datetime(2026, 9, 20, 21, 0, tzinfo=timezone.utc))
 
 
 if __name__ == "__main__":
